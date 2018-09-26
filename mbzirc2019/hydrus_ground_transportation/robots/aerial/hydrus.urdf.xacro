@@ -6,6 +6,6 @@
   <xacro:include filename="$(find hydrus)/robots/quad/euclid201806.urdf.xacro" />
 
   <!-- additional modules -->
-  <xacro:include filename="$(find aerial_robot_practice)/robots/aerial/additional_modules.urdf.xacro" />
+  <xacro:include filename="$(find hydrus_ground_transportation)/robots/aerial/additional_modules.urdf.xacro" />
 
 </robot>

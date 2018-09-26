@@ -16,5 +16,5 @@
     <arg name="manager" value="hsi_filter_manager"/>
   </include>
 
-  <rosparam command="load" file="$(find aerial_robot_practice)/config/hsi_color_filter_for_sim.yaml"/>
+  <rosparam command="load" file="$(find hydrus_ground_transportation)/config/hsi_color_filter_for_sim.yaml"/>
 </launch>

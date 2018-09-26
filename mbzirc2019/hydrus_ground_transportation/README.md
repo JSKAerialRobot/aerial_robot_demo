@@ -1,6 +1,6 @@
 # aerial mode on simulation
 
-$ roslaunch aerial_robot_practice bringup.launch
+$ roslaunch hydrus_ground_transportation bringup.launch
 
 $ rostopic pub -1 /task_start std_msgs/Empty "{}"
 
@@ -10,7 +10,7 @@ You cannot do this because [you cannot build aerial_robot_perception](https://gi
 
 # ground mode on simulation
 
-$ roslaunch aerial_robot_practice bringup.launch ground:=True
+$ roslaunch hydrus_ground_transportation bringup.launch ground:=True
 
 $ rostopic pub -1 /task_start std_msgs/Empty "{}"
 
@@ -19,7 +19,7 @@ If the hydrus cannot recognize a red object, it can be that the parameter of hsi
 # ground mode on real machine
 --- on hydrus(euclid) side ---
 
-$ roslaunch aerial_robot_practice bringup.launch simulation:=False real_machine:=True headless:=True ground:=True estimate_mode:=1
+$ roslaunch hydrus_ground_transportation bringup.launch simulation:=False real_machine:=True headless:=True ground:=True estimate_mode:=1
 
 $ rosservice call /attitude~~
 

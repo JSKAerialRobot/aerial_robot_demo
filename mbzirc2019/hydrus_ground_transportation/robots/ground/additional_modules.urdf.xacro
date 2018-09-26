@@ -6,7 +6,7 @@
 
   <!-- downward camera -->
   <xacro:extra_module name = "downward_camera" parent = "link3" visible = "1"
-                      model_url = "package://aerial_robot_practice/urdf/mesh/modules/sensor/camera_200_note_type_holder.dae">
+                      model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/sensor/camera_200_note_type_holder.dae">
     <origin xyz="0.09 0.0 -0.02175" rpy="0 ${pi/2} 0 "/>
     <inertial>
       <mass value = "0.036" />
@@ -40,7 +40,7 @@
       <visual>
         <origin rpy="${-pi/2} 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://aerial_robot_practice/urdf/mesh/modules/mechanical/roller_BCBE10.dae"/>
+          <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/roller_BCBE10.dae"/>
         </geometry>
       </visual>
 

@@ -6,5 +6,5 @@
     <arg name="publish_tf" value="true"/>
   </include>
 
-  <rosparam command="load" file="$(find aerial_robot_practice)/config/hsi_color_filter_for_real.yaml"/>
+  <rosparam command="load" file="$(find hydrus_ground_transportation)/config/hsi_color_filter_for_real.yaml"/>
 </launch>
