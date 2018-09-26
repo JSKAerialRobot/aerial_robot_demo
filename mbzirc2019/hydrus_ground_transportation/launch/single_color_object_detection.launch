@@ -1,0 +1,20 @@
+<launch>
+  <include file="$(find aerial_robot_perception)/launch/create_points.launch">
+    <arg name="register_image" value="false"/>
+    <arg name="rgb_image" value="/camera/deprecated/image_raw"/>
+    <arg name="depth_image" value="/camera/depth/image_raw"/>
+    <arg name="rgb_camera_info" value="/camera/deprecated/camera_info"/>
+    <arg name="output" value="/camera/depth_registered/points"/>
+    <arg name="create_manager" value="true"/>
+    <arg name="manager" value="hsi_filter_manager"/>
+  </include>
+
+  <include file="$(find aerial_robot_perception)/launch/hsi_color_filter_pcl.launch">
+    <arg name="input" value="/camera/depth_registered/points"/>
+    <arg name="publish_tf" value="true"/>
+    <arg name="create_manager" value="false"/>
+    <arg name="manager" value="hsi_filter_manager"/>
+  </include>
+
+  <rosparam command="load" file="$(find hydrus_ground_transportation)/config/hsi_color_filter_for_sim.yaml"/>
+</launch>

@@ -1,0 +1,10 @@
+<launch>
+  <include file="$(find aerial_robot_perception)/launch/hsi_color_filter_pcl.launch">
+    <arg name="input" default="/camera/depth_registered/points_color/throttle"/>
+    <arg name="create_manager" default="true"/>
+    <arg name="manager" default="hsi_filter_manager"/>
+    <arg name="publish_tf" value="true"/>
+  </include>
+
+  <rosparam command="load" file="$(find hydrus_ground_transportation)/config/hsi_color_filter_for_real.yaml"/>
+</launch>

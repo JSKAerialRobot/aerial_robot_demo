@@ -1,0 +1,13 @@
+hsi_color_filter:
+        h_limit_max: 12
+        h_limit_min: -70
+        s_limit_max: 197
+        s_limit_min: 125
+        i_limit_max: 255
+        i_limit_min: 0
+
+euclidean_clustering:
+        tolerance: 0.02
+        label_tracking_tolerance: 0.18
+        max_size: 25000
+        min_size: 150

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <xacro:include filename="$(find hydrus)/urdf/common.xacro" />
+
+  <!-- downward camera -->
+  <xacro:extra_module name = "downward_camera" parent = "link3" visible = "1"
+                      model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/sensor/camera_200_note_type_holder.dae">
+    <origin xyz="0.09 0.0 -0.02175" rpy="0 ${pi/2} 0 "/>
+    <inertial>
+      <mass value = "0.036" />
+      <origin xyz="${-2.89*0.001} ${-3.72*0.001} ${-0.5 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00001" ixy="0.0" ixz="0.0"
+          iyy="0.00001" iyz="0.0"
+          izz="0.00002"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- rollers -->
+  <!-- special macro function -->
+  <xacro:macro name="roller" params="id parent *origin">
+    <joint name="${parent}2roller${id}" type="fixed">
+      <parent link="${parent}"/>
+      <child link="roller${id}"/>
+      <xacro:insert_block name="origin" />
+    </joint>
+    <link name="roller${id}">
+
+      <inertial>
+        <mass value = "0.01875" />
+        <origin xyz="0 ${4.85*0.001} 0" rpy="0 0 0"/>
+        <inertia
+            ixx="0.00001" ixy="0.0" ixz="0.0"
+            iyy="0.00001" iyz="0.0"
+            izz="0.00002"/>
+      </inertial>
+
+      <visual>
+        <origin rpy="${-pi/2} 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/roller_BCBE10.dae"/>
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 -0.01024"/>
+        <geometry>
+          <sphere radius="${4.76*0.001}"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="roller${id}">
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+    </gazebo>
+
+  </xacro:macro>
+
+  <xacro:roller id= "1" parent = "link1" >
+    <origin xyz="${52.5 * 0.001} 0 ${-218 * 0.001}" rpy="0 0 0"/>
+  </xacro:roller>
+  <xacro:roller id= "2" parent = "link1" >
+  <origin xyz="${538 * 0.001} 0 ${-164 * 0.001}" rpy="0 0 0"/>
+  </xacro:roller>
+  <xacro:roller id= "3" parent = "link3" >
+    <origin xyz="${50 * 0.001} 0 ${-91.5 * 0.001}" rpy="0 0 0"/>
+  </xacro:roller>
+  <xacro:roller id= "4" parent = "link4" >
+    <origin xyz="${50 * 0.001} 0 ${-164 * 0.001}" rpy="0 0 0"/>
+  </xacro:roller>
+  <xacro:roller id= "5" parent = "link4" >
+    <origin xyz="${535.5 * 0.001} 0 ${-218 * 0.001}" rpy="0 0 0"/>
+  </xacro:roller>
+
+</robot>
