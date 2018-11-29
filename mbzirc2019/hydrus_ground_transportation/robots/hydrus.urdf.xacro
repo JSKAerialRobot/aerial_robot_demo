@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base kinematics model -->
+  <xacro:include filename="$(find hydrus)/urdf/common.xacro" />
+  <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
+
+  <xacro:hydrusx_link self="1" child="2" rotor_direction="-1" />
+  <xacro:hydrusx_link self="2" child="3" rotor_direction="1"  with_leg= "0" />
+  <xacro:hydrusx_link self="3" child="4" rotor_direction="-1" with_leg= "0" />
+  <xacro:hydrusx_link self="4" child="4" rotor_direction="1" />
+
+  <!-- oboard sensors and processors -->
+  <xacro:include filename="$(find hydrus)/robots/onboards/tx2_zed_201810/onboards.urdf.xacro" />
+  <xacro:onboards link = "2" />
+
+  <!-- additional legs -->
+
+  <!-- actuated leg in head link -->
+  <xacro:extra_module name = "actuated_leg1_stationary_part" parent = "link1" visible = "1"
+                      model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
+    <origin xyz="${link_length/2 + 0.2355} 0.0 0" rpy="0 0 ${pi}"/>
+    <inertial>
+      <mass value = "0.142" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0001" ixy="0.0" ixz="0.0"
+          iyy="0.0001" iyz="0.0"
+          izz="0.0001"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <joint name="actuated_leg1_joint" type="prismatic">
+    <limit effort="50" lower="0" upper="0.0927" velocity="1"/>
+    <parent link="actuated_leg1_stationary_part"/>
+    <child link="actuated_leg1_movable_part"/>
+    <origin rpy="0 0 ${pi}" xyz="-0.0115 0 -0.0115"/>
+    <axis xyz="0 0 -1"/>
+    <dynamics damping="0.1" friction="0.01"/>
+  </joint>
+
+  <link name="actuated_leg1_movable_part">
+    <inertial>
+      <origin xyz="-0.002860 0.000000 -0.089840" rpy="0 0 0"/>
+      <mass value="0.107000"/>
+      <inertia
+          ixx="0.002466" iyy="0.003026" izz="0.000699"
+          ixy="0.000150" ixz="0.001147" iyz="0.000280"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0025 0 -0.128"/>
+      <geometry>
+        <sphere radius="${55 / 2 * 0.001}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- small omniwheel in third link -->
+  <joint name="link3_to_leg2" type="fixed">
+    <parent link="link3"/>
+    <child link="leg2"/>
+    <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="leg2">
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <mass value="0.072000"/>
+      <inertia
+          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+        <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
+        <geometry>
+          <sphere radius="${55 / 2 * 0.001}"/>
+        </geometry>
+    </collision>
+  </link>
+
+  <!-- actuated leg in end link -->
+  <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link4" visible = "1"
+                      model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
+    <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
+    <inertial>
+      <mass value = "0.142" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0001" ixy="0.0" ixz="0.0"
+          iyy="0.0001" iyz="0.0"
+          izz="0.0001"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <joint name="actuated_leg2_joint" type="prismatic">
+    <limit effort="50" lower="0" upper="0.0927" velocity="1"/>
+    <parent link="actuated_leg2_stationary_part"/>
+    <child link="actuated_leg2_movable_part"/>
+    <origin rpy="0 0 ${pi}" xyz="-0.0115 0 -0.0115"/>
+    <axis xyz="0 0 -1"/>
+    <dynamics damping="0.1" friction="0.01"/>
+  </joint>
+
+  <link name="actuated_leg2_movable_part">
+    <inertial>
+      <origin xyz="-0.002860 0.000000 -0.089840" rpy="0 0 0"/>
+      <mass value="0.107000"/>
+      <inertia
+          ixx="0.002466" iyy="0.003026" izz="0.000699"
+          ixy="0.000150" ixz="0.001147" iyz="0.000280"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0025 0 -0.128"/>
+      <geometry>
+        <sphere radius="${55 / 2 * 0.001}"/>
+      </geometry>
+    </collision>
+  </link>
+
+    <transmission name="actuated_leg1_joint_tran">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="actuated_leg1_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="actuated_leg1_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="actuated_leg2_joint_tran">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="actuated_leg2_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="actuated_leg2_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+</robot>
