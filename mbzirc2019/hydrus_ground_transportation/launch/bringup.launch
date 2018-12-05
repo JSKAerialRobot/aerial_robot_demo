@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
   ###########  launch config  ###########
-  <arg name="real_machine" default="False" />
-  <arg name="simulation" default="True" />
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
   <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
-  <arg name="headless" default="False" />
+  <arg name="headless" default="True" />
 
   ##########  basic bringup file ########
   <include file="$(find hydrus)/launch/bringup.launch" >
