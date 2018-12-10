@@ -9,7 +9,7 @@
   <xacro:hydrusx_link self="1" child="2" rotor_direction="-1" with_battery = "0" />
   <xacro:hydrusx_link self="2" child="3" rotor_direction="1"  with_leg= "0" with_battery = "0" />
   <xacro:hydrusx_link self="3" child="4" rotor_direction="-1" with_leg= "0" with_battery = "0" />
-  <xacro:hydrusx_link self="4" child="4" rotor_direction="1" with_battery = "0"/>
+  <xacro:hydrusx_link self="4" child="4" rotor_direction="1"  with_leg= "0" with_battery = "0"/>
 
   <!-- oboard sensors and processors -->
   <xacro:include filename="$(find hydrus)/robots/onboards/tx2_zed_201810/onboards.urdf.xacro" />
@@ -93,7 +93,7 @@
     </collision>
   </link>
 
-  <!-- actuated leg in end link -->
+  <!-- actuated leg in end links: one actuated leg and one standrad leg -->
   <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link4" visible = "1"
                       model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
     <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
@@ -137,6 +137,10 @@
       </geometry>
     </collision>
   </link>
+
+  <xacro:standard_leg parent = "link4" self= "3" >
+    <origin xyz="${end_leg_offset} 0.0 0" rpy="0 0 0"/>
+  </xacro:standard_leg>
 
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
