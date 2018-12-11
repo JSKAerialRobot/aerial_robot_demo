@@ -17,10 +17,10 @@
 
   <!-- additional legs -->
 
-  <!-- actuated leg in head link -->
-  <xacro:extra_module name = "actuated_leg1_stationary_part" parent = "link1" visible = "1"
+  <!-- actuated leg in the second link -->
+  <xacro:extra_module name = "actuated_leg1_stationary_part" parent = "link2" visible = "1"
                       model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
-    <origin xyz="${link_length/2 + 0.2355} 0.0 0" rpy="0 0 ${pi}"/>
+    <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
     <inertial>
       <mass value = "0.142" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -62,7 +62,7 @@
     </collision>
   </link>
 
-  <!-- small omniwheel in third link -->
+  <!-- small omniwheel in the third link -->
   <joint name="link3_to_leg2" type="fixed">
     <parent link="link3"/>
     <child link="leg2"/>
@@ -93,10 +93,10 @@
     </collision>
   </link>
 
-  <!-- actuated leg in end links: one actuated leg and one standrad leg -->
-  <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link4" visible = "1"
+  <!-- actuated leg in the thrid links: one actuated leg and one standrad leg -->
+  <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link3" visible = "1"
                       model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
-    <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
+    <origin xyz="${link_length/2 + 0.2355} 0.0 0" rpy="0 0 ${pi}"/>
     <inertial>
       <mass value = "0.142" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
