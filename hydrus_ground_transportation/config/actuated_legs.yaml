@@ -2,7 +2,7 @@ hydrusx:
   servo_controller:
     legs:
       ctrl_pub_topic: /extra_servo_cmd
-      # torque_pub_topic:  not implemented yet
+      torque_pub_topic: /extra_servo_torque_enable
 
       # for simulation
       simulation:
