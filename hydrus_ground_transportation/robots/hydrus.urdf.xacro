@@ -6,9 +6,9 @@
   <xacro:include filename="$(find hydrus)/urdf/common.xacro" />
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
 
-  <xacro:hydrusx_link self="1" child="2" rotor_direction="-1" with_battery = "0" />
+  <xacro:hydrusx_link self="1" child="2" rotor_direction="-1" with_leg= "0" with_battery = "0" />
   <xacro:hydrusx_link self="2" child="3" rotor_direction="1"  with_leg= "0" with_battery = "0" />
-  <xacro:hydrusx_link self="3" child="4" rotor_direction="-1" with_leg= "0" with_battery = "0" />
+  <xacro:hydrusx_link self="3" child="4" rotor_direction="-1" with_leg= "1" with_battery = "0" />
   <xacro:hydrusx_link self="4" child="4" rotor_direction="1"  with_leg= "0" with_battery = "0"/>
 
   <!-- oboard sensors and processors -->
@@ -62,37 +62,6 @@
     </collision>
   </link>
 
-  <!-- small omniwheel in the third link -->
-  <joint name="link3_to_leg2" type="fixed">
-    <parent link="link3"/>
-    <child link="leg2"/>
-    <origin xyz="${general_leg_offset} 0.0 0" rpy="0 0 0"/>
-    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
-    <axis xyz="0 0 0"/>
-  </joint>
-
-  <link name="leg2">
-    <inertial>
-      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
-      <mass value="0.072000"/>
-      <inertia
-          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
-          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
-      <geometry>
-        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-        <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
-        <geometry>
-          <sphere radius="${55 / 2 * 0.001}"/>
-        </geometry>
-    </collision>
-  </link>
-
   <!-- actuated leg in the thrid links: one actuated leg and one standrad leg -->
   <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link3" visible = "1"
                       model_url = "package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
@@ -138,9 +107,67 @@
     </collision>
   </link>
 
-  <xacro:standard_leg parent = "link4" self= "3" >
+  <!-- small omniwheel in the first link -->
+  <joint name="link1_to_leg1" type="fixed">
+    <parent link="link1"/>
+    <child link="leg1"/>
+    <origin xyz="${head_leg_offset} 0.0 0" rpy="0 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="leg1">
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <mass value="0.072000"/>
+      <inertia
+          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+        <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
+        <geometry>
+          <sphere radius="${55 / 2 * 0.001}"/>
+        </geometry>
+    </collision>
+  </link>
+
+  <!-- small omniwheel in the forth link -->
+  <joint name="link4_to_leg2" type="fixed">
+    <parent link="link4"/>
+    <child link="leg2"/>
     <origin xyz="${end_leg_offset} 0.0 0" rpy="0 0 0"/>
-  </xacro:standard_leg>
+    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="leg2">
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <mass value="0.072000"/>
+      <inertia
+          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://hydrus_ground_transportation/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
+      <geometry>
+        <sphere radius="${55 / 2 * 0.001}"/>
+      </geometry>
+    </collision>
+  </link>
 
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
