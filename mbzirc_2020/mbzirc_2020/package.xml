@@ -1,0 +1,25 @@
+<package>
+  <name>mbzirc_2020</name>
+  <version>1.0.1</version>
+  <description>
+      Software of JSK lab in mbzirc challenge 2020.
+  </description>
+
+  <maintainer email="bakui@jsk.imi.i.u-tokyo.ac.jp">Moju Zhao</maintainer>
+  <maintainer email="shifan@jsk.imi.i.u-tokyo.ac.jp">Fan Shi</maintainer>
+  <maintainer email="anzai@jsk.imi.i.u-tokyo.ac.jp">Tomoki Anzai</maintainer>
+  <maintainer email="k-ito@jsk.imi.i.u-tokyo.ac.jp">Keita Ito</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!--   jsk_mbzirc_common-->
+  <run_depend>mbzirc_common</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
