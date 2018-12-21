@@ -3,7 +3,8 @@
   <arg name="debug" default="false"/>
   <arg name="gui" default="true"  />
   <arg name="headless" default="false"/>
-  <arg name="use_ground_truth" default="false" />
+  <arg name="use_ground_truth" default="true" />
+  <arg name="uav_name" default="UAV" />
 
 
   <include file="$(find mbzirc_common)/launch/mbzirc_arena.launch" >
@@ -13,19 +14,28 @@
     <arg name="headless" default="$(arg headless)"/>
   </include>
 
-  <arg name="x" value="0"/>
-  <arg name="y" value="0"/>
+  <arg name="x" value="2"/>
+  <arg name="y" value="2"/>
   <arg name="z" value="0.3"/>
 
   <!-- Spawn simulated quadrotor uav -->
-  <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
-    <arg name="name" value="uav"/>
-    <arg name="model" value="$(find mbzirc_common)/urdf/hawk.urdf.xacro"/>
-    <arg name="use_ground_truth_for_tf" value="$(arg use_ground_truth)" />
-    <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
-    <arg name="x" value="$(arg x)"/>
-    <arg name="y" value="$(arg y)"/>
-    <arg name="z" value="$(arg z)"/>
-  </include>
+  <group ns="$(arg uav_name)">
+    <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
+      <arg name="name" value="$(arg uav_name)"/>
+      <arg name="model" value="$(find mbzirc_common)/urdf/hawk.urdf.xacro"/>
+      <!-- <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor.gazebo.xacro"/> -->
+      <arg name="use_ground_truth_for_tf" value="$(arg use_ground_truth)" />
+      <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
+      <arg name="tf_prefix" value="$(arg uav_name)" />
+      <arg name="world_frame" value="/world" />
+      <arg name="x" value="$(arg x)"/>
+      <arg name="y" value="$(arg y)"/>
+      <arg name="z" value="$(arg z)"/>
+    </include>
+    <node pkg="mbzirc_common" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
+          launch-prefix="xterm -e">
+    </node>
+  </group>
+
 
 </launch>
