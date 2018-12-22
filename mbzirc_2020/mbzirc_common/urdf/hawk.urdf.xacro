@@ -69,5 +69,32 @@
     </plugin>
   </gazebo>
 
+  <!-- Ball attachment -->
+  <joint name="attach_link_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="attach_link_frame"/>
+      <origin xyz="0 0 -0.06" rpy="0 0 0" />
+  </joint>
+
+  <link name="attach_link_frame">
+    <inertial>
+      <mass value="0.00001" /> <!-- Todo: add accurate mass of attach_link -->
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="2.632e-4" ixy="0" ixz="0" iyy="2.632e-4" iyz="0" izz="1.62e-4" /> <!-- Todo: add accurate inertia of attach_link -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.03" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.012" length="0.06"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.03" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.012" length="0.06"/>
+      </geometry>
+    </collision>
+  </link>
+
 </robot>
 
