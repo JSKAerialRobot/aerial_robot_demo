@@ -1,5 +1,5 @@
 <launch>
-  <arg name="world_name" default="$(find mbzirc_common)/gazebo_model/world/empty.world"/>
+  <arg name="world_name" default="$(find mbzirc_common)/gazebo_model/world/mbzirc_arena.world"/>
   <arg name="gui" default="true" doc="set false for headless environment " />
   <arg name="paused" default="false"/>
   <arg name="debug" default="false"/>

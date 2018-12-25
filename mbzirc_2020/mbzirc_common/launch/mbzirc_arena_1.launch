@@ -8,6 +8,7 @@
 
 
   <include file="$(find mbzirc_common)/launch/mbzirc_arena.launch" >
+    <arg name="world_name" default="$(find mbzirc_common)/gazebo_model/world/mbzirc_arena_task_1.world"/>
     <arg name="paused" default="$(arg paused)"/>
     <arg name="debug" default="$(arg debug)"/>
     <arg name="gui" default="$(arg gui)"  />

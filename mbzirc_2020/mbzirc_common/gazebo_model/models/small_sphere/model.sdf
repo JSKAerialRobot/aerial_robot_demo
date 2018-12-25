@@ -7,25 +7,25 @@
         <mass>0.1</mass>
         <inertia>
           <!-- http://answers.gazebosim.org/question/4372/the-inertia-matrix-explained/ -->
-          <ixx>0.0004</ixx>    <!-- for a box: ixx = 0.4 * mass * r * r -->
+          <ixx>0.000225</ixx>    <!-- for a box: ixx = 0.4 * mass * r * r -->
           <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
           <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-          <iyy>0.0004</iyy>    <!-- for a box: iyy = 0.4 * mass * r * r -->
+          <iyy>0.000225</iyy>    <!-- for a box: iyy = 0.4 * mass * r * r -->
           <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-          <izz>0.0004</izz>    <!-- for a box: izz = 0.4 * mass * r * r -->
+          <izz>0.000225</izz>    <!-- for a box: izz = 0.4 * mass * r * r -->
         </inertia>
       </inertial>
       <collision name="collision">
         <geometry>
           <sphere>
-            <radius>0.1</radius>
+            <radius>0.04</radius>
           </sphere>
         </geometry>
       </collision>
       <visual name="visual">
         <geometry>
           <sphere>
-            <radius>0.1</radius>
+            <radius>0.075</radius>
           </sphere>
         </geometry>
         <material>
