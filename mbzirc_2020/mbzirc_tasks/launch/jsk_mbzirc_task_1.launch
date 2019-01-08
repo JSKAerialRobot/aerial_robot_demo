@@ -27,6 +27,7 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="type" value="quad" />
     <arg name="headless" value="true" />
+    <arg name="launch_gazebo" value="false" />
   </include>
 
   <group unless="$(arg headless)" >
