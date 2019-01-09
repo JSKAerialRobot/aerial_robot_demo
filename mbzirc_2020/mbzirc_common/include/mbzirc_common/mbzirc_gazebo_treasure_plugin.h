@@ -96,6 +96,9 @@ private:
   bool terminated_;
   bool static_object_;
 
+  std::string guard_name_;
+  std::string pirate_name_;
+
   //renew the data of the gazebo objects
   void gazeboCallback(const gazebo_msgs::ModelStates gazebo_model_states)
   {
@@ -106,7 +109,7 @@ private:
         this->magnet_on_ = on;
   }
 
-  void updateTreasureState(int owner_id, double offset_z);
+  void updateTreasureState(int owner_id, std::string robot_name);
 };
 
 }  // namespace gazebo

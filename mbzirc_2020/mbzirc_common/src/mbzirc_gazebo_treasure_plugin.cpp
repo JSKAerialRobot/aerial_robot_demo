@@ -83,6 +83,15 @@ namespace gazebo
         return;
       }
 
+    if (_sdf->HasElement("guardName") && _sdf->GetElement("guardName")->GetValue())
+      guard_name_ = _sdf->GetElement("guardName")->Get<std::string>();
+    else
+      guard_name_ = "hawk";
+
+    if (_sdf->HasElement("pirateName") && _sdf->GetElement("pirateName")->GetValue())
+      pirate_name_ = _sdf->GetElement("pirateName")->Get<std::string>();
+    else
+      pirate_name_ = "hydrusx";
 
     // Make sure the ROS node for Gazebo has already been initialized
     if (!ros::isInitialized())
@@ -120,8 +129,8 @@ namespace gazebo
         for(int i = 0; i < this->gazebo_models_.name.size(); i++)
           {
             int pirate_id, guard_id;
-            pirate_id = gazebo_models_.name.at(i).find("hydrusx");
-            guard_id = gazebo_models_.name.at(i).find("hawk");
+            pirate_id = gazebo_models_.name.at(i).find(pirate_name_);
+            guard_id = gazebo_models_.name.at(i).find(guard_name_);
             if (treasure_state_ == TREASURE_CRUISE){
               if (pirate_id >= 0){
                 // judge whether treasure is grubbed
@@ -131,13 +140,13 @@ namespace gazebo
                    fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
                    fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
                   treasure_state_ = TREASURE_CAPTURED;
-                  updateTreasureState(i, -0.03);
+                  updateTreasureState(i, pirate_name_);
                   break;
                 }
               }
               else if (guard_id >= 0){
                 // reset object positon
-                updateTreasureState(i, -0.27);
+                updateTreasureState(i, guard_name_);
                 break;
               }
               else
@@ -146,7 +155,7 @@ namespace gazebo
             else if (treasure_state_ == TREASURE_CAPTURED){
               if (pirate_id >= 0){
                 // reset object positon
-                updateTreasureState(i, -0.03);
+                updateTreasureState(i, pirate_name_);
               }
               else
                 continue;
@@ -172,8 +181,13 @@ namespace gazebo
     state_stamp_ = ros::Time();
   }
 
-  void GazeboTreasure::updateTreasureState(int owner_id, double offset_z){
+  void GazeboTreasure::updateTreasureState(int owner_id, std::string robot_name){
     geometry_msgs::Pose pose = gazebo_models_.pose.at(owner_id);
+    double offset_z = 0.0;
+    if (robot_name == std::string("hawk"))
+      offset_z = -0.27;
+    else if (robot_name == std::string("hydrusx"))
+      offset_z = -0.03;
     pose.position.z += offset_z;
     model_->SetWorldPose(math::Pose(math::Vector3(pose.position.x,
                                                   pose.position.y,
