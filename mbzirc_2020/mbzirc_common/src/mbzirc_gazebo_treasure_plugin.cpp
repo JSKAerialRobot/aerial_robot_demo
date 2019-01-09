@@ -126,11 +126,12 @@ namespace gazebo
               if (pirate_id >= 0){
                 // judge whether treasure is grubbed
                 geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(i);
-                if(fabs(pose_pirate.position.x - pose_object.pos.x)<0.2&&
-                   fabs(pose_pirate.position.y - pose_object.pos.y)<0.2&&
-                   fabs(pose_pirate.position.z - pose_object.pos.z)<0.2){
+                double grub_thre = 0.3;
+                if(fabs(pose_pirate.position.x - pose_object.pos.x)<grub_thre&&
+                   fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
+                   fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
                   treasure_state_ = TREASURE_CAPTURED;
-                  updateTreasureState(i, -0.27);
+                  updateTreasureState(i, -0.03);
                   break;
                 }
               }
@@ -145,7 +146,7 @@ namespace gazebo
             else if (treasure_state_ == TREASURE_CAPTURED){
               if (pirate_id >= 0){
                 // reset object positon
-                updateTreasureState(i, -0.17);
+                updateTreasureState(i, -0.03);
               }
               else
                 continue;
