@@ -55,6 +55,7 @@ namespace gazebo
     link_ = _model->GetLink();
     link_name_ = link_->GetName();
     namespace_.clear();
+    model_->SetGravityMode(false);
 
     static_object_ = false;
     last_time_ = world_->GetSimTime();
@@ -173,10 +174,10 @@ namespace gazebo
   void GazeboTreasure::updateTreasureState(int owner_id, double offset_z){
     geometry_msgs::Pose pose = gazebo_models_.pose.at(owner_id);
     pose.position.z += offset_z;
-    model_->SetLinkWorldPose(math::Pose(pose.position.x,
-                                        pose.position.y,
-                                        pose.position.z,
-                                        0, 0, 0), link_);
+    model_->SetWorldPose(math::Pose(math::Vector3(pose.position.x,
+                                                  pose.position.y,
+                                                  pose.position.z),
+                                    math::Quaternion(0, 0, 0, 1)));
   }
 
   // Register this plugin with the simulator
