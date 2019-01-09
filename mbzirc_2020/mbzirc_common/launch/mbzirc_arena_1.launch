@@ -4,7 +4,7 @@
   <arg name="gui" default="true"  />
   <arg name="headless" default="false"/>
   <arg name="use_ground_truth" default="true" />
-  <arg name="uav_name" default="UAV" />
+  <arg name="uav_name" default="hawk" />
 
 
   <include file="$(find mbzirc_common)/launch/mbzirc_arena.launch" >
