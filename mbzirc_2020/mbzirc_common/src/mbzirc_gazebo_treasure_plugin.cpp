@@ -126,46 +126,36 @@ namespace gazebo
     else
       {
         math::Pose pose_object = link_->GetWorldPose();  //the pose of the object
-        for(int i = 0; i < this->gazebo_models_.name.size(); i++)
-          {
-            int pirate_id, guard_id;
-            pirate_id = gazebo_models_.name.at(i).find(pirate_name_);
-            guard_id = gazebo_models_.name.at(i).find(guard_name_);
-            if (treasure_state_ == TREASURE_CRUISE){
-              if (pirate_id >= 0){
-                // judge whether treasure is grubbed
-                geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(i);
-                double grub_thre = 0.3;
-                if(fabs(pose_pirate.position.x - pose_object.pos.x)<grub_thre&&
-                   fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
-                   fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
-                  treasure_state_ = TREASURE_CAPTURED;
-                  updateTreasureState(i, pirate_name_);
-                  break;
-                }
-              }
-              else if (guard_id >= 0){
-                // reset object positon
-                updateTreasureState(i, guard_name_);
-                break;
-              }
-              else
-                continue;
-            }
-            else if (treasure_state_ == TREASURE_CAPTURED){
-              if (pirate_id >= 0){
-                // reset object positon
-                updateTreasureState(i, pirate_name_);
-              }
-              else
-                continue;
-            }
-            else
-              continue;
+        int pirate_id = -1, guard_id = -1;
+        for(int i = 0; i < this->gazebo_models_.name.size(); i++){
+          if (gazebo_models_.name.at(i) == pirate_name_)
+            pirate_id = i;
+          else if (gazebo_models_.name.at(i) == guard_name_)
+            guard_id = i;
+        }
+        if (treasure_state_ == TREASURE_CRUISE){
+          if (guard_id >= 0){
+            // reset object positon
+            updateTreasureState(guard_id, guard_name_);
           }
-
-        last_time_ = world_->GetSimTime();
-
+          if (pirate_id >= 0){
+            // judge whether treasure is grubbed
+            geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(pirate_id);
+            double grub_thre = 0.3;
+            if(fabs(pose_pirate.position.x - pose_object.pos.x)<grub_thre&&
+               fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
+               fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
+              treasure_state_ = TREASURE_CAPTURED;
+              updateTreasureState(pirate_id, pirate_name_);
+            }
+          }
+        }
+        else if (treasure_state_ == TREASURE_CAPTURED){
+          if (pirate_id >= 0){
+            // reset object positon
+            updateTreasureState(pirate_id, pirate_name_);
+          }
+        }
       }
 
     if( static_object_ )
