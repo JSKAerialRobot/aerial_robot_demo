@@ -12,12 +12,19 @@ $ roslaunch mbzirc_common mbzirc_arena_1.launch
 $ roslaunch mbzirc_tasks jsk_mbzirc_task_1.launch
 ```
 
-- run mbzirc task1 in gazebo:
+- enable hector motors in gazebo:
+```
+$ rosservice call /hawk/enable_motors "enable: true"
+```
+
+## task 1 cheat mode
+
+- run simulation of task1:
 ```
 $ roslaunch mbzirc_tasks jsk_mbzirc_task_1.launch
 ```
 
-- enable hector motors in gazebo:
+- run cheat mode of task1:
 ```
-$ rosservice call /hawk/enable_motors "enable: true"
+$ rosrun mbzirc_tasks task_1_cheat.py
 ```
