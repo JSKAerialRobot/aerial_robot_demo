@@ -44,6 +44,7 @@
       <plugin name="mbzirc_gazebo_treasure_plugin_sphere_1" filename="libmbzirc_gazebo_treasure_plugin.so">
         <guardName>hawk</guardName>
         <pirateName>hydrusx</pirateName>
+        <markerTopicName>/long_box/marker</markerTopicName>
       </plugin>
     </model>
 
