@@ -45,6 +45,7 @@
 #include <gazebo_msgs/ModelStates.h>
 #include <gazebo_msgs/ModelState.h>
 #include <std_msgs/Bool.h>
+#include <visualization_msgs/Marker.h>
 
 #include <stdio.h>
 #include <ros/callback_queue.h>
@@ -84,9 +85,12 @@ private:
 
   event::ConnectionPtr update_connection_;
 
-  //treasure plugin for attaching the object to uav
+  // treasure plugin for attaching the object to uav
   ros::Subscriber gazebo_model_sub_; //get the model states
   ros::Subscriber magnet_release_sub_; //release the object(disable attach)
+
+  // treasure marker for visualization
+  ros::Publisher treasure_marker_pub_;
 
   gazebo_msgs::ModelStates gazebo_models_; //model states...
   int treasure_state_;

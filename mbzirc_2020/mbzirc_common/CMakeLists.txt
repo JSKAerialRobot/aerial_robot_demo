@@ -7,7 +7,7 @@ add_definitions(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS gazebo_ros roscpp std_msgs geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS gazebo_ros roscpp std_msgs geometry_msgs visualization_msgs)
 
 # Depend on system install of Gazebo and SDFormat
 find_package(gazebo REQUIRED)

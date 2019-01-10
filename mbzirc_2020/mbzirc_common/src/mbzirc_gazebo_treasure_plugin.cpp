@@ -93,6 +93,12 @@ namespace gazebo
     else
       pirate_name_ = "hydrusx";
 
+    std::string treasure_marker_topic_name;
+    if (_sdf->HasElement("markerTopicName") && _sdf->GetElement("markerTopicName")->GetValue())
+      treasure_marker_topic_name = _sdf->GetElement("markerTopicName")->Get<std::string>();
+    else
+      treasure_marker_topic_name = "/treasure/marker";
+
     // Make sure the ROS node for Gazebo has already been initialized
     if (!ros::isInitialized())
       {
@@ -105,9 +111,12 @@ namespace gazebo
     pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true);  // set latch true
     ros::NodeHandle param_handle(*node_handle_, "controller");
 
-    //subscribe to the gazebo models
+    // subscribe to the gazebo models
     gazebo_model_sub_ = node_handle_->subscribe("/gazebo/model_states",3,&GazeboTreasure::gazeboCallback,this);
     magnet_release_sub_ = node_handle_->subscribe("/mag_on",3,&GazeboTreasure::magnetCallback,this);
+
+    // publisher
+    treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
 
     update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                                 boost::bind(&GazeboTreasure::Update, this));
@@ -172,17 +181,36 @@ namespace gazebo
   }
 
   void GazeboTreasure::updateTreasureState(int owner_id, std::string robot_name){
-    geometry_msgs::Pose pose = gazebo_models_.pose.at(owner_id);
+    geometry_msgs::Pose treausre_pose = gazebo_models_.pose.at(owner_id);
     double offset_z = 0.0;
     if (robot_name == std::string("hawk"))
       offset_z = -0.27;
     else if (robot_name == std::string("hydrusx"))
       offset_z = -0.03;
-    pose.position.z += offset_z;
-    model_->SetWorldPose(math::Pose(math::Vector3(pose.position.x,
-                                                  pose.position.y,
-                                                  pose.position.z),
+    treausre_pose.position.z += offset_z;
+    model_->SetWorldPose(math::Pose(math::Vector3(treausre_pose.position.x,
+                                                  treausre_pose.position.y,
+                                                  treausre_pose.position.z),
                                     math::Quaternion(0, 0, 0, 1)));
+
+    // publish the treasure marker in the rviz
+    visualization_msgs::Marker treasure_marker;
+    treasure_marker.ns = "treasure_marker";
+    treasure_marker.id = 0;
+    treasure_marker.type = visualization_msgs::Marker::SPHERE;
+    treasure_marker.action = visualization_msgs::Marker::ADD;
+    double ball_radius = 0.075 * 2;
+    treasure_marker.scale.x = ball_radius;
+    treasure_marker.scale.y = ball_radius;
+    treasure_marker.scale.z = ball_radius;
+    treasure_marker.color.a = 1.0; // Don't forget to set the alpha!
+    treasure_marker.color.r = 1.0;
+    treasure_marker.color.g = 0.0;
+    treasure_marker.color.b = 0.0;
+    treasure_marker.header.frame_id = "world";
+    treasure_marker.header.stamp = ros::Time::now();
+    treasure_marker.pose = treausre_pose;
+    treasure_marker_pub_.publish(treasure_marker);
   }
 
   // Register this plugin with the simulator

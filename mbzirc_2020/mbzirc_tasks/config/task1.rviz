@@ -114,16 +114,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        bat3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        bat4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         fc:
           Alpha: 1
           Show Axes: false
@@ -259,6 +249,14 @@ Visualization Manager:
         {}
       Update Interval: 0
       Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /treasure/marker
+      Name: Marker
+      Namespaces:
+        treasure_marker: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
