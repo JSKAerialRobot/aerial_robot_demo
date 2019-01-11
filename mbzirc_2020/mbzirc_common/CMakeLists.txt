@@ -25,12 +25,6 @@ catkin_package(
 # build plugins
 include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
-add_library(mbzirc_gazebo_panel_plugin src/mbzirc_gazebo_panel_plugin.cpp)
-target_link_libraries(mbzirc_gazebo_panel_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
-add_library(mbzirc_gazebo_uav_collision_rule_plugin src/mbzirc_gazebo_uav_collision_rule_plugin.cpp)
-target_link_libraries(mbzirc_gazebo_uav_collision_rule_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
 add_library(mbzirc_gazebo_treasure_plugin src/mbzirc_gazebo_treasure_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -42,8 +36,7 @@ target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
 ## Install ##
 #############
 install(TARGETS
-  mbzirc_gazebo_panel_plugin
-  mbzirc_gazebo_uav_collision_rule_plugin
+  mbzirc_gazebo_treasure_plugin
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   )
