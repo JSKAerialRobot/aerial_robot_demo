@@ -68,7 +68,7 @@ if __name__ == '__main__':
     hawk_pose_cmd_msg.header.frame_id = "world"
     hawk_pose_cmd_msg.pose.position.x = 2.0
     hawk_pose_cmd_msg.pose.position.y = 2.0
-    hawk_pose_cmd_msg.pose.position.z = 1.5
+    hawk_pose_cmd_msg.pose.position.z = 2.5
     hawk_pose_cmd_pub.publish(hawk_pose_cmd_msg)
     rospy.loginfo("guard robot flys to fixed position")
     rospy.sleep(5)
@@ -85,11 +85,11 @@ if __name__ == '__main__':
     hydrus_cmd_msg.psi_nav_mode = hydrus_cmd_msg.POS_MODE
     hydrus_cmd_msg.target_pos_x = 2.0
     hydrus_cmd_msg.target_pos_y = 2.0 - 0.6 * 0.707
-    hydrus_cmd_msg.target_pos_z = 1.1
+    hydrus_cmd_msg.target_pos_z = 2.05
     hydrus_cmd_msg.target_psi = -0.7850
     hydrusx_nav_cmd_pub.publish(hydrus_cmd_msg)
     rospy.loginfo("pirate robot flys to grub treasure")
-    rospy.sleep(7)
+    rospy.sleep(10)
 
     ## hydrus fly back to the safe position
     hydrus_cmd_msg.target_pos_x = 0.0
