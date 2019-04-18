@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <name>mbzirc2020_task1_common</name>
+  <version>1.0.1</version>
+  <description>The mbzirc2020_task1_common package</description>
+
+  <maintainer email="shifan@jsk.imi.i.u-tokyo.ac.jp">Fan Shi</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+=  <build_depend>geometry_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/gazebo_model/models" />
+  </export>
+
+</package>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>mbzirc2020_task1_tasks</name>
+  <version>1.0.1</version>
+  <description>The mbzirc2020_task1_tasks package</description>
+
+  <maintainer email="shifan@jsk.imi.i.u-tokyo.ac.jp">Fan Shi</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+</package>

@@ -1,0 +1,24 @@
+<package>
+  <name>mbzirc2020_task1</name>
+  <version>1.0.1</version>
+  <description>
+      Software of JSK lab in mbzirc challenge 2020 task 1.
+  </description>
+
+  <maintainer email="shifan@jsk.imi.i.u-tokyo.ac.jp">Fan Shi</maintainer>
+  <maintainer email="bakui@jsk.imi.i.u-tokyo.ac.jp">Moju Zhao</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!--   jsk_mbzirc_common-->
+  <run_depend>mbzirc2020_task1_common</run_depend>
+  <run_depend>mbzirc2020_task1_tasks</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
