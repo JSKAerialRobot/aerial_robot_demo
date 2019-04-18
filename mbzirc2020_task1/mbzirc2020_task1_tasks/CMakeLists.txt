@@ -47,6 +47,7 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
   )
 
 catkin_package(
@@ -56,11 +57,20 @@ catkin_package(
   DEPENDS EIGEN3
   )
 
+add_library(motion_single_primitive src/MotionSinglePrimitive.cpp)
+target_link_libraries(motion_single_primitive ${catkin_LIBRARIES})
+
 add_library(linear_kalman_filter src/LinearKalmanFilter.cpp)
 target_link_libraries(linear_kalman_filter ${catkin_LIBRARIES})
 
 add_library(trajectory_predictor src/TrajectoryPredictor.cpp)
 target_link_libraries(trajectory_predictor ${catkin_LIBRARIES} linear_kalman_filter)
 
-add_executable(tracking_trajectory_estimator_node src/trajectory_predictor_node.cpp)
-target_link_libraries(tracking_trajectory_estimator_node trajectory_predictor ${catkin_LIBRARIES})
+add_library(trajectory_tracker src/TrajectoryTracker.cpp)
+target_link_libraries(trajectory_tracker ${catkin_LIBRARIES} trajectory_predictor motion_single_primitive)
+
+add_executable(trajectory_predictor_node src/trajectory_predictor_node.cpp)
+target_link_libraries(trajectory_predictor_node trajectory_predictor ${catkin_LIBRARIES})
+
+add_executable(trajectory_tracker_node src/trajectory_tracker_node.cpp)
+target_link_libraries(trajectory_tracker_node trajectory_tracker ${catkin_LIBRARIES})
