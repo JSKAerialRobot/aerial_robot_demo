@@ -1,3 +1,3 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package mbzirc_2020
+Changelog for package mbzirc2020_task1
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

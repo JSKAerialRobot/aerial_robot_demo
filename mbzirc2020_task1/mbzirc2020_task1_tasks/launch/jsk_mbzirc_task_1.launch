@@ -10,7 +10,7 @@
   <arg name="estimate_mode" default="2" />
   <arg name="uav_name" default="hawk" />
 
-  <include file="$(find mbzirc_common)/launch/mbzirc_arena_1.launch" >
+  <include file="$(find mbzirc2020_task1_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
     <arg name="debug" default="$(arg debug)"/>
     <arg name="gui" value="$(arg gui)" />
@@ -20,18 +20,18 @@
   </include>
 
   <!-- Spawn simulated HYDRUS uav -->
-  <include file="$(find hydrus)/launch/bringup.launch" >
-    <arg name="real_machine" value="$(arg real_machine)" />
-    <arg name="simulation" value="$(arg simulation)" />
-    <arg name="control_mode" value="$(arg control_mode)" />
-    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
-    <arg name="type" value="quad" />
-    <arg name="headless" value="true" />
-    <arg name="launch_gazebo" value="false" />
-  </include>
+  <!-- <include file="$(find hydrus)/launch/bringup.launch" > -->
+  <!--   <arg name="real_machine" value="$(arg real_machine)" /> -->
+  <!--   <arg name="simulation" value="$(arg simulation)" /> -->
+  <!--   <arg name="control_mode" value="$(arg control_mode)" /> -->
+  <!--   <arg name="estimate_mode"  value= "$(arg estimate_mode)" /> -->
+  <!--   <arg name="type" value="quad" /> -->
+  <!--   <arg name="headless" value="true" /> -->
+  <!--   <arg name="launch_gazebo" value="false" /> -->
+  <!-- </include> -->
 
   <group unless="$(arg headless)" >
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc_tasks)/config/task1.rviz"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task1_tasks)/config/task1.rviz"/>
   </group>
 
 

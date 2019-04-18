@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mbzirc_common/mbzirc_gazebo_treasure_plugin.h>
+#include <mbzirc2020_task1_common/mbzirc_gazebo_treasure_plugin.h>
 #include <string>
 
 namespace gazebo

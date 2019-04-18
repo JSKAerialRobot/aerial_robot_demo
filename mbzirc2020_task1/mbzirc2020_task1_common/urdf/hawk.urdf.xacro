@@ -19,7 +19,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://mbzirc_common/urdf/meshes/hawk.stl" scale=".0254 .0254 .0254"/> <!-- mm has bug, right now use inch from ST8 -->
+        <mesh filename="package://mbzirc2020_task1_common/urdf/meshes/hawk.stl" scale=".0254 .0254 .0254"/> <!-- mm has bug, right now use inch from ST8 -->
         <cylinder radius=".295" length=".23"/>
       </geometry>
       <material name="color">
@@ -30,7 +30,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://mbzirc_common/urdf/meshes/hawk.stl" scale=".0254 .0254 .0254"/> <!-- mm has bug, right now use inch from ST8 -->
+        <mesh filename="package://mbzirc2020_task1_common/urdf/meshes/hawk.stl" scale=".0254 .0254 .0254"/> <!-- mm has bug, right now use inch from ST8 -->
       </geometry>
     </collision>
   </link>
