@@ -43,7 +43,7 @@ namespace trajectory_predictor{
     u_dim_ = 3; // a_x, a_y, a_z
     z_dim_ = 6; // p_x, v_x, p_y, v_y, p_z, v_z
     filter_freq_ = 100.0; // same with odom update frequency
-    prediect_period_ = 2.0; // predict period of future state
+    nhp_.param("prediect_period", prediect_period_, 2.0); // predict period of future state
     lkf_ = new LinearKalmanFilter(nh_, nhp_, state_dim_, u_dim_, z_dim_);
     x_post_ = Eigen::VectorXd::Zero(state_dim_);
     cur_z_ = Eigen::VectorXd::Zero(z_dim_);
