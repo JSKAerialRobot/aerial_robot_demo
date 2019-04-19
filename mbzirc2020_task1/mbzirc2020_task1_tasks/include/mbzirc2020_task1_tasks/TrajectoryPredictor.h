@@ -97,6 +97,7 @@ namespace trajectory_predictor{
     int map_mode_;
     double map_radius_;
     double map_cross_ang_;
+    double object_default_height_;
     double object_default_vel_value_;
     double object_default_acc_value_;
     std::vector<mapPriorInfo> map_prior_info_vec_;

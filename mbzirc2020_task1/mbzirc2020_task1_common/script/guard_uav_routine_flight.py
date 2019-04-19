@@ -17,15 +17,18 @@ COUNTER_CLOCK = -1
 class hawkCircleMotionCommand:
     def init(self):
         rospy.init_node('hawk_circle_motion_command', anonymous=True)
+        rospy.loginfo("Hawk program wait for 10 seconds to be activated");
+        rospy.sleep(5.0)
+        rospy.loginfo("Hawk program is activated.")
 
         self.__hawk_pose_command_pub = rospy.Publisher('/hawk/command/pose', PoseStamped, queue_size=1)
         self.__hawk_vel_command_pub = rospy.Publisher('/hawk/command/twist', TwistStamped, queue_size=1)
         self.__time_cnt = 0.0
         self.__timer_gap = 0.01
-        self.__radius = 16.0
-        self.__fixed_height = 2.5
-        self.__linear_vel = 5.0
-        self.__route_cross_ang = math.pi / 4.0 ## cross angle of two straight line: self.__route_cross_ang * 2.0
+        self.__radius = rospy.get_param('~radius', 16.0)
+        self.__fixed_height = rospy.get_param('~object_height', 2.5)
+        self.__linear_vel = rospy.get_param('~linear_velocity', 5.0)
+        self.__route_cross_ang = rospy.get_param('~cross_angle', math.pi / 4.0) ## cross angle of two straight line: self.__route_cross_ang * 2.0
         self.__ang_vel = self.__linear_vel / self.__radius
 
         self.__left_down_corner = [-self.__radius / math.tan(self.__route_cross_ang) * math.cos(self.__route_cross_ang),

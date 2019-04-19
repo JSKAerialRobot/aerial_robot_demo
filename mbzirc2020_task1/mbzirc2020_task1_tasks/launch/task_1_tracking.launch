@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
+    <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+  </node>
+
+</launch>

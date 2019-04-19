@@ -54,9 +54,10 @@ namespace trajectory_predictor{
     if (map_mode_ == MAP_REGION_INFO)
       updateMapInfo();
 
-    nhp_.param("map_radius", map_radius_, 16.0);
-    nhp_.param("map_cross_ang", map_cross_ang_, PI / 4.0);
-    nhp_.param("object_default_vel_value", object_default_vel_value_, 5.0);
+    nhp_.param("radius", map_radius_, 16.0);
+    nhp_.param("cross_angle", map_cross_ang_, PI / 4.0);
+    nhp_.param("object_height", object_default_height_, 2.5);
+    nhp_.param("linear_velocity", object_default_vel_value_, 5.0);
     object_default_acc_value_ = pow(object_default_vel_value_, 2.0) / map_radius_;
     updateMapInfo();
 
