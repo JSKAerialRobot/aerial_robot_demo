@@ -39,6 +39,9 @@
     <node pkg="mbzirc2020_task1_common" type="guard_uav_routine_flight.py" name="guard_uav_routine_flight" output="screen" respawn="false">
       <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
     </node>
+    <node pkg="mbzirc2020_task1_common" type="visualize_uav_default_route.py" name="visualize_uav_default_route" output="screen" respawn="false">
+      <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+    </node>
   </group>
 
 

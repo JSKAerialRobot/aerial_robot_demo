@@ -17,7 +17,7 @@ COUNTER_CLOCK = -1
 class hawkCircleMotionCommand:
     def init(self):
         rospy.init_node('hawk_circle_motion_command', anonymous=True)
-        rospy.loginfo("Hawk program wait for 10 seconds to be activated");
+        rospy.loginfo("Hawk program wait for 5 seconds to be activated");
         rospy.sleep(5.0)
         rospy.loginfo("Hawk program is activated.")
 
