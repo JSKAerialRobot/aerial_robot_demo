@@ -97,13 +97,13 @@ class hawkCircleMotionCommand:
         hawk_pose_cmd_msg.pose.position.z = cur_pose[2]
         self.__hawk_pose_command_pub.publish(hawk_pose_cmd_msg)
 
-        hawk_vel_cmd_msg = TwistStamped()
-        hawk_vel_cmd_msg.header.stamp = rospy.Time.now()
-        hawk_vel_cmd_msg.header.frame_id = "world"
-        hawk_vel_cmd_msg.twist.linear.x = cur_vel[0]
-        hawk_vel_cmd_msg.twist.linear.y = cur_vel[1]
-        hawk_vel_cmd_msg.twist.linear.z = cur_vel[2]
-        self.__hawk_vel_command_pub.publish(hawk_vel_cmd_msg)
+        # hawk_vel_cmd_msg = TwistStamped()
+        # hawk_vel_cmd_msg.header.stamp = rospy.Time.now()
+        # hawk_vel_cmd_msg.header.frame_id = "/world"
+        # hawk_vel_cmd_msg.twist.linear.x = cur_vel[0]
+        # hawk_vel_cmd_msg.twist.linear.y = cur_vel[1]
+        # hawk_vel_cmd_msg.twist.linear.z = cur_vel[2]
+        # self.__hawk_vel_command_pub.publish(hawk_vel_cmd_msg)
 
     def __circleMotion(self, circle_center, rotation, start_ang):
         time = self.__time_cnt - self.__time_checkpoint[self.__route_id]
