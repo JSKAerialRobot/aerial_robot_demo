@@ -3,7 +3,8 @@
   <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
     <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
     <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
-    <param name="prediect_period" value="4.0" />
+    <param name="replan_timer_period" value="2.0" />
+    <param name="predict_horizon" value="4.0" />
   </node>
 
 </launch>

@@ -40,11 +40,18 @@ namespace trajectory_tracker{
     nhp_ = nhp;
 
     nhp_.param("replan_timer_period", replan_timer_period_, 0.1);
+    nhp_.param("predict_horizon", kf_predict_horizon_, 4.0);
+
+    replan_cnt_ = 0;
 
     primitive_ = new MotionSinglePrimitive();
 
-    pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/tracking_path", 1);
-    pub_tracking_target_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/tracking_target", 1);
+    pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/planned_path", 1);
+    pub_tracking_target_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/track/vis/target_marker", 1);
+    pub_tracking_primitive_params_ = nh_.advertise<mbzirc2020_task1_tasks::PrimitiveParams>("/track/primitive_params", 1);
+
+    sub_host_robot_odom_ = nh_.subscribe<nav_msgs::Odometry>("/uav/cog/odom", 1, &TrajectoryTracker::hostRobotOdomCallback, this);
+    sub_host_robot_imu_ = nh_.subscribe<sensor_msgs::Imu>("/ros_imu", 1, &TrajectoryTracker::hostRobotImuCallback, this);
 
     predictor_thread_ = boost::thread(boost::bind(&TrajectoryTracker::predictorThread, this));
     replan_timer_ = nh_.createTimer(ros::Duration(replan_timer_period_), &TrajectoryTracker::replanCallback, this);
@@ -61,26 +68,71 @@ namespace trajectory_tracker{
     // boost::lock_guard<boost::mutex> lock(mutex_);
     if (!object_trajectory_predictor_->checkPredictedResultsAvaiable())
       return;
-    double period = 1.0;
+
     Eigen::VectorXd cur_state = object_trajectory_predictor_->getPredictedState(0.0); // p_x, v_x, p_y, v_y
     Eigen::VectorXd cur_u = object_trajectory_predictor_->getPredictedControlInput(0.0); // a_x, a_y
+
+    double period = 1.0;
+    double dist_xy = sqrt(pow(cur_state(0) - host_robot_odom_.pose.pose.position.x, 2) +
+                          pow(cur_state(2) - host_robot_odom_.pose.pose.position.y, 2));
+    double max_chase_delta_speed = 1.0;
+    if (period < dist_xy / max_chase_delta_speed){
+      period = dist_xy / max_chase_delta_speed;
+      if (period > kf_predict_horizon_)
+        period = kf_predict_horizon_;
+    }
+    // test
+    period = 2.2;
+    
+
     Eigen::VectorXd end_state = object_trajectory_predictor_->getPredictedState(period);
     Eigen::VectorXd end_u = object_trajectory_predictor_->getPredictedControlInput(period);
     Eigen::VectorXd cur_state_full(3 * 3);
     Eigen::VectorXd end_state_full(3 * 3);
-    cur_state_full << cur_state(0), cur_state(1), cur_u(0), // x axis
-      cur_state(2), cur_state(3), cur_u(1), // y axis
-      cur_state(4), cur_state(5), cur_u(2); // z axis
-    // todo
-    cur_state_full(6) -= 2.0; // add offset in z axis
+    // cur_state_full << cur_state(0), cur_state(1), cur_u(0), // x axis
+    //   cur_state(2), cur_state(3), cur_u(1), // y axis
+    //   cur_state(4), cur_state(5), cur_u(2); // z axis
+    // // todo
+    // cur_state_full(6) -= 2.0; // add offset in z axis
+    cur_state_full << host_robot_odom_.pose.pose.position.x, host_robot_odom_.twist.twist.linear.x, host_robot_acc_world_(0), // x axis
+      host_robot_odom_.pose.pose.position.y, host_robot_odom_.twist.twist.linear.y, host_robot_acc_world_(1), // y axis
+      host_robot_odom_.pose.pose.position.z, host_robot_odom_.twist.twist.linear.z, host_robot_acc_world_(2); // z axis
+
     end_state_full << end_state(0), end_state(1), end_u(0),
       end_state(2), end_state(3), end_u(1),
       end_state(4), end_state(5), end_u(2);
+    end_state_full(6) -= 2.0; // add offset in z axis // todo
     convertToMPState(x_start_, cur_state_full);
     convertToMPState(x_end_, end_state_full);
 
     primitive_->init(period, x_start_, x_end_);
+    publishPrimitiveParam();
     visualizationPrimitive();
+  }
+
+  void TrajectoryTracker::publishPrimitiveParam(){
+    mbzirc2020_task1_tasks::PrimitiveParams param_msg;
+    std::vector<Eigen::VectorXd> primtive_param_vec = primitive_->getPrimitiveParams();
+    int primitive_order = primitive_->getPolynomialOrder();
+    int primitive_dim = primitive_->getStateDim();
+    if (primitive_dim != 3){
+      ROS_ERROR("primitive dimension is not 3, the x, y, z params could not be pulished.");
+      return;
+    }
+    param_msg.order = primitive_order;
+    param_msg.header.frame_id = "/world";
+    param_msg.header.stamp = ros::Time::now(); // todo: real trajectory start time
+    param_msg.period = primitive_->getPeriod();
+    param_msg.x_params.resize(primitive_order);
+    for (int i = 0; i < primitive_order; ++i)
+      param_msg.x_params[i] = primtive_param_vec[0](i);
+    param_msg.y_params.resize(primitive_order);
+    for (int i = 0; i < primitive_order; ++i)
+      param_msg.y_params[i] = primtive_param_vec[1](i);
+    param_msg.z_params.resize(primitive_order);
+    for (int i = 0; i < primitive_order; ++i)
+      param_msg.z_params[i] = primtive_param_vec[2](i);
+    pub_tracking_primitive_params_.publish(param_msg);
   }
 
   void TrajectoryTracker::visualizationPrimitive(){
@@ -135,5 +187,21 @@ namespace trajectory_tracker{
     for (int i = 0; i < n_axis; ++i)
       for (int j = 0; j < 3; ++j) // pos, vel, acc
         x.state[i](j) = state(i * 3 + j);
+  }
+
+  void TrajectoryTracker::hostRobotOdomCallback(const nav_msgs::OdometryConstPtr& msg){
+    host_robot_odom_ = *msg;
+  }
+
+  void TrajectoryTracker::hostRobotImuCallback(const sensor_msgs::ImuConstPtr& msg){
+    host_robot_imu_ = *msg;
+    Eigen::Quaterniond q(host_robot_imu_.orientation.w,
+                         host_robot_imu_.orientation.x,
+                         host_robot_imu_.orientation.y,
+                         host_robot_imu_.orientation.z);
+    Eigen::Vector3d acc_b(host_robot_imu_.linear_acceleration.x,
+                          host_robot_imu_.linear_acceleration.y,
+                          host_robot_imu_.linear_acceleration.z);
+    host_robot_acc_world_ = q * acc_b;
   }
 }

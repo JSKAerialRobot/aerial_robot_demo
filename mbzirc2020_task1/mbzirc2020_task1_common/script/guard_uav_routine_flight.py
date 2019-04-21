@@ -58,8 +58,8 @@ class hawkCircleMotionCommand:
         rospy.sleep(1.0)
 
         self.__hawk_init_pose()
-        rospy.loginfo("Hawk fly to the inital position, wait for 10 seconds.")
-        rospy.sleep(10.0)
+        rospy.loginfo("Hawk fly to the inital position, wait for 30 seconds.")
+        rospy.sleep(30.0)
         rospy.loginfo("Hawk starts routine flight.")
 
         rospy.Timer(rospy.Duration(self.__timer_gap), self.__timerCallback)

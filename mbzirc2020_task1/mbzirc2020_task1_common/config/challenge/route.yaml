@@ -2,5 +2,5 @@
 
 radius: 16.0
 cross_angle: 0.78539816339 ## angle between straight route and x axis, the angle between two straight routes should x2
-linear_velocity: 2.0
+linear_velocity: 5.0
 object_height: 4.0

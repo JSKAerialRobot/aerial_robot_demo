@@ -61,12 +61,15 @@ namespace motion_single_primitive{
     double getPrimitiveEnergy(int derivative_order = SNAP);
     MPState getWaypointState(double relative_time);
     double getPeriod(){return period_;}
+    int getStateDim(){return state_dim_;}
+    int getPolynomialOrder(){return polynomial_order_;}
+    std::vector<Eigen::VectorXd> getPrimitiveParams(){return traj_poly_param_vec_;}
 
   private:
     /* basic */
     int polynomial_order_;
     int state_dim_;
-    int period_;
+    double period_;
     MPState x_start_;
     MPState x_end_;
     std::vector<Eigen::VectorXd> traj_poly_param_vec_;

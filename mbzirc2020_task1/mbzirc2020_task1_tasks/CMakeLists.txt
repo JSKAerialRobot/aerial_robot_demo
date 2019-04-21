@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   nav_msgs
+  sensor_msgs
   message_generation
   message_runtime
   )
@@ -36,6 +37,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 find_package(Boost REQUIRED COMPONENTS thread)
 
+add_message_files(
+  FILES
+  PrimitiveParams.msg
+  )
+generate_messages(DEPENDENCIES std_msgs)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -53,7 +60,7 @@ include_directories(include
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES linear_kalman_filter trajectory_predictor
-  CATKIN_DEPENDS roscpp rospy
+  CATKIN_DEPENDS roscpp rospy std_msgs
   DEPENDS EIGEN3
   )
 

@@ -42,6 +42,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <sensor_msgs/Imu.h>
 
 /* linear algebra */
 #include <math.h>
@@ -63,6 +64,7 @@
 /* local */
 #include <mbzirc2020_task1_tasks/TrajectoryPredictor.h>
 #include <mbzirc2020_task1_tasks/MotionSinglePrimitive.h>
+#include <mbzirc2020_task1_tasks/PrimitiveParams.h>
 using namespace trajectory_predictor;
 using namespace motion_single_primitive;
 
@@ -80,19 +82,32 @@ namespace trajectory_tracker{
     double replan_timer_period_;
     MotionSinglePrimitive *primitive_;
 
+    double kf_predict_horizon_;
     boost::thread predictor_thread_;
     boost::mutex mutex_;
     TrajectoryPredictor *object_trajectory_predictor_;
     MPState x_start_;
     MPState x_end_;
 
+    // host robot
+    nav_msgs::Odometry host_robot_odom_;
+    sensor_msgs::Imu host_robot_imu_;
+    Eigen::Vector3d host_robot_acc_world_;
+
     ros::Publisher pub_tracking_trajectory_;
     ros::Publisher pub_tracking_target_markers_;
+    ros::Publisher pub_tracking_primitive_params_;
+
+    ros::Subscriber sub_host_robot_odom_;
+    ros::Subscriber sub_host_robot_imu_;
 
     void predictorThread();
     void replanCallback(const ros::TimerEvent& event);
     void convertToMPState(MPState &x, Eigen::VectorXd state);
+    void publishPrimitiveParam();
     void visualizationPrimitive();
+    void hostRobotOdomCallback(const nav_msgs::OdometryConstPtr& msg);
+    void hostRobotImuCallback(const sensor_msgs::ImuConstPtr& msg);
   };
 }
 

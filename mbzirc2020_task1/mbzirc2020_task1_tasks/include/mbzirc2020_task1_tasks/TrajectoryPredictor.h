@@ -84,7 +84,7 @@ namespace trajectory_predictor{
     int u_dim_;
     int z_dim_; // observation
     double filter_freq_;
-    double prediect_period_;
+    double predict_horizon_;
 
     bool filter_init_flag_;
     Eigen::VectorXd x_post_;
