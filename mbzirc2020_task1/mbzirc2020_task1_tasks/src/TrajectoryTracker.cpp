@@ -201,5 +201,6 @@ namespace trajectory_tracker{
                           host_robot_imu_.linear_acceleration.y,
                           host_robot_imu_.linear_acceleration.z);
     host_robot_acc_world_ = q * acc_b;
+    host_robot_acc_world_(2) -= 9.8;
   }
 }
