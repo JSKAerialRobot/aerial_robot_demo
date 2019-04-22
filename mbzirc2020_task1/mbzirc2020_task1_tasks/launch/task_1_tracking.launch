@@ -1,10 +1,20 @@
 <launch>
+  <arg name="fake_vision" default="true" />
 
   <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
     <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
     <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
     <param name="replan_timer_period" value="2.0" />
     <param name="predict_horizon" value="4.0" />
+  </node>
+
+  <group if="$(arg fake_vision)">
+    <node pkg="mbzirc2020_task1_tasks" type="fake_visual_detector.py" name="fake_visual_detector" output="screen" respawn="false">
+      <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+    </node>
+  </group>
+
+  <node pkg="mbzirc2020_task1_tasks" type="hydrus_tracking_controller.py" name="hydrus_tracking_controller" output="screen" respawn="false">
   </node>
 
 </launch>

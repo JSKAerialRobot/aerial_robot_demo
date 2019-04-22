@@ -17,6 +17,8 @@ class fakeVisualDetector:
         rospy.init_node('fake_visual_detector', anonymous=True)
         rospy.sleep(5.0)
 
+        self.__uav_object_offset_z = rospy.get_param('~uav_object_offset_z', 0.27)
+
         self.__object_find_dist_rate_thre = 2.0
 
         self.__visual_tracking_state = NOT_START
@@ -55,6 +57,7 @@ class fakeVisualDetector:
 
         if self.__visual_tracking_state == FOUND:
             ## todo: add case for state change: FOUND -> NOT_FOUND
+            self.__object_gt_odom.pose.pose.position.z -= self.__uav_object_offset_z
             self.__detected_object_odom_pub.publish(self.__object_gt_odom)
 
     def __hydrusOdomCallback(self, msg):
