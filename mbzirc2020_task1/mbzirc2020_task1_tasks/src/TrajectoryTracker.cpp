@@ -43,6 +43,7 @@ namespace trajectory_tracker{
     nhp_.param("predict_horizon", kf_predict_horizon_, 4.0);
 
     primitive_ = new MotionSinglePrimitive();
+    replan_prev_time_ = 0.0;
 
     pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/planned_path", 1);
     pub_tracking_target_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/track/vis/target_marker", 1);
@@ -52,7 +53,7 @@ namespace trajectory_tracker{
     sub_host_robot_imu_ = nh_.subscribe<sensor_msgs::Imu>("/ros_imu", 1, &TrajectoryTracker::hostRobotImuCallback, this);
 
     predictor_thread_ = boost::thread(boost::bind(&TrajectoryTracker::predictorThread, this));
-    replan_timer_ = nh_.createTimer(ros::Duration(replan_timer_period_), &TrajectoryTracker::replanCallback, this);
+    replan_timer_ = nh_.createTimer(ros::Duration(0.001), &TrajectoryTracker::replanCallback, this);
     // todo: think about whether thread is needed for predictor
     object_trajectory_predictor_ = new TrajectoryPredictor(nh_, nhp_);
   }
@@ -67,6 +68,14 @@ namespace trajectory_tracker{
     if (!object_trajectory_predictor_->checkPredictedResultsAvaiable())
       return;
 
+    double cur_time = ros::Time::now().toSec();
+    if (cur_time - replan_prev_time_ > replan_timer_period_){
+      replan_prev_time_ = cur_time;
+      replanImpl();
+    }
+  }
+
+  void TrajectoryTracker::replanImpl(){
     Eigen::VectorXd cur_state = object_trajectory_predictor_->getPredictedState(0.0); // p_x, v_x, p_y, v_y
     Eigen::VectorXd cur_u = object_trajectory_predictor_->getPredictedControlInput(0.0); // a_x, a_y
 

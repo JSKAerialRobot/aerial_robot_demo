@@ -79,6 +79,7 @@ namespace trajectory_tracker{
     ros::NodeHandle nhp_;
 
     ros::Timer replan_timer_;
+    double replan_prev_time_;
     double replan_timer_period_;
     MotionSinglePrimitive *primitive_;
 
@@ -102,6 +103,7 @@ namespace trajectory_tracker{
     ros::Subscriber sub_host_robot_imu_;
 
     void predictorThread();
+    void replanImpl();
     void replanCallback(const ros::TimerEvent& event);
     void convertToMPState(MPState &x, Eigen::VectorXd state);
     void publishPrimitiveParam();
