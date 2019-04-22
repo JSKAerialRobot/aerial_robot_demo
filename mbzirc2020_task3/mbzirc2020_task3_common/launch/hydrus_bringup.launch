@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+  ###########  launch config  ###########
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="control_mode" default="0" />
+  <arg name="estimate_mode"  default= "0" />
+  <arg name="headless" default="True" />
+
+  <arg name="cheating_fire"  default= "True" /> <!-- use primitive object instead of real fire -->
+  <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/fire_fighting.world" if="$(arg cheating_fire)"/>
+  <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/fire_fighting.world" unless="$(arg cheating_fire)"/> <!-- TODO: change to the real env -->
+
+  ##########  basic bringup file ########
+  <include file="$(find hydrus)/launch/bringup.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="control_mode" value="$(arg control_mode)" />
+    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="worldtype" value="$(arg gazebo_world)" />
+    <!-- TODO: will switch to the costumized model in the near future -->
+    <!-- <arg name="direct_model" value="True" /> -->
+  </include>
+
+  ########## recognition ###############
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch">
+    <arg name="image_topic" value="/zed/rgb/image_rect_color"/>
+    <arg name="camera_info_topic" value="/zed/rgb/camera_info"/>
+    <arg name="output_screen" value="true"/>
+
+    <!-- object property -->
+    <arg name="object_height" default="0.02"/>
+    <arg name="contour_area_size" value="0.196"/>
+
+    <!-- red color -->
+    <arg name="h_limit_max" default="33" />
+    <arg name="h_limit_min" default="10" />
+    <arg name="s_limit_max" default="255" />
+    <arg name="s_limit_min" default="0" />
+    <arg name="v_limit_max" default="255" />
+    <arg name="v_limit_min" default="0" />
+  </include>
+
+
+</launch>
