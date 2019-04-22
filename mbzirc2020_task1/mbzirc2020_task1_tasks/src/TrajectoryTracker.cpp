@@ -42,8 +42,6 @@ namespace trajectory_tracker{
     nhp_.param("replan_timer_period", replan_timer_period_, 0.1);
     nhp_.param("predict_horizon", kf_predict_horizon_, 4.0);
 
-    replan_cnt_ = 0;
-
     primitive_ = new MotionSinglePrimitive();
 
     pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/planned_path", 1);
