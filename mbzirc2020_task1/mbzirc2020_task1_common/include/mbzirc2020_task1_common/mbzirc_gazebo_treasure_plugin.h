@@ -102,6 +102,9 @@ private:
 
   std::string guard_name_;
   std::string pirate_name_;
+  double grab_thre_;
+  double guard_uav_treasure_offset_z_;
+  double pirate_uav_treasure_offset_z_;
 
   //renew the data of the gazebo objects
   void gazeboCallback(const gazebo_msgs::ModelStates gazebo_model_states)

@@ -12,38 +12,22 @@ catkin build
 
 ## how to use
 
-- run mbzirc_arena wolrd in gazebo:
-```
-$ roslaunch mbzirc2020_task1_common mbzirc_arena_1.launch
-```
-
 - run simulation of task1:
 ```
 $ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch
 ```
 
-- enable hector motors in gazebo:
+- manually control hector in gazebo:
 ```
+$ roslaunch mbzirc2020_task1_common mbzirc_arena_1.launch start:=false
 $ rosservice call /hawk/enable_motors "enable: true"
-```
-
-## task 1 standard mode
-
-- run simulation of task1:
-```
-$ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch
-```
-
-- hector moves in 8 shape:
-```
-$ rosrun mbzirc2020_task1_common guard_uav_routine_flight.py
 ```
 
 ## task 1 cheat mode
 
 - run simulation of task1:
 ```
-$ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch
+$ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch start:=false
 ```
 
 - run cheat mode of task1:

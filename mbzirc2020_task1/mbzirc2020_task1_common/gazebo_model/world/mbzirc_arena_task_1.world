@@ -45,6 +45,9 @@
         <guardName>hawk</guardName>
         <pirateName>hydrusx</pirateName>
         <markerTopicName>/treasure/marker</markerTopicName>
+        <grabThreshold>0.3</grabThreshold>
+        <guardUavTreasureOffsetZ>0.5</guardUavTreasureOffsetZ>
+        <pirateUavTreasureOffsetZ>0.03</pirateUavTreasureOffsetZ>
       </plugin>
     </model>
 

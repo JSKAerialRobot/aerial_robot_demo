@@ -93,6 +93,21 @@ namespace gazebo
     else
       pirate_name_ = "hydrusx";
 
+    if (_sdf->HasElement("guardUavTreasureOffsetZ") && _sdf->GetElement("guardUavTreasureOffsetZ")->GetValue())
+      guard_uav_treasure_offset_z_ = _sdf->GetElement("guardUavTreasureOffsetZ")->Get<double>();
+    else
+      guard_uav_treasure_offset_z_ = 0.27;
+
+    if (_sdf->HasElement("pirateUavTreasureOffsetZ") && _sdf->GetElement("pirateUavTreasureOffsetZ")->GetValue())
+      pirate_uav_treasure_offset_z_ = _sdf->GetElement("pirateUavTreasureOffsetZ")->Get<double>();
+    else
+      pirate_uav_treasure_offset_z_ = 0.03;
+
+    if (_sdf->HasElement("grabThreshold") && _sdf->GetElement("grabThreshold")->GetValue())
+      grab_thre_ = _sdf->GetElement("grabThreshold")->Get<double>();
+    else
+      grab_thre_ = 0.3;
+
     std::string treasure_marker_topic_name;
     if (_sdf->HasElement("markerTopicName") && _sdf->GetElement("markerTopicName")->GetValue())
       treasure_marker_topic_name = _sdf->GetElement("markerTopicName")->Get<std::string>();
@@ -148,12 +163,11 @@ namespace gazebo
             updateTreasureState(guard_id, guard_name_);
           }
           if (pirate_id >= 0){
-            // judge whether treasure is grubbed
+            // judge whether treasure is grabbed
             geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(pirate_id);
-            double grub_thre = 0.3;
-            if(fabs(pose_pirate.position.x - pose_object.pos.x)<grub_thre&&
-               fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
-               fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
+            if(fabs(pose_pirate.position.x - pose_object.pos.x)<grab_thre_&&
+               fabs(pose_pirate.position.y - pose_object.pos.y)<grab_thre_&&
+               fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_){
               treasure_state_ = TREASURE_CAPTURED;
               updateTreasureState(pirate_id, pirate_name_);
             }
@@ -184,10 +198,10 @@ namespace gazebo
     geometry_msgs::Pose treausre_pose = gazebo_models_.pose.at(owner_id);
     double offset_z = 0.0;
     if (robot_name == std::string("hawk"))
-      offset_z = -0.27;
+      offset_z = guard_uav_treasure_offset_z_;
     else if (robot_name == std::string("hydrusx"))
-      offset_z = -0.03;
-    treausre_pose.position.z += offset_z;
+      offset_z = pirate_uav_treasure_offset_z_;
+    treausre_pose.position.z -= offset_z;
     model_->SetWorldPose(math::Pose(math::Vector3(treausre_pose.position.x,
                                                   treausre_pose.position.y,
                                                   treausre_pose.position.z),
