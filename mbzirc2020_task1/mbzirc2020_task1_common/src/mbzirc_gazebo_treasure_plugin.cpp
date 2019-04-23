@@ -129,6 +129,7 @@ namespace gazebo
     // subscribe to the gazebo models
     gazebo_model_sub_ = node_handle_->subscribe("/gazebo/model_states",3,&GazeboTreasure::gazeboCallback,this);
     magnet_release_sub_ = node_handle_->subscribe("/mag_on",3,&GazeboTreasure::magnetCallback,this);
+    treasure_force_init_sub_ = node_handle_->subscribe("/treasure_force_init_cmd",3,&GazeboTreasure::treasureForceInitCallback,this);
 
     // publisher
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
@@ -136,6 +137,10 @@ namespace gazebo
     update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                                 boost::bind(&GazeboTreasure::Update, this));
 
+  }
+
+  void GazeboTreasure::treasureForceInitCallback(std_msgs::Empty msg){
+    treasure_state_ = TREASURE_FORCE_INIT;
   }
 
 
@@ -157,7 +162,13 @@ namespace gazebo
           else if (gazebo_models_.name.at(i) == guard_name_)
             guard_id = i;
         }
-        if (treasure_state_ == TREASURE_CRUISE){
+        if (treasure_state_ == TREASURE_FORCE_INIT){
+          if (guard_id >= 0){
+            updateTreasureState(guard_id, guard_name_);
+            treasure_state_ = TREASURE_CRUISE;
+          }
+        }
+        else if (treasure_state_ == TREASURE_CRUISE){
           if (guard_id >= 0){
             // reset object positon
             updateTreasureState(guard_id, guard_name_);

@@ -37,6 +37,7 @@
 #define TRAJECTORY_TRACKER_H
 
 #include <std_msgs/Empty.h>
+#include <std_msgs/UInt8.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -73,7 +74,8 @@ namespace trajectory_tracker{
   #define KEEP_TRACKING 1
   #define START_GRAPPING 2
   #define IN_GRAPPING 3
-  #define AFTER_GRAPPING 4
+  #define KEEP_STILL 4
+  #define QUIT_TASK 5
   class TrajectoryTracker{
   public:
     TrajectoryTracker(ros::NodeHandle nh, ros::NodeHandle nhp);
@@ -109,7 +111,7 @@ namespace trajectory_tracker{
 
     ros::Subscriber sub_host_robot_odom_;
     ros::Subscriber sub_host_robot_imu_;
-    ros::Subscriber sub_host_robot_grab_flag_;
+    ros::Subscriber sub_host_robot_task_command_;
 
     void predictorThread();
     void replanImpl();
@@ -119,7 +121,7 @@ namespace trajectory_tracker{
     void visualizationPrimitive();
     void hostRobotOdomCallback(const nav_msgs::OdometryConstPtr& msg);
     void hostRobotImuCallback(const sensor_msgs::ImuConstPtr& msg);
-    void hostRobotGrabFlagCallback(std_msgs::Empty msg);
+    void hostRobotTaskCommandCallback(const std_msgs::UInt8 msg);
   };
 }
 

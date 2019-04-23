@@ -53,7 +53,7 @@ namespace trajectory_tracker{
 
     sub_host_robot_odom_ = nh_.subscribe<nav_msgs::Odometry>("/uav/cog/odom", 1, &TrajectoryTracker::hostRobotOdomCallback, this);
     sub_host_robot_imu_ = nh_.subscribe<sensor_msgs::Imu>("/ros_imu", 1, &TrajectoryTracker::hostRobotImuCallback, this);
-    sub_host_robot_grab_flag_ = nh_.subscribe<std_msgs::Empty>("/track/grab/command", 1, &TrajectoryTracker::hostRobotGrabFlagCallback, this);
+    sub_host_robot_task_command_ = nh_.subscribe<std_msgs::UInt8>("/track/task/command", 1, &TrajectoryTracker::hostRobotTaskCommandCallback, this);
 
     predictor_thread_ = boost::thread(boost::bind(&TrajectoryTracker::predictorThread, this));
     replan_timer_ = nh_.createTimer(ros::Duration(0.001), &TrajectoryTracker::replanCallback, this);
@@ -110,7 +110,7 @@ namespace trajectory_tracker{
     else if (tracking_state_ == IN_GRAPPING){
       primitive_period_ -= ros::Time::now().toSec() - replan_prev_time_;
       if (primitive_period_ < 0.0){
-        tracking_state_ = AFTER_GRAPPING;
+        tracking_state_ = KEEP_STILL;
         primitive_period_ = 2.0;
         replan_timer_period_ = primitive_period_ - 0.2;
       }
@@ -118,8 +118,13 @@ namespace trajectory_tracker{
       else if (primitive_period_ < 0.3)
         return;
     }
-    else if (tracking_state_ == AFTER_GRAPPING){
+    else if (tracking_state_ == KEEP_STILL){
       return;
+    }
+    else if (tracking_state_ == QUIT_TASK){
+      tracking_state_ = KEEP_STILL;
+      primitive_period_ = 2.0;
+      replan_timer_period_ = primitive_period_ - 0.2;
     }
 
     Eigen::VectorXd end_state = object_trajectory_predictor_->getPredictedState(period);
@@ -140,7 +145,9 @@ namespace trajectory_tracker{
       end_state(4), end_state(5), end_u(2);
     if (tracking_state_ == KEEP_TRACKING)
       end_state_full(6) -= 2.0; // add offset in z axis // todo
-    else if (tracking_state_ == AFTER_GRAPPING){
+    else if (tracking_state_ == KEEP_STILL){
+      end_state_full(0) = cur_state_full(0) + host_robot_odom_.twist.twist.linear.x * primitive_period_ / 2.0; // to decelerate smoothly
+      end_state_full(3) = cur_state_full(3) + host_robot_odom_.twist.twist.linear.y * primitive_period_ / 2.0;
       end_state_full(6) -= 2.0;
       for (int i = 0; i < 3; ++i)
         for (int j = 1; j < 3; ++j) // vel, acc is set to be 0; pos not change
@@ -250,14 +257,13 @@ namespace trajectory_tracker{
     host_robot_acc_world_(2) -= 9.8;
   }
 
-  void TrajectoryTracker::hostRobotGrabFlagCallback(std_msgs::Empty msg){
-    if (tracking_state_ == KEEP_TRACKING){
+  void TrajectoryTracker::hostRobotTaskCommandCallback(const std_msgs::UInt8 msg){
+    if (msg.data == 0) // force switching to static state
+      tracking_state_ = QUIT_TASK;
+    else if (msg.data == 1)
       tracking_state_ = START_GRAPPING;
-      immediate_replan_flag_ = true;
-    }
-    else if (tracking_state_ == AFTER_GRAPPING){ // switch back to tracking mode when in after_grapping state
-      tracking_state_ = KEEP_TRACKING;
-      immediate_replan_flag_ = true;
-    }
+    else if (msg.data == 2)
+      tracking_state_ = PRE_TRACKING;
+    immediate_replan_flag_ = true;
   }
 }
