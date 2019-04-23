@@ -36,12 +36,11 @@
 
     <model name='asphalt_plane'>
       <static>1</static>
-      <pose>0 12 0 0 0 0</pose>
       <link name='link'>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>40 40 0.1</size>
+              <size>20 20 0.1</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -56,7 +55,7 @@
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-              <size>40 40 0.1</size>
+              <size>20 20 0.1</size>
             </box>
           </geometry>
           <material>
@@ -73,20 +72,33 @@
       </link>
     </model>
 
-    <model name='goal1'>
-      <static>1</static>
-      <pose>0.1 7.0 0.05 0 0 0</pose>
-      <link name='link'>
+    <model name='object'>
+      <pose>0 1 0.5 0 0 0</pose>
+      <link name='object_link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.3</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+        </collision>
         <visual name='visual'>
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-              <size>10 0.2 0.01</size>
+              <size>0.2 0.2 0.3</size>
             </box>
           </geometry>
           <material>
-            <ambient>1.0 1.0 1.0 1</ambient>
-            <diffuse>1.0 1.0 1.0 1</diffuse>
+            <ambient>1.0 0.0 0.0 1</ambient>
+            <diffuse>1.0 0.0 0.0 1</diffuse>
             <specular>0.01 0.01 0.01 1</specular>
             <emissive>0 0 0 1</emissive>
           </material>
@@ -96,39 +108,6 @@
         <gravity>1</gravity>
       </link>
     </model>
-
-    <model name='goal2'>
-      <static>1</static>
-      <pose>5.0 12.1 0.05 0 0 0</pose>
-      <link name='link'>
-        <visual name='visual'>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.2 10 0.01</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>1.0 1.0 1.0 1</ambient>
-            <diffuse>1.0 1.0 1.0 1</diffuse>
-            <specular>0.01 0.01 0.01 1</specular>
-            <emissive>0 0 0 1</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-    </model>
-
-    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble1">
-      <bottom_right>-1.0 17.0 0.0</bottom_right>
-      <top_left>1.0 19.0 1.0</top_left>
-      <brick_size>0.3 0.2 0.2</brick_size>
-      <brick_color>1.0 0.0 0.0</brick_color>
-      <brick_mass>0.381</brick_mass>
-      <count>50</count>
-    </plugin>
 
   </world>
 </sdf>
