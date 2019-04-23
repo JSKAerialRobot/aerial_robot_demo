@@ -9,7 +9,7 @@
   <arg name="headless" default="True" />
   <arg name="worldtype" default="default" />
   <arg name="spawn_x" default="0.0"/>
-  <arg name="spawn_y" default="-8.0"/>
+  <arg name="spawn_y" default="0.0"/>
   <arg name="spawn_z" default="0.5"/>
   <arg name="spawn_yaw" default="0.0"/>
 
