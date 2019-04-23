@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mbzirc2020_task2_common</name>
+  <version>0.0.0</version>
+  <description>The mbzirc2020_task2_common package</description>
+
+  <maintainer email="anzai@jsk.imi.i.u-tokyo.ac.jp">Tomoki Anzai</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>hydrus</depend>
+  <depend>mbzirc2020_task2_simulation</depend>
+  <depend>gazebo_ros</depend>
+
+  <export>
+
+  </export>
+</package>
