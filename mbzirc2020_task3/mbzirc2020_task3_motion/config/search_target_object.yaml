@@ -1,0 +1,9 @@
+# search planner params
+
+search_rate : 5.0
+
+area_corners : [[0, 0], [10, 10]]
+search_height : 3.0
+search_grid_size : 2.0
+reach_margin : 0.2
+
