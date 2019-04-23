@@ -69,6 +69,11 @@ using namespace trajectory_predictor;
 using namespace motion_single_primitive;
 
 namespace trajectory_tracker{
+  #define PRE_TRACKING 0
+  #define KEEP_TRACKING 1
+  #define START_GRAPPING 2
+  #define IN_GRAPPING 3
+  #define AFTER_GRAPPING 4
   class TrajectoryTracker{
   public:
     TrajectoryTracker(ros::NodeHandle nh, ros::NodeHandle nhp);
@@ -82,6 +87,9 @@ namespace trajectory_tracker{
     double replan_prev_time_;
     double replan_timer_period_;
     MotionSinglePrimitive *primitive_;
+    int tracking_state_;
+    double primitive_period_;
+    bool immediate_replan_flag_;
 
     double kf_predict_horizon_;
     boost::thread predictor_thread_;
@@ -101,6 +109,7 @@ namespace trajectory_tracker{
 
     ros::Subscriber sub_host_robot_odom_;
     ros::Subscriber sub_host_robot_imu_;
+    ros::Subscriber sub_host_robot_grab_flag_;
 
     void predictorThread();
     void replanImpl();
@@ -110,6 +119,7 @@ namespace trajectory_tracker{
     void visualizationPrimitive();
     void hostRobotOdomCallback(const nav_msgs::OdometryConstPtr& msg);
     void hostRobotImuCallback(const sensor_msgs::ImuConstPtr& msg);
+    void hostRobotGrabFlagCallback(std_msgs::Empty msg);
   };
 }
 

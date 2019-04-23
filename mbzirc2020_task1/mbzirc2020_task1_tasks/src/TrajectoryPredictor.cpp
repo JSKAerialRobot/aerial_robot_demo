@@ -62,7 +62,7 @@ namespace trajectory_predictor{
     updateMapInfo();
 
     std::string sub_tracked_object_odom_topic_name;
-    nhp_.param("tracked_object_odom_topic_name", sub_tracked_object_odom_topic_name, std::string("/hawk/ground_truth/state"));
+    nhp_.param("tracked_object_odom_topic_name", sub_tracked_object_odom_topic_name, std::string("/vision/object_odom"));
     sub_tracked_object_odom_ = nh_.subscribe<nav_msgs::Odometry>(sub_tracked_object_odom_topic_name, 1, &TrajectoryPredictor::trackedObjectOdomCallback, this);
 
     pub_predicted_object_trajectory_ = nh_.advertise<nav_msgs::Path>("/predicted_object_path", 1);

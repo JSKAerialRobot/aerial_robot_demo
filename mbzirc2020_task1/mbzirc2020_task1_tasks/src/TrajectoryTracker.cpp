@@ -44,6 +44,8 @@ namespace trajectory_tracker{
 
     primitive_ = new MotionSinglePrimitive();
     replan_prev_time_ = 0.0;
+    tracking_state_ = PRE_TRACKING;
+    immediate_replan_flag_ = false;
 
     pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/planned_path", 1);
     pub_tracking_target_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/track/vis/target_marker", 1);
@@ -51,6 +53,7 @@ namespace trajectory_tracker{
 
     sub_host_robot_odom_ = nh_.subscribe<nav_msgs::Odometry>("/uav/cog/odom", 1, &TrajectoryTracker::hostRobotOdomCallback, this);
     sub_host_robot_imu_ = nh_.subscribe<sensor_msgs::Imu>("/ros_imu", 1, &TrajectoryTracker::hostRobotImuCallback, this);
+    sub_host_robot_grab_flag_ = nh_.subscribe<std_msgs::Empty>("/track/grab/command", 1, &TrajectoryTracker::hostRobotGrabFlagCallback, this);
 
     predictor_thread_ = boost::thread(boost::bind(&TrajectoryTracker::predictorThread, this));
     replan_timer_ = nh_.createTimer(ros::Duration(0.001), &TrajectoryTracker::replanCallback, this);
@@ -69,9 +72,10 @@ namespace trajectory_tracker{
       return;
 
     double cur_time = ros::Time::now().toSec();
-    if (cur_time - replan_prev_time_ > replan_timer_period_){
-      replan_prev_time_ = cur_time;
+    if (cur_time - replan_prev_time_ > replan_timer_period_ || immediate_replan_flag_){
       replanImpl();
+      immediate_replan_flag_ = false;
+      replan_prev_time_ = cur_time;
     }
   }
 
@@ -89,8 +93,34 @@ namespace trajectory_tracker{
         period = kf_predict_horizon_;
     }
     // test
-    period = 2.2;
+    // period = 2.2;
+    replan_timer_period_ = period - 0.2;
     
+    if (tracking_state_ == PRE_TRACKING){
+      tracking_state_ = KEEP_TRACKING;
+      primitive_period_ = period;
+    }
+    else if (tracking_state_ == KEEP_TRACKING)
+      primitive_period_ = period;
+    else if (tracking_state_ == START_GRAPPING){
+      primitive_period_ = period;
+      tracking_state_ = IN_GRAPPING;
+      replan_timer_period_ = 0.1;
+    }
+    else if (tracking_state_ == IN_GRAPPING){
+      primitive_period_ -= ros::Time::now().toSec() - replan_prev_time_;
+      if (primitive_period_ < 0.0){
+        tracking_state_ = AFTER_GRAPPING;
+        primitive_period_ = 2.0;
+        replan_timer_period_ = primitive_period_ - 0.2;
+      }
+      /* during gripping, when period is too small, no need to replan */
+      else if (primitive_period_ < 0.3)
+        return;
+    }
+    else if (tracking_state_ == AFTER_GRAPPING){
+      return;
+    }
 
     Eigen::VectorXd end_state = object_trajectory_predictor_->getPredictedState(period);
     Eigen::VectorXd end_u = object_trajectory_predictor_->getPredictedControlInput(period);
@@ -108,11 +138,18 @@ namespace trajectory_tracker{
     end_state_full << end_state(0), end_state(1), end_u(0),
       end_state(2), end_state(3), end_u(1),
       end_state(4), end_state(5), end_u(2);
-    end_state_full(6) -= 2.0; // add offset in z axis // todo
+    if (tracking_state_ == KEEP_TRACKING)
+      end_state_full(6) -= 2.0; // add offset in z axis // todo
+    else if (tracking_state_ == AFTER_GRAPPING){
+      end_state_full(6) -= 2.0;
+      for (int i = 0; i < 3; ++i)
+        for (int j = 1; j < 3; ++j) // vel, acc is set to be 0; pos not change
+          end_state_full(i * 3 + j) = 0.0;
+    }
     convertToMPState(x_start_, cur_state_full);
     convertToMPState(x_end_, end_state_full);
 
-    primitive_->init(period, x_start_, x_end_);
+    primitive_->init(primitive_period_, x_start_, x_end_);
     publishPrimitiveParam();
     visualizationPrimitive();
   }
@@ -211,5 +248,16 @@ namespace trajectory_tracker{
                           host_robot_imu_.linear_acceleration.z);
     host_robot_acc_world_ = q * acc_b;
     host_robot_acc_world_(2) -= 9.8;
+  }
+
+  void TrajectoryTracker::hostRobotGrabFlagCallback(std_msgs::Empty msg){
+    if (tracking_state_ == KEEP_TRACKING){
+      tracking_state_ = START_GRAPPING;
+      immediate_replan_flag_ = true;
+    }
+    else if (tracking_state_ == AFTER_GRAPPING){ // switch back to tracking mode when in after_grapping state
+      tracking_state_ = KEEP_TRACKING;
+      immediate_replan_flag_ = true;
+    }
   }
 }
