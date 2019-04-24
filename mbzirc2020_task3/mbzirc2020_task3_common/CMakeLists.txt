@@ -17,7 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
-catkin_package()
+catkin_package(
+ CATKIN_DEPENDS hydrus
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  ###########  launch config  ###########
+  <arg name="verbose" default="False" />
+  <arg name="debug" default="False" />
+
+  <node pkg="mbzirc2020_task3_motion" type="open_form_planner_node" name="open_form_planner_node" output="screen" >
+    <param name="debug" value="$(arg debug)" />
+    <param name="verbose" value="$(arg verbose)" />
+    <param name="joint_ctrl_topic_name" value="/hydrusx/joints_ctrl" />
+    <param name="as_extra_module" value="false" />
+    <param name="add_extra_moudle_srv_name" value="/hydrusx/add_extra_module" />
+
+    <rosparam file="$(find mbzirc2020_task3_motion)/config/SheetProperty.yaml" command="load" />
+  </node>
+
+</launch>
