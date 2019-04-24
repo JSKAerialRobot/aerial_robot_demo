@@ -22,11 +22,16 @@
     <arg name="direct_model" value="True" />
     <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.urdf.xacro" if="$(eval (1 - arg('simulation')))"/>
     <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.gazebo.xacro" if="$(eval arg('simulation'))"/>
+  </include>
 
+  ######### open-form planner ##########
+  <include file="$(find mbzirc2020_task3_motion)/launch/open_form_planner.launch" >
+    <arg name="debug" value="false" />
+    <arg name="verbose" value="true" />
   </include>
 
   ########## recognition ###############
-  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch">
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(arg cheating_fire)">
     <arg name="image_topic" value="/zed/rgb/image_rect_color"/>
     <arg name="camera_info_topic" value="/zed/rgb/camera_info"/>
     <arg name="output_screen" value="true"/>
