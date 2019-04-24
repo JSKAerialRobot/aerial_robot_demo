@@ -84,7 +84,7 @@ namespace motion_single_primitive{
     MPState waypoint_state;
     for (int i = 0; i < state_dim_; ++i)
       waypoint_state.state.push_back(Eigen::Vector3d::Zero());
-    for (int i = 0; i < 2; ++i){ // pos, vel, acc
+    for (int i = 0; i < 3; ++i){ // pos, vel, acc
         Eigen::VectorXd state_vec = calculatePolynomialValue(relative_time, i);
       for (int j = 0; j < state_dim_; ++j)
         waypoint_state.state[j](i) = state_vec[j];
