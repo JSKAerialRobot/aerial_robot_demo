@@ -7,12 +7,14 @@ import time
 import math
 from enum import Enum
 import rospy
+import tf
 import tf2_ros
 
 from subprocess import *
 import numpy as np
 from sensor_msgs.msg import JointState
 from aerial_robot_msgs.msg import FlightNav
+from std_msgs.msg import Empty
 
 from hydrus_commander import HydrusCommander
 
@@ -171,7 +173,10 @@ class ReachPlanner:
                 if abs(cog_pos.transform.translation.z - self.descending_height) < self.height_margin:
                     self.state = ReachPlannerState.GRASPING
             elif self.state == ReachPlannerState.GRASPING:
-                self.commander.covering_motion(cog_pos.transform.translation.x, cog_pos.transform.translation.y, self.covering_pre_height, self.covering_post_height, self.covering_move_dist)
+                rot = cog_pos.transform.rotation
+                q = (rot.x, rot.y, rot.z, rot.w)
+                cog_euler = tf.transformations.euler_from_quaternion(q)
+                self.commander.covering_motion(cog_pos.transform.translation.x, cog_pos.transform.translation.y, cog_euler[2], self.covering_pre_height, self.covering_post_height, self.covering_move_dist)
                 self.state = ReachPlannerState.FINISHED
                 pass
             elif self.state == ReachPlannerState.FINISHED:
@@ -182,11 +187,8 @@ class ReachPlanner:
                 return ReachPlannerState.FAILURE
             rate.sleep()
 
-def main():
-    rospy.init_node('task3_motion_planner')
-    commander = HydrusCommander()
-    commander.close_joints()
-
+def task3_start(msg):
+    """callback function to start task3"""
     searcher = SearchPlanner()
     result = searcher.execute()
     # TODO Check result
@@ -208,8 +210,15 @@ def main():
         rospy.logerr("Reach Planner FAILED")
     else:
         rospy.logerr("Reach Planner UNKNOWN")
-
     return
+
+def main():
+    rospy.init_node('task3_motion_planner')
+    commander = HydrusCommander()
+    commander.close_joints()
+
+    task_start_sub = rospy.Subscriber("task3_start", Empty, task3_start)
+    rospy.spin()
 
 if __name__ == "__main__":
     main()

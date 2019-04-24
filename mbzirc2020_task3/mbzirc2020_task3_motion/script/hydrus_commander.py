@@ -5,10 +5,12 @@
 import sys
 import time
 import rospy
+import math
 
 from std_msgs.msg import Empty
 from sensor_msgs.msg import JointState
 from aerial_robot_msgs.msg import FlightNav
+from std_srvs.srv import Trigger
 
 class HydrusCommander():
     def __init__(self, name="hydrus_commander"):
@@ -83,24 +85,30 @@ class HydrusCommander():
 
     def open_joints(self):
         """open links"""
-        self.joint_publish([1.1, 1.1, 1.1])
+        # self.joint_publish([1.1, 1.1, 1.1])
+        rospy.wait_for_service("/send_open_form")
+        try:
+            send_open_form = rospy.ServiceProxy('/send_open_form', Trigger)
+            resp1 = send_open_form()
+            return
+        except rospy.ServiceException, e:
+            rospy.logerr("Service call failed: %s"%e)
 
     def close_joints(self):
         """close links"""
         self.joint_publish([1.55, 1.55, 1.55])
 
-    def covering_motion(self,pos_x, pos_y, covering_pre_height, covering_post_height, covering_move_dist):
-        self.change_yaw(0.75)
-        time.sleep(2)
-        self.move_to(pos_x-covering_move_dist/2, pos_y)
-        time.sleep(2)
+    def covering_motion(self,pos_x, pos_y, cog_yaw, covering_pre_height, covering_post_height, covering_move_dist):
+        dest_yaw = cog_yaw + 0.785 # correct forward angle of open form
+        forward_dir = [-covering_move_dist*math.sin(dest_yaw), covering_move_dist*math.cos(dest_yaw)]
         self.open_joints()
+        time.sleep(2)
+        self.move_to(pos_x+forward_dir[0]/2, pos_y+forward_dir[1]/2)
         time.sleep(1)
-        self.change_yaw(0.75)
         self.change_height(covering_pre_height)
         time.sleep(5)
 
-        self.move_to(pos_x+covering_move_dist, pos_y)
+        self.move_to(pos_x-forward_dir[0], pos_y-forward_dir[1])
         self.change_height(covering_post_height)
 
 def main():
@@ -108,16 +116,16 @@ def main():
     commander = HydrusCommander()
     # commander.arm_and_takeoff()
     # time.sleep(10)
-    commander.close_joints()
-    commander.move_to(2, 2)
-    commander.change_height(1.0)
-
     # commander.open_joints()
     # time.sleep(2)
     # commander.close_joints()
 
     commander.close_joints()
-    commander.covering_motion(2,2,0.8, 0.3, 1.0)
+    commander.change_yaw(0.0)
+    commander.change_height(1.0)
+    commander.move_to(2, 2)
+    time.sleep(5)
+    commander.covering_motion(2,2,0,0.8, 0.3, 1.0)
 
 if __name__ == "__main__":
     main()
