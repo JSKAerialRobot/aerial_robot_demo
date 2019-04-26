@@ -104,7 +104,7 @@ namespace trajectory_tracker{
     else if (tracking_state_ == START_GRAPPING){
       primitive_period_ = period;
       tracking_state_ = IN_GRAPPING;
-      replan_timer_period_ = 0.1;
+      // replan_timer_period_ = 0.1; // Not working
     }
     else if (tracking_state_ == IN_GRAPPING){
       primitive_period_ -= ros::Time::now().toSec() - replan_prev_time_;
