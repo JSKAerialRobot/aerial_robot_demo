@@ -80,12 +80,11 @@ namespace trajectory_tracker{
   }
 
   void TrajectoryTracker::replanImpl(){
-    Eigen::VectorXd cur_state = object_trajectory_predictor_->getPredictedState(0.0); // p_x, v_x, p_y, v_y
-    Eigen::VectorXd cur_u = object_trajectory_predictor_->getPredictedControlInput(0.0); // a_x, a_y
+    Eigen::VectorXd cur_state = object_trajectory_predictor_->getPredictedState(0.0); // p_x, v_x, a_x, p_y, v_y, a_y, p_z, v_z, a_z
 
     double period = 1.0;
     double dist_xy = sqrt(pow(cur_state(0) - host_robot_odom_.pose.pose.position.x, 2) +
-                          pow(cur_state(2) - host_robot_odom_.pose.pose.position.y, 2));
+                          pow(cur_state(3) - host_robot_odom_.pose.pose.position.y, 2));
     double max_chase_delta_speed = 1.0;
     if (period < dist_xy / max_chase_delta_speed){
       period = dist_xy / max_chase_delta_speed;
@@ -128,21 +127,13 @@ namespace trajectory_tracker{
     }
 
     Eigen::VectorXd end_state = object_trajectory_predictor_->getPredictedState(period);
-    Eigen::VectorXd end_u = object_trajectory_predictor_->getPredictedControlInput(period);
     Eigen::VectorXd cur_state_full(3 * 3);
     Eigen::VectorXd end_state_full(3 * 3);
-    // cur_state_full << cur_state(0), cur_state(1), cur_u(0), // x axis
-    //   cur_state(2), cur_state(3), cur_u(1), // y axis
-    //   cur_state(4), cur_state(5), cur_u(2); // z axis
-    // // todo
-    // cur_state_full(6) -= 2.0; // add offset in z axis
     cur_state_full << host_robot_odom_.pose.pose.position.x, host_robot_odom_.twist.twist.linear.x, host_robot_acc_world_(0), // x axis
       host_robot_odom_.pose.pose.position.y, host_robot_odom_.twist.twist.linear.y, host_robot_acc_world_(1), // y axis
       host_robot_odom_.pose.pose.position.z, host_robot_odom_.twist.twist.linear.z, host_robot_acc_world_(2); // z axis
 
-    end_state_full << end_state(0), end_state(1), end_u(0),
-      end_state(2), end_state(3), end_u(1),
-      end_state(4), end_state(5), end_u(2);
+    end_state_full = end_state;
     if (tracking_state_ == KEEP_TRACKING)
       end_state_full(6) -= 2.0; // add offset in z axis // todo
     else if (tracking_state_ == KEEP_STILL){

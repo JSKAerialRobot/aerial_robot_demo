@@ -6,6 +6,7 @@
     <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
     <param name="replan_timer_period" value="2.0" />
     <param name="predict_horizon" value="4.0" />
+    <param name="kf_method" value="0" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
   </node>
 
   <group if="$(arg fake_vision)">

@@ -61,6 +61,10 @@ namespace trajectory_predictor{
   #define MAP_NO_INFO 0
   #define MAP_POINT_INFO 1 // map info obtains from every single state
   #define MAP_REGION_INFO 2 // map info discretize into several regions
+
+  #define POS_VEL 0
+  #define POS_IM_VEL 1
+  #define POS_ONLY 2
   struct mapPriorInfo{
     Eigen::Vector2d start;
     Eigen::Vector2d end;
@@ -70,7 +74,6 @@ namespace trajectory_predictor{
   public:
     TrajectoryPredictor(ros::NodeHandle nh, ros::NodeHandle nhp);
     Eigen::VectorXd getPredictedState(double relative_time);
-    Eigen::VectorXd getPredictedControlInput(double relative_time);
     bool checkPredictedResultsAvaiable(){return predicted_results_available_;}
 
   private:
@@ -78,6 +81,7 @@ namespace trajectory_predictor{
     ros::NodeHandle nh_;
     ros::NodeHandle nhp_;
 
+    int kf_method_;
     nav_msgs::Odometry tracked_object_odom_;
     LinearKalmanFilter *lkf_;
     int state_dim_;
@@ -88,6 +92,7 @@ namespace trajectory_predictor{
 
     bool filter_init_flag_;
     Eigen::VectorXd x_post_;
+    Eigen::VectorXd u_prev_;
     Eigen::VectorXd cur_z_;
     bool predicted_results_available_;
     std::vector<Eigen::VectorXd> predicted_state_vec_;
@@ -106,14 +111,15 @@ namespace trajectory_predictor{
     ros::Publisher pub_predicted_object_trajectory_;
 
     void updatePredictorFilter();
-    void updateModel(Eigen::VectorXd cur_x, Eigen::MatrixXd &cur_F, Eigen::MatrixXd &cur_B, Eigen::MatrixXd &cur_H, Eigen::VectorXd &cur_u);
+    void updateModel(Eigen::Vector3d cur_pos, Eigen::MatrixXd &cur_F, Eigen::MatrixXd &cur_B, Eigen::MatrixXd &cur_H, Eigen::VectorXd &cur_u);
     void updateNoiseModel(Eigen::MatrixXd &Q, Eigen::MatrixXd &R);
     void trackedObjectOdomCallback(const nav_msgs::OdometryConstPtr& msg);
     void predictState();
     void visualizePredictedState();
     Eigen::VectorXd initStateFromObservation(Eigen::VectorXd &z);
+    Eigen::VectorXd initControlInputFromObservation(Eigen::VectorXd &z);
     void updateMapInfo();
-    Eigen::VectorXd getControlInputFromMap(Eigen::VectorXd &x);
+    Eigen::VectorXd getControlInputFromMap(Eigen::Vector3d &cur_pos);
   };
 }
 
