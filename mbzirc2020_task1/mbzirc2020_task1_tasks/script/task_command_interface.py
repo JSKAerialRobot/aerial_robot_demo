@@ -41,7 +41,7 @@ import sys, select, termios, tty
 
 msg = """
 
-    g: start gripping the object
+    g: start grapping the object
     r: force reset treasure to guard uav and quit the task
     s: pirate robot starts to track
     q: pirate robot quits tracking and keeps still
@@ -74,7 +74,7 @@ if __name__=="__main__":
 			if key == 'g':
                             task_cmd_msg.data = 1
 			    track_task_command_pub.publish(task_cmd_msg)
-                            print "[gripping command sent to pirate robot]"
+                            print "[grapping command sent to pirate robot]"
 			if key == 'r':
                             task_cmd_msg.data = 0
 			    track_task_command_pub.publish(task_cmd_msg)

@@ -39,6 +39,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped
 from aerial_robot_msgs.msg import FlightNav
 from mbzirc2020_task1_tasks.msg import PrimitiveParams
+from sensor_msgs.msg import JointState
 
 __author__ = 'shifan@jsk.imi.i.u-tokyo.ac.jp (Fan Shi)'
 POS_VEL = 0
@@ -61,6 +62,7 @@ class hydrusTrackingController:
         self.__hydrusx_start_pub = rospy.Publisher('/teleop_command/start', Empty, queue_size=1)
         self.__hydrusx_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
         self.__hydrusx_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
+        self.__hydrusx_joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
         rospy.sleep(1.0)
         self.__hydrus_nav_cmd = FlightNav()
         self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
@@ -74,6 +76,14 @@ class hydrusTrackingController:
         self.__hydrus_nav_cmd.target_pos_z = 2.0
         self.__hydrus_nav_cmd.psi_nav_mode = self.__hydrus_nav_cmd.POS_MODE
         self.__hydrus_nav_cmd.target_psi = -math.pi / 2.0 # 0.0
+
+        self.__hydrus_joints_ctrl_msg = JointState()
+        self.__hydrus_joints_ctrl_msg.name.append("joint1")
+        self.__hydrus_joints_ctrl_msg.name.append("joint2")
+        self.__hydrus_joints_ctrl_msg.name.append("joint3")
+        self.__hydrus_joints_ctrl_msg.position.append(math.pi / 2.0)
+        self.__hydrus_joints_ctrl_msg.position.append(math.pi / 2.0)
+        self.__hydrus_joints_ctrl_msg.position.append(math.pi / 2.0)
 
         ## hydrusx start and takeoff
         if self.__hydrus_init_process:
@@ -130,6 +140,19 @@ class hydrusTrackingController:
 
         self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
 
+        if self.__primitive_params.grap_flag:
+            ## todo: better joints trajectory planning
+            ## case 1: open
+            if cur_time - self.__primitive_params.header.stamp.to_sec() < self.__primitive_params.period / 2.0:
+                self.__hydrus_joints_ctrl_msg.position[0] = 1.1
+                self.__hydrus_joints_ctrl_msg.position[2] = 1.1
+                self.__hydrusx_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
+            ## case 2: close
+            else:
+                self.__hydrus_joints_ctrl_msg.position[0] = math.pi / 2.0
+                self.__hydrus_joints_ctrl_msg.position[2] = math.pi / 2.0
+                self.__hydrusx_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
+
     def __objectOdomCallback(self, msg):
         self.__object_odom = msg
 
@@ -143,7 +166,7 @@ class hydrusTrackingController:
     def __getPositionFromPrimitive(self, time):
         t = time - self.__primitive_params.header.stamp.to_sec()
         if t > self.__primitive_params.period:
-            rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
+            # rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
             t = self.__primitive_params.period
         pos = [0.0, 0.0, 0.0]
         for i in range(0, self.__primitive_params.order):
@@ -156,10 +179,10 @@ class hydrusTrackingController:
         ## rospy.get_time()
         t = time - self.__primitive_params.header.stamp.to_sec()
         if t > self.__primitive_params.period:
-            rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
+            # rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
             t = self.__primitive_params.period
         elif t < 0.0:
-            rospy.logwarn("[hydrus_tracking_controller] Time is lower than 0")
+            # rospy.logwarn("[hydrus_tracking_controller] Time is lower than 0")
             t = 0.0
         vel = [0.0, 0.0, 0.0]
         for i in range(1, self.__primitive_params.order):
@@ -171,7 +194,7 @@ class hydrusTrackingController:
     def __getPsiFromPrimitive(self, time):
         t = time - self.__primitive_params.header.stamp.to_sec()
         if t > self.__primitive_params.period:
-            rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
+            # rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
             t = self.__primitive_params.period
         psi = 0.0
         for i in range(0, self.__primitive_params.order):

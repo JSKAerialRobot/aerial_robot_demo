@@ -128,7 +128,7 @@ namespace trajectory_tracker{
         primitive_period_ = 2.0;
         replan_timer_period_ = primitive_period_ - 0.2;
       }
-      /* during gripping, when period is too small, no need to replan */
+      /* during grapping, when period is too small, no need to replan */
       else if (primitive_period_ < 0.3)
         return;
     }
@@ -193,6 +193,11 @@ namespace trajectory_tracker{
     param_msg.z_params.resize(primitive_order);
     for (int i = 0; i < primitive_order; ++i)
       param_msg.z_params[i] = primtive_param_vec[2](i);
+
+    if (tracking_state_ == IN_GRAPPING)
+      param_msg.grap_flag = true;
+    else
+      param_msg.grap_flag = false;
 
     param_msg.psi_params.resize(primitive_order);
     // todo: since euler intepolation has problem of jumping, directly give the target psi
