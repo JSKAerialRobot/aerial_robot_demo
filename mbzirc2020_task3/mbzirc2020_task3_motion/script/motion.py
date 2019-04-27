@@ -117,7 +117,7 @@ class Task3Motion():
         self.commander.change_height(self.search_height)
         init_pos = self.grid_pos(self.current_grid_idx)
         self.commander.move_to(init_pos[0], init_pos[1])
-        self.commander.close_joints()
+        #self.commander.close_joints()
         self.state = Task3MotionState.SEARCHING
 
     def targetPositionCallback(self, msg):
@@ -135,7 +135,7 @@ class Task3Motion():
         except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
             rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
 
-        # rospy.loginfo(self.state.value)
+        rospy.loginfo(self.state.value)
         # state machine
         if self.state == Task3MotionState.INITIAL_STATE:
             pass
