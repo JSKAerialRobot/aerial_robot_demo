@@ -93,6 +93,9 @@ namespace trajectory_tracker{
     int tracking_state_;
     double primitive_period_;
     bool immediate_replan_flag_;
+    int primitive_candidates_num_;
+    double primitive_period_step_;
+    double primitive_period_base_;
 
     double kf_predict_horizon_;
     boost::thread predictor_thread_;
@@ -117,6 +120,7 @@ namespace trajectory_tracker{
     void predictorThread();
     void replanImpl();
     void replanCallback(const ros::TimerEvent& event);
+    void generatePrimitive(double period);
     void convertToMPState(MPState &x, Eigen::VectorXd state);
     void publishPrimitiveParam();
     void visualizationPrimitive();

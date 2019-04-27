@@ -73,8 +73,11 @@ namespace motion_single_primitive{
       int factor1 = nMultiply(i1, derivative_order);
       for (int i2 = derivative_order; i2 < polynomial_order_; ++i2){
         int factor2 = nMultiply(i2, derivative_order);
-        energy_sum += factor1 * factor2 / (i1 + i2 - 2 * derivative_order + 1)
-          * pow(period_, i1 + i2 - 2 * derivative_order + 1);
+        double factor = factor1 * factor2 / (i1 + i2 - 2 * derivative_order + 1)
+            * pow(period_, i1 + i2 - 2 * derivative_order + 1);
+        for (int j = 0; j < traj_poly_param_vec_.size(); ++j)
+          energy_sum += factor * traj_poly_param_vec_[j](i1)
+            * traj_poly_param_vec_[j](i2);
       }
     }
     return energy_sum;
