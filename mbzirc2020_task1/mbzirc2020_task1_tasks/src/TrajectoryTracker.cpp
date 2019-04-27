@@ -174,6 +174,24 @@ namespace trajectory_tracker{
     param_msg.z_params.resize(primitive_order);
     for (int i = 0; i < primitive_order; ++i)
       param_msg.z_params[i] = primtive_param_vec[2](i);
+
+    param_msg.psi_params.resize(primitive_order);
+    // todo: since euler intepolation has problem of jumping, directly give the target psi
+    // tf::Quaternion q(host_robot_imu_.orientation.x,
+    //                  host_robot_imu_.orientation.y,
+    //                  host_robot_imu_.orientation.z,
+    //                  host_robot_imu_.orientation.w);
+    // tf::Matrix3x3  uav_rot_mat(q);
+    // tfScalar uav_roll, uav_pitch, uav_psi;
+    // uav_rot_mat.getRPY(uav_roll, uav_pitch, uav_psi);
+    // param_msg.psi_params[0] = uav_psi;
+
+    Eigen::VectorXd end_state_full = object_trajectory_predictor_->getPredictedState(param_msg.period);
+    double target_psi = atan2(end_state_full(4), end_state_full(1));
+    double psi_offset_uav = PI + 0.785;
+    param_msg.psi_params[0] = target_psi + psi_offset_uav;
+    while (param_msg.psi_params[0] > PI)
+      param_msg.psi_params[0] -= 2.0 * PI;
     pub_tracking_primitive_params_.publish(param_msg);
   }
 

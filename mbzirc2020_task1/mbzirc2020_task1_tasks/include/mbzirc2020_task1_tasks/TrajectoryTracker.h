@@ -57,6 +57,7 @@
 #include <ros/ros.h>
 #include <iostream>
 #include <math.h>
+#include <tf/LinearMath/Transform.h>
 
 /* thread */
 #include <boost/thread/mutex.hpp>

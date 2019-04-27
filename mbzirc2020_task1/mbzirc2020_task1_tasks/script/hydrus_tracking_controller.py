@@ -41,7 +41,9 @@ from aerial_robot_msgs.msg import FlightNav
 from mbzirc2020_task1_tasks.msg import PrimitiveParams
 
 __author__ = 'shifan@jsk.imi.i.u-tokyo.ac.jp (Fan Shi)'
-
+POS_VEL = 0
+POS = 1
+POS_VEL_PSI = 2
 class hydrusTrackingController:
     def init(self):
         rospy.init_node('hydrus_tracking_controller', anonymous=True)
@@ -71,7 +73,7 @@ class hydrusTrackingController:
         self.__hydrus_nav_cmd.pos_z_nav_mode = self.__hydrus_nav_cmd.POS_MODE
         self.__hydrus_nav_cmd.target_pos_z = 2.0
         self.__hydrus_nav_cmd.psi_nav_mode = self.__hydrus_nav_cmd.POS_MODE
-        self.__hydrus_nav_cmd.target_psi = 0.0
+        self.__hydrus_nav_cmd.target_psi = -math.pi / 2.0 # 0.0
 
         ## hydrusx start and takeoff
         if self.__hydrus_init_process:
@@ -87,6 +89,7 @@ class hydrusTrackingController:
         self.__hydrus_motion_init_flag_pub.publish(Empty())
 
         self.__hydrus_controller_freq = rospy.get_param('~hydrus_controller_freq', 100.0)
+        self.__control_mode = rospy.get_param('~control_model', POS_VEL)
         rospy.Timer(rospy.Duration(1.0 / self.__hydrus_controller_freq), self.__hydrusControllerCallback)
 
     def __hydrusControllerCallback(self, event):
@@ -97,9 +100,8 @@ class hydrusTrackingController:
         target_pos = self.__getPositionFromPrimitive(cur_time)
         target_vel = self.__getVelocityFromPrimitive(cur_time)
 
-        control_mode = 1
         ## velocity control
-        if control_mode == 1:
+        if self.__control_mode == POS_VEL or self.__control_mode == POS_VEL_PSI:
             p_para = 0.5
             self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
             self.__hydrus_nav_cmd.pos_xy_nav_mode = self.__hydrus_nav_cmd.POS_VEL_MODE
@@ -116,7 +118,11 @@ class hydrusTrackingController:
             self.__hydrus_nav_cmd.target_vel_z = target_vel[2]
             self.__hydrus_nav_cmd.target_pos_z = target_pos[2]
 
-        elif control_mode == 2:
+            if self.__control_mode == POS_VEL_PSI:
+                target_psi = self.__getPsiFromPrimitive(cur_time)
+                self.__hydrus_nav_cmd.target_psi = target_psi
+
+        elif self.__control_mode == POS:
             self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
             self.__hydrus_nav_cmd.target_pos_x = target_pos[0]
             self.__hydrus_nav_cmd.target_pos_y = target_pos[1]
@@ -161,6 +167,16 @@ class hydrusTrackingController:
             vel[1] += math.pow(t, i - 1) * i * self.__primitive_params.y_params[i]
             vel[2] += math.pow(t, i - 1) * i * self.__primitive_params.z_params[i]
         return vel
+
+    def __getPsiFromPrimitive(self, time):
+        t = time - self.__primitive_params.header.stamp.to_sec()
+        if t > self.__primitive_params.period:
+            rospy.logwarn("[hydrus_tracking_controller] Time is out of the bound")
+            t = self.__primitive_params.period
+        psi = 0.0
+        for i in range(0, self.__primitive_params.order):
+            psi += math.pow(t, i) * self.__primitive_params.psi_params[i]
+        return psi
 
 if __name__ == '__main__':
     try:

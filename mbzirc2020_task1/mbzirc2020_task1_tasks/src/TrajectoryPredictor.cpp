@@ -238,7 +238,7 @@ namespace trajectory_predictor{
           if (predicted_state_vec_.empty())
             prev_vel_xy << x_post_(1), x_post_(3);
           else
-            prev_vel_xy << predicted_state_vec_[predicted_state_vec_.size() - 1](1), predicted_state_vec_[predicted_state_vec_.size() - 1](3);
+            prev_vel_xy << predicted_state_vec_.back()(1), predicted_state_vec_.back()(3);
         case POS_ONLY:
           if (predicted_state_vec_.empty())
             prev_vel_xy << u_prev_(0), u_prev_(2);
