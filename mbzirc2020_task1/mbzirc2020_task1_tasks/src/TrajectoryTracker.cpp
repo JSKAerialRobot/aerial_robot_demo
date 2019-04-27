@@ -41,6 +41,7 @@ namespace trajectory_tracker{
 
     nhp_.param("replan_timer_period", replan_timer_period_, 0.1);
     nhp_.param("predict_horizon", kf_predict_horizon_, 4.0);
+    nhp_.param("tracking_offset_z", tracking_offset_z_, 1.0);
     nhp_.param("primitive_candidates_num", primitive_candidates_num_, 6);
     nhp_.param("primitive_period_step", primitive_period_step_, 0.3);
     nhp_.param("primitive_period_base_", primitive_period_base_, 0.3);
@@ -155,11 +156,11 @@ namespace trajectory_tracker{
 
     end_state_full = end_state;
     if (tracking_state_ == KEEP_TRACKING)
-      end_state_full(6) -= 2.0; // add offset in z axis // todo
+      end_state_full(6) -= tracking_offset_z_; // add offset in z axis // todo
     else if (tracking_state_ == KEEP_STILL){
       end_state_full(0) = cur_state_full(0) + host_robot_odom_.twist.twist.linear.x * primitive_period_ / 2.0; // to decelerate smoothly
       end_state_full(3) = cur_state_full(3) + host_robot_odom_.twist.twist.linear.y * primitive_period_ / 2.0;
-      end_state_full(6) -= 2.0; // add offset in z axis // todo
+      end_state_full(6) -= tracking_offset_z_; // add offset in z axis // todo
       for (int i = 0; i < 3; ++i)
         for (int j = 1; j < 3; ++j) // vel, acc is set to be 0; pos not change
           end_state_full(i * 3 + j) = 0.0;

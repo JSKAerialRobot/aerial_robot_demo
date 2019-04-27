@@ -91,6 +91,7 @@ namespace trajectory_tracker{
     double replan_timer_period_;
     MotionSinglePrimitive *primitive_;
     int tracking_state_;
+    double tracking_offset_z_;
     double primitive_period_;
     bool immediate_replan_flag_;
     int primitive_candidates_num_;
