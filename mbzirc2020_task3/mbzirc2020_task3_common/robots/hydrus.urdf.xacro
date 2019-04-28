@@ -10,7 +10,7 @@
   <xacro:onboards link = "2" />
 
   <!-- add sheet as a rigid point, meanings less inertia -->
-  <xacro:property name="sheet_mass" value=".5" />
+  <xacro:property name="sheet_mass" value=".41" />
   <xacro:extra_module name = "sheet_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
     <inertial>
