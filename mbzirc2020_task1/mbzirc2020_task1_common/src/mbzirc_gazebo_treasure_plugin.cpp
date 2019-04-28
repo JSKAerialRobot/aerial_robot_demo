@@ -129,7 +129,7 @@ namespace gazebo
     // subscribe to the gazebo models
     gazebo_model_sub_ = node_handle_->subscribe("/gazebo/model_states",3,&GazeboTreasure::gazeboCallback,this);
     magnet_release_sub_ = node_handle_->subscribe("/mag_on",3,&GazeboTreasure::magnetCallback,this);
-    treasure_force_init_sub_ = node_handle_->subscribe("/treasure_force_init_cmd",3,&GazeboTreasure::treasureForceInitCallback,this);
+    treasure_force_state_sub_ = node_handle_->subscribe("/treasure_force_state_cmd",3,&GazeboTreasure::treasureForceStateCallback,this);
 
     // publisher
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
@@ -139,8 +139,12 @@ namespace gazebo
 
   }
 
-  void GazeboTreasure::treasureForceInitCallback(std_msgs::Empty msg){
-    treasure_state_ = TREASURE_FORCE_INIT;
+  void GazeboTreasure::treasureForceStateCallback(std_msgs::UInt8 msg){
+    if (msg.data == TREASURE_RELEASE)
+      model_->SetGravityMode(true);
+    else if (treasure_state_ == TREASURE_RELEASE) // previous state is release state
+      model_->SetGravityMode(false);
+    treasure_state_ = msg.data;
   }
 
 
@@ -190,6 +194,8 @@ namespace gazebo
             updateTreasureState(pirate_id, pirate_name_);
           }
         }
+        else if (treasure_state_ == TREASURE_RELEASE)
+          visualizeTreasure();
       }
 
     if( static_object_ )
@@ -217,7 +223,15 @@ namespace gazebo
                                                   treausre_pose.position.y,
                                                   treausre_pose.position.z),
                                     math::Quaternion(0, 0, 0, 1)));
+    visualizeTreasure();
+  }
 
+  void GazeboTreasure::visualizeTreasure(){
+    math::Pose pose_object = link_->GetWorldPose();
+    geometry_msgs::Pose treausre_pose;
+    treausre_pose.position.x = pose_object.pos.x;
+    treausre_pose.position.y = pose_object.pos.y;
+    treausre_pose.position.z = pose_object.pos.z;
     // publish the treasure marker in the rviz
     visualization_msgs::Marker treasure_marker;
     treasure_marker.ns = "treasure_marker";
