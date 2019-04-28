@@ -154,8 +154,12 @@ bool OpenFormPlanner::plan()
   double min_hovering_force_diff = 1e6;
   double delta_angle = 1e-3;
   double angle_bound = M_PI / 2;// can get from model
-  double j2_angle = angle_bound;
   Eigen::VectorXd optimal_hovering_force_vec;
+
+  bool oneshot_search;
+  double j2_angle;
+  nhp_.param("oneshot_search", oneshot_search, false);
+  nhp_.param("serach_init_angle", j2_angle, M_PI/2);
 
   /* debug */
   std::string topic_name;
@@ -203,6 +207,7 @@ bool OpenFormPlanner::plan()
 
       j2_angle -= delta_angle;
 
+      if(oneshot_search) break;
     }
 
   if(verbose_)
