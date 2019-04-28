@@ -32,9 +32,12 @@
     <arg name="debug" value="false" />
     <arg name="verbose" value="true" />
 
+    <arg name="sheet_width" value="0.85" />
+
     <!-- adhoc configuraiton -->
     <arg name="oneshot_search" value="true" />
     <arg name="serach_init_angle" value="1.65" />
+
   </include>
 
   ########## recognition ###############
@@ -69,7 +72,7 @@
   <node pkg="rostest" type="hztest" name="image_trigger" if = "$(arg real_machine)">
     <param name="topic" value="/zed/rgb/image_rect_color" />
     <param name="hz" value="30.0" />
-    <param name="hzerror" value="5" />
+    <param name="hzerror" value="10" />
     <param name="test_duration" value="8.0" />
   </node>
 

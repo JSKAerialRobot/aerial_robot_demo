@@ -64,7 +64,6 @@ private:
   bool verbose_;
   bool debug_;
   bool as_extra_module_;
-  double sheet_mass_; // not used
   double sheet_width_;
 
   bool sendOpenFormCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);

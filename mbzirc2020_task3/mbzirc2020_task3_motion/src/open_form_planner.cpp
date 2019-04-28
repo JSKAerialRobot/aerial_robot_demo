@@ -62,11 +62,13 @@ OpenFormPlanner::OpenFormPlanner(ros::NodeHandle nh, ros::NodeHandle nhp): nh_(n
     if(as_extra_module_)
       {
         /* hard-coding*/
+        double sheet_mass;
+        nhp_.param("sheet_mass", sheet_mass, 0.0); //Kg
 
         auto anchor_point1_kdl = seg_tf_mag.at(std::string("link1")).Inverse() * seg_tf_mag.at(std::string("leg1"));
-        kinematics_->addExtraModule(std::string("first_half_sheet_weight"), std::string("link1"), anchor_point1_kdl, KDL::RigidBodyInertia(sheet_mass_/2));
+        kinematics_->addExtraModule(std::string("first_half_sheet_weight"), std::string("link1"), anchor_point1_kdl, KDL::RigidBodyInertia(sheet_mass/2));
         auto anchor_point2_kdl = seg_tf_mag.at(std::string("link4")).Inverse() * seg_tf_mag.at(std::string("leg5"));
-        kinematics_->addExtraModule(std::string("second_half_sheet_weight"), std::string("link4"), anchor_point2_kdl, KDL::RigidBodyInertia(sheet_mass_/2));
+        kinematics_->addExtraModule(std::string("second_half_sheet_weight"), std::string("link4"), anchor_point2_kdl, KDL::RigidBodyInertia(sheet_mass/2));
 
         std::string srv_name;
         nhp_.param("add_extra_moudle_srv_name", srv_name, std::string("add_extra_module"));
@@ -79,7 +81,7 @@ OpenFormPlanner::OpenFormPlanner(ros::NodeHandle nh, ros::NodeHandle nhp): nh_(n
             srv.request.module_name = std::string("first_half_sheet_weight");
             srv.request.parent_link_name = std::string("link1");
             srv.request.transform = tf2::kdlToTransform(anchor_point1_kdl).transform;
-            srv.request.inertia.m = sheet_mass_/2;
+            srv.request.inertia.m = sheet_mass/2;
 
             if (client.call(srv))
               {
@@ -144,7 +146,6 @@ void OpenFormPlanner::rosParamInit()
   nhp_.param("debug", debug_, false);
 
   nhp_.param("as_extra_module", as_extra_module_, false); // add sheet as extra module
-  nhp_.param("sheet_mass", sheet_mass_, 0.3); //Kg
   nhp_.param("sheet_width", sheet_width_, 1.0); //m
 }
 
