@@ -45,6 +45,9 @@ msg = """
     r: force reset treasure to guard uav and quit the task
     s: pirate robot starts to track
     q: pirate robot quits tracking and keeps still
+    c: treasure object is cheated on pirate robot
+    f: flying to treasure box
+    t: treasure object is throwed
 
     please don't have caps lock on.
     CTRL+c to quit
@@ -62,32 +65,58 @@ if __name__=="__main__":
 	print msg
 
 	rospy.init_node('task_command', anonymous=True)
-        treasure_init_pub = rospy.Publisher("/treasure_force_init_cmd", Empty, queue_size=1)
+        treasure_force_state_pub = rospy.Publisher("/treasure_force_state_cmd", UInt8, queue_size=1)
         track_task_command_pub = rospy.Publisher('/track/task/command', UInt8, queue_size=1)
 	task_cmd_msg = UInt8() 
-	empty_msg = Empty() 
+	empty_msg = Empty()
+        treause_force_capture_msg = UInt8()
+        treause_force_capture_msg.data = 1
+        treause_force_init_msg = UInt8()
+        treause_force_init_msg.data = 2
+        treause_force_release_msg = UInt8()
+        treause_force_release_msg.data = 3
 
+        ## PRE_TRACKING 0
+        ## KEEP_TRACKING 1
+        ## START_GRAPPING 2
+        ## IN_GRAPPING 3
+        ## KEEP_STILL 4
+        ## QUIT_TASK 5
+        ## CRUISE_TREASURE_BOX 6
+        ## RELEASE_OBJECT 7
 	try:
 		while(True):
 			key = getKey()
 			# takeoff and landing
 			if key == 'g':
-                            task_cmd_msg.data = 1
+                            task_cmd_msg.data = 2 ## START_GRAPPING
 			    track_task_command_pub.publish(task_cmd_msg)
                             print "[grapping command sent to pirate robot]"
 			if key == 'r':
-                            task_cmd_msg.data = 0
+                            task_cmd_msg.data = 5 ## QUIT_TASK
 			    track_task_command_pub.publish(task_cmd_msg)
-                            treasure_init_pub.publish(empty_msg)
+                            treasure_force_state_pub.publish(treause_force_init_msg)
                             print "[treause force reset and quit the task]"
 			if key == 'q':
-                            task_cmd_msg.data = 0
+                            task_cmd_msg.data = 5 ## QUIT_TASK
 			    track_task_command_pub.publish(task_cmd_msg)
                             print "[quit the task]"
 			if key == 's':
-                            task_cmd_msg.data = 2
-			    track_task_command_pub.publish(task_cmd_msg)
+                            task_cmd_msg.data = 0 ## PRE_TRACKING
+                            track_task_command_pub.publish(task_cmd_msg)
                             print "[tracking command sent to pirate robot]"
+			if key == 'c':
+                            treasure_force_state_pub.publish(treause_force_capture_msg)
+                            print "[treasure cheats to pirate robot]"
+			if key == 'f':
+                            task_cmd_msg.data = 6 ## CRUISE_TREASURE_BOX
+                            track_task_command_pub.publish(task_cmd_msg)
+                            print "[flying to treasure box]"
+			if key == 't':
+                            task_cmd_msg.data = 7 ## RELEASE_OBJECT
+                            track_task_command_pub.publish(task_cmd_msg)
+                            treasure_force_state_pub.publish(treause_force_release_msg)
+                            print "[treasure object is throwed]"
                         if (key == '\x03'):
 			    break
 			rospy.sleep(0.001)

@@ -44,7 +44,10 @@ namespace trajectory_tracker{
     nhp_.param("tracking_offset_z", tracking_offset_z_, 1.0);
     nhp_.param("primitive_candidates_num", primitive_candidates_num_, 6);
     nhp_.param("primitive_period_step", primitive_period_step_, 0.3);
-    nhp_.param("primitive_period_base_", primitive_period_base_, 0.3);
+    nhp_.param("primitive_period_base", primitive_period_base_, 0.3);
+    nhp_.param("treasure_box_x", treasure_box_pos_(0), 0.0);
+    nhp_.param("treasure_box_y", treasure_box_pos_(1), 0.0);
+    treasure_box_pos_(2) = 1.0;
 
     primitive_ = new MotionSinglePrimitive();
     replan_prev_time_ = 0.0;
@@ -140,6 +143,17 @@ namespace trajectory_tracker{
       primitive_period_ = 2.0;
       replan_timer_period_ = primitive_period_ - 0.2;
     }
+    else if (tracking_state_ == RELEASE_OBJECT){
+      primitive_period_ = 1.0;
+      replan_timer_period_ = primitive_period_ - 0.2;
+    }
+    else if (tracking_state_ == CRUISE_TREASURE_BOX){
+      double dist_treasure_box = sqrt(pow(treasure_box_pos_(0) - host_robot_odom_.pose.pose.position.x, 2) +
+                                      pow(treasure_box_pos_(1) - host_robot_odom_.pose.pose.position.y, 2));
+      primitive_period_ = dist_treasure_box / 2.0;
+      replan_timer_period_ = primitive_period_ - 0.2;
+
+    }
 
     generatePrimitive(period);
     publishPrimitiveParam();
@@ -147,24 +161,32 @@ namespace trajectory_tracker{
   }
 
   void TrajectoryTracker::generatePrimitive(double period){
-    Eigen::VectorXd end_state = object_trajectory_predictor_->getPredictedState(period);
-    Eigen::VectorXd cur_state_full(3 * 3);
-    Eigen::VectorXd end_state_full(3 * 3);
+    Eigen::VectorXd cur_state_full = Eigen::VectorXd::Zero(3 * 3);
+    Eigen::VectorXd end_state_full = Eigen::VectorXd::Zero(3 * 3);
     cur_state_full << host_robot_odom_.pose.pose.position.x, host_robot_odom_.twist.twist.linear.x, host_robot_acc_world_(0), // x axis
       host_robot_odom_.pose.pose.position.y, host_robot_odom_.twist.twist.linear.y, host_robot_acc_world_(1), // y axis
       host_robot_odom_.pose.pose.position.z, host_robot_odom_.twist.twist.linear.z, host_robot_acc_world_(2); // z axis
 
-    end_state_full = end_state;
-    if (tracking_state_ == KEEP_TRACKING)
+    if (tracking_state_ == KEEP_TRACKING){
+      end_state_full = object_trajectory_predictor_->getPredictedState(period);
       end_state_full(6) -= tracking_offset_z_; // add offset in z axis // todo
-    else if (tracking_state_ == KEEP_STILL){
+    }
+    else if (tracking_state_ == KEEP_STILL || tracking_state_ == RELEASE_OBJECT){
       end_state_full(0) = cur_state_full(0) + host_robot_odom_.twist.twist.linear.x * primitive_period_ / 2.0; // to decelerate smoothly
       end_state_full(3) = cur_state_full(3) + host_robot_odom_.twist.twist.linear.y * primitive_period_ / 2.0;
-      end_state_full(6) -= tracking_offset_z_; // add offset in z axis // todo
-      for (int i = 0; i < 3; ++i)
-        for (int j = 1; j < 3; ++j) // vel, acc is set to be 0; pos not change
-          end_state_full(i * 3 + j) = 0.0;
+      end_state_full(6) = cur_state_full(6); // add offset in z axis // todo
     }
+    else if (tracking_state_ == CRUISE_TREASURE_BOX){
+      for (int i = 0; i < 3; ++i)
+        for (int j = 1; j < 3; ++j)
+          cur_state_full(i * 3 + j) = 0.0; // set start vel/acc 0
+      end_state_full = Eigen::VectorXd::Zero(3 * 3);
+      for (int i = 0; i < 3; ++i)
+        end_state_full(3 * i) = treasure_box_pos_(i);
+      tracking_state_ = KEEP_STILL; // quit CRUISE_TREASURE_BOX state
+    }
+    else // IN_GRAPPING
+      end_state_full = object_trajectory_predictor_->getPredictedState(period);
     convertToMPState(x_start_, cur_state_full);
     convertToMPState(x_end_, end_state_full);
 
@@ -196,6 +218,10 @@ namespace trajectory_tracker{
 
     if (tracking_state_ == IN_GRAPPING)
       param_msg.grap_flag = true;
+    else if (tracking_state_ == RELEASE_OBJECT){
+      param_msg.grap_flag = true;
+      tracking_state_ = KEEP_STILL; // quit RELEASE_OBJECT state
+    }
     else
       param_msg.grap_flag = false;
 
@@ -210,12 +236,14 @@ namespace trajectory_tracker{
     // uav_rot_mat.getRPY(uav_roll, uav_pitch, uav_psi);
     // param_msg.psi_params[0] = uav_psi;
 
-    Eigen::VectorXd end_state_full = object_trajectory_predictor_->getPredictedState(param_msg.period);
-    double target_psi = atan2(end_state_full(4), end_state_full(1));
-    double psi_offset_uav = PI + 0.785;
-    param_msg.psi_params[0] = target_psi + psi_offset_uav;
-    while (param_msg.psi_params[0] > PI)
-      param_msg.psi_params[0] -= 2.0 * PI;
+    if (tracking_state_ == KEEP_TRACKING || tracking_state_ == IN_GRAPPING){
+      Eigen::VectorXd end_state_full = object_trajectory_predictor_->getPredictedState(param_msg.period);
+      double target_psi = atan2(end_state_full(4), end_state_full(1));
+      double psi_offset_uav = PI + 0.785;
+      param_msg.psi_params[0] = target_psi + psi_offset_uav;
+      while (param_msg.psi_params[0] > PI)
+        param_msg.psi_params[0] -= 2.0 * PI;
+    }
     pub_tracking_primitive_params_.publish(param_msg);
   }
 
@@ -291,12 +319,16 @@ namespace trajectory_tracker{
   }
 
   void TrajectoryTracker::hostRobotTaskCommandCallback(const std_msgs::UInt8 msg){
-    if (msg.data == 0) // force switching to static state
+    if (msg.data == 5) // force switching to static state
       tracking_state_ = QUIT_TASK;
-    else if (msg.data == 1)
-      tracking_state_ = START_GRAPPING;
     else if (msg.data == 2)
+      tracking_state_ = START_GRAPPING;
+    else if (msg.data == 0)
       tracking_state_ = PRE_TRACKING;
+    else if (msg.data == 6)
+      tracking_state_ = CRUISE_TREASURE_BOX;
+    else if (msg.data == 7)
+      tracking_state_ = RELEASE_OBJECT;
     immediate_replan_flag_ = true;
   }
 }

@@ -77,6 +77,8 @@ namespace trajectory_tracker{
   #define IN_GRAPPING 3
   #define KEEP_STILL 4
   #define QUIT_TASK 5
+  #define CRUISE_TREASURE_BOX 6
+  #define RELEASE_OBJECT 7
   class TrajectoryTracker{
   public:
     TrajectoryTracker(ros::NodeHandle nh, ros::NodeHandle nhp);
@@ -109,6 +111,8 @@ namespace trajectory_tracker{
     nav_msgs::Odometry host_robot_odom_;
     sensor_msgs::Imu host_robot_imu_;
     Eigen::Vector3d host_robot_acc_world_;
+
+    Eigen::Vector3d treasure_box_pos_;
 
     ros::Publisher pub_tracking_trajectory_;
     ros::Publisher pub_tracking_target_markers_;

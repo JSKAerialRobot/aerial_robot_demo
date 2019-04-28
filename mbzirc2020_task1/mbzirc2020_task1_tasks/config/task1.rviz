@@ -269,7 +269,7 @@ Visualization Manager:
       Head Length: 0.200000003
       Length: 0.300000012
       Line Style: Billboards
-      Line Width: 0.3
+      Line Width: 0.25
       Name: Path
       Offset:
         X: 0
@@ -292,7 +292,7 @@ Visualization Manager:
       Head Length: 0.200000003
       Length: 0.300000012
       Line Style: Billboards
-      Line Width: 0.3
+      Line Width: 0.25
       Name: Path
       Offset:
         X: 0
