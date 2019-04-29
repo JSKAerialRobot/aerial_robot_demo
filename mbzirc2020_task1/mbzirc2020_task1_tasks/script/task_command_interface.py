@@ -36,6 +36,7 @@ from std_msgs.msg import Empty
 from std_msgs.msg import Int8
 from std_msgs.msg import UInt16
 from std_msgs.msg import UInt8
+from std_msgs.msg import Bool
 
 import sys, select, termios, tty
 
@@ -66,6 +67,7 @@ if __name__=="__main__":
 
 	rospy.init_node('task_command', anonymous=True)
         treasure_force_state_pub = rospy.Publisher("/treasure_force_state_cmd", UInt8, queue_size=1)
+        treasure_capture_flag_pub = rospy.Publisher("/treasure/capture_flag", Bool, queue_size=1)
         track_task_command_pub = rospy.Publisher('/track/task/command', UInt8, queue_size=1)
 	task_cmd_msg = UInt8() 
 	empty_msg = Empty()
@@ -104,6 +106,10 @@ if __name__=="__main__":
 			if key == 's':
                             task_cmd_msg.data = 0 ## PRE_TRACKING
                             track_task_command_pub.publish(task_cmd_msg)
+                            treasure_force_state_pub.publish(treause_force_init_msg)
+                            not_capture_msg = Bool()
+                            not_capture_msg.data = False
+                            treasure_capture_flag_pub.publish(not_capture_msg)
                             print "[tracking command sent to pirate robot]"
 			if key == 'c':
                             treasure_force_state_pub.publish(treause_force_capture_msg)

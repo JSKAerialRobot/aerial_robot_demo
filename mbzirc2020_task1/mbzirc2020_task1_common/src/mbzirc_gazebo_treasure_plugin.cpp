@@ -114,6 +114,12 @@ namespace gazebo
     else
       treasure_marker_topic_name = "/treasure/marker";
 
+    std::string treasure_capture_flag_topic_name;
+    if (_sdf->HasElement("captureFlagTopicName") && _sdf->GetElement("captureFlagTopicName")->GetValue())
+      treasure_capture_flag_topic_name = _sdf->GetElement("captureFlagTopicName")->Get<std::string>();
+    else
+      treasure_capture_flag_topic_name = "/treasure/capture_flag";
+
     // Make sure the ROS node for Gazebo has already been initialized
     if (!ros::isInitialized())
       {
@@ -133,6 +139,7 @@ namespace gazebo
 
     // publisher
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
+    treasure_capture_flag_pub_ = node_handle_->advertise<std_msgs::Bool>(treasure_capture_flag_topic_name, 1, true);
 
     update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                                 boost::bind(&GazeboTreasure::Update, this));
@@ -182,7 +189,7 @@ namespace gazebo
             geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(pirate_id);
             if(fabs(pose_pirate.position.x - pose_object.pos.x)<grab_thre_&&
                fabs(pose_pirate.position.y - pose_object.pos.y)<grab_thre_&&
-               fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_){
+               fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_ / 2.0){
               treasure_state_ = TREASURE_CAPTURED;
               updateTreasureState(pirate_id, pirate_name_);
             }
@@ -192,6 +199,9 @@ namespace gazebo
           if (pirate_id >= 0){
             // reset object positon
             updateTreasureState(pirate_id, pirate_name_);
+            std_msgs::Bool capture_flag_msg;
+            capture_flag_msg.data = true;
+            treasure_capture_flag_pub_.publish(capture_flag_msg);
           }
         }
         else if (treasure_state_ == TREASURE_RELEASE)

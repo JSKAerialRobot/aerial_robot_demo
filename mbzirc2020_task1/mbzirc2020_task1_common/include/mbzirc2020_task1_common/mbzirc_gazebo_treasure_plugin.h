@@ -96,6 +96,7 @@ private:
 
   // treasure marker for visualization
   ros::Publisher treasure_marker_pub_;
+  ros::Publisher treasure_capture_flag_pub_;
 
   gazebo_msgs::ModelStates gazebo_models_; //model states...
   int treasure_state_;
