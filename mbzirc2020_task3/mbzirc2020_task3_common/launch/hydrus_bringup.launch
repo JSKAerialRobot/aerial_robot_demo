@@ -76,4 +76,10 @@
     <param name="test_duration" value="8.0" />
   </node>
 
+  ########## motion planner ###############
+  <include file="$(find mbzirc2020_task3_motion)/launch/search_and_reach_single_color_object.launch">
+    <arg name="target_tf_name" value="target_object"/>
+    <arg name="log_output" default="screen"/>
+  </include>
+
 </launch>
