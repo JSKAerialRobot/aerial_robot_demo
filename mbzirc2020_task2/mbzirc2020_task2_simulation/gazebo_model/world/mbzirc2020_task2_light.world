@@ -127,7 +127,7 @@
       <brick_size>0.3 0.2 0.2</brick_size>
       <brick_color>1.0 0.0 0.0</brick_color>
       <brick_mass>0.381</brick_mass>
-      <count>50</count>
+      <count>200</count>
     </plugin>
 
   </world>
