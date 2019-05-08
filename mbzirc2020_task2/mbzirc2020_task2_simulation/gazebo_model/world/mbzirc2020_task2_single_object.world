@@ -78,7 +78,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.2 0.2 0.3</size>
+              <size>0.3 0.3 0.3</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -93,7 +93,7 @@
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-              <size>0.2 0.2 0.3</size>
+              <size>0.3 0.3 0.3</size>
             </box>
           </geometry>
           <material>
@@ -108,6 +108,10 @@
         <gravity>1</gravity>
       </link>
     </model>
+    <gazebo reference='object'>
+      <mu1>0.5</mu1>
+      <mu2>0.5</mu2>
+    </gazebo>
 
   </world>
 </sdf>
