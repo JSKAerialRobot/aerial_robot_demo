@@ -111,7 +111,6 @@ namespace trajectory_tracker{
     else if (tracking_state_ == KEEP_TRACKING)
       primitive_period_ = period;
     else if (tracking_state_ == START_GRAPPING){
-      primitive_period_ = period;
       tracking_state_ = IN_GRAPPING;
       // replan_timer_period_ = 0.1; // Not working
       /* find the primitive with minimum snap energy */
@@ -127,6 +126,7 @@ namespace trajectory_tracker{
         if (primitive_visualize_flag_)
           visualizationPrimitive(PRIMITIVE_MODE);
       }
+      primitive_period_ = period;
     }
     else if (tracking_state_ == IN_GRAPPING){
       primitive_period_ -= ros::Time::now().toSec() - replan_prev_time_;
@@ -159,7 +159,7 @@ namespace trajectory_tracker{
 
     }
 
-    generatePrimitive(period);
+    generatePrimitive(primitive_period_);
     publishPrimitiveParam();
     visualizationPrimitive();
   }
@@ -176,8 +176,8 @@ namespace trajectory_tracker{
       end_state_full(6) -= tracking_offset_z_; // add offset in z axis // todo
     }
     else if (tracking_state_ == KEEP_STILL || tracking_state_ == RELEASE_OBJECT){
-      end_state_full(0) = cur_state_full(0) + host_robot_odom_.twist.twist.linear.x * primitive_period_ / 2.0; // to decelerate smoothly
-      end_state_full(3) = cur_state_full(3) + host_robot_odom_.twist.twist.linear.y * primitive_period_ / 2.0;
+      end_state_full(0) = cur_state_full(0) + host_robot_odom_.twist.twist.linear.x * period / 2.0; // to decelerate smoothly
+      end_state_full(3) = cur_state_full(3) + host_robot_odom_.twist.twist.linear.y * period / 2.0;
       end_state_full(6) = cur_state_full(6); // add offset in z axis // todo
     }
     else if (tracking_state_ == CRUISE_TREASURE_BOX){
@@ -194,7 +194,7 @@ namespace trajectory_tracker{
     convertToMPState(x_start_, cur_state_full);
     convertToMPState(x_end_, end_state_full);
 
-    primitive_->init(primitive_period_, x_start_, x_end_);
+    primitive_->init(period, x_start_, x_end_);
   }
 
   void TrajectoryTracker::publishPrimitiveParam(){
