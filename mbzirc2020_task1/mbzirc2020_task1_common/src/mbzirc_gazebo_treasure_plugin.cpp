@@ -191,6 +191,7 @@ namespace gazebo
                fabs(pose_pirate.position.y - pose_object.pos.y)<grab_thre_&&
                fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_ / 2.0){
               treasure_state_ = TREASURE_CAPTURED;
+              ROS_ERROR("TREASURE_CAPTURED");
               updateTreasureState(pirate_id, pirate_name_);
             }
           }

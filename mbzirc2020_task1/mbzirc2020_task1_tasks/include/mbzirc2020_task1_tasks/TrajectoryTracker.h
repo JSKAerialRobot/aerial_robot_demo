@@ -79,6 +79,9 @@ namespace trajectory_tracker{
   #define QUIT_TASK 5
   #define CRUISE_TREASURE_BOX 6
   #define RELEASE_OBJECT 7
+
+  #define SELECTED_TRAJECTORY_MODE 1
+  #define PRIMITIVE_MODE 2
   class TrajectoryTracker{
   public:
     TrajectoryTracker(ros::NodeHandle nh, ros::NodeHandle nhp);
@@ -99,6 +102,7 @@ namespace trajectory_tracker{
     int primitive_candidates_num_;
     double primitive_period_step_;
     double primitive_period_base_;
+    bool primitive_visualize_flag_;
 
     double kf_predict_horizon_;
     boost::thread predictor_thread_;
@@ -117,6 +121,7 @@ namespace trajectory_tracker{
     ros::Publisher pub_tracking_trajectory_;
     ros::Publisher pub_tracking_target_markers_;
     ros::Publisher pub_tracking_primitive_params_;
+    ros::Publisher pub_grabbing_primitive_trajectory_;
 
     ros::Subscriber sub_host_robot_odom_;
     ros::Subscriber sub_host_robot_imu_;
@@ -128,7 +133,7 @@ namespace trajectory_tracker{
     void generatePrimitive(double period);
     void convertToMPState(MPState &x, Eigen::VectorXd state);
     void publishPrimitiveParam();
-    void visualizationPrimitive();
+    void visualizationPrimitive(int mode=SELECTED_TRAJECTORY_MODE);
     void hostRobotOdomCallback(const nav_msgs::OdometryConstPtr& msg);
     void hostRobotImuCallback(const sensor_msgs::ImuConstPtr& msg);
     void hostRobotTaskCommandCallback(const std_msgs::UInt8 msg);

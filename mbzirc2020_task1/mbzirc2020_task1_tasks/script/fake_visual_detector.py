@@ -73,10 +73,11 @@ class fakeVisualDetector:
         if msg.data:
             self.__treasure_capture_flag = True
             self.__visual_tracking_state = NOT_FOUND
-            time.sleep(3)
+            rospy.logwarn("[fake_visual_detector] Treasure is NOT FOUND")
         else:
             self.__treasure_capture_flag = False
             self.__visual_tracking_state = FOUND
+            rospy.logwarn("[fake_visual_detector] Treasure is FOUND")
 
 if __name__ == '__main__':
     try:

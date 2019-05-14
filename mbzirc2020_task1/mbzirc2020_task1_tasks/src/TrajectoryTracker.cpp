@@ -45,6 +45,7 @@ namespace trajectory_tracker{
     nhp_.param("primitive_candidates_num", primitive_candidates_num_, 6);
     nhp_.param("primitive_period_step", primitive_period_step_, 0.3);
     nhp_.param("primitive_period_base", primitive_period_base_, 0.3);
+    nhp_.param("primitive_visualize_flag", primitive_visualize_flag_, false);
     nhp_.param("treasure_box_x", treasure_box_pos_(0), 0.0);
     nhp_.param("treasure_box_y", treasure_box_pos_(1), 0.0);
     treasure_box_pos_(2) = 1.0;
@@ -55,6 +56,7 @@ namespace trajectory_tracker{
     immediate_replan_flag_ = false;
 
     pub_tracking_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/planned_path", 1);
+    pub_grabbing_primitive_trajectory_ = nh_.advertise<nav_msgs::Path>("/track/vis/grab_primitive", 1);
     pub_tracking_target_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/track/vis/target_marker", 1);
     pub_tracking_primitive_params_ = nh_.advertise<mbzirc2020_task1_tasks::PrimitiveParams>("/track/primitive_params", 1);
 
@@ -122,6 +124,8 @@ namespace trajectory_tracker{
           min_energy = cur_energy;
           period = period_candidate;
         }
+        if (primitive_visualize_flag_)
+          visualizationPrimitive(PRIMITIVE_MODE);
       }
     }
     else if (tracking_state_ == IN_GRAPPING){
@@ -247,7 +251,7 @@ namespace trajectory_tracker{
     pub_tracking_primitive_params_.publish(param_msg);
   }
 
-  void TrajectoryTracker::visualizationPrimitive(){
+  void TrajectoryTracker::visualizationPrimitive(int mode){
     nav_msgs::Path tracking_path;
     tracking_path.header.frame_id = std::string("/world");
     tracking_path.header.stamp = ros::Time::now();
@@ -262,7 +266,10 @@ namespace trajectory_tracker{
       waypoint_pose.pose.position.z = waypoint.state[2](0);
       tracking_path.poses.push_back(waypoint_pose);
     }
-    pub_tracking_trajectory_.publish(tracking_path);
+    if (mode == SELECTED_TRAJECTORY_MODE)
+      pub_tracking_trajectory_.publish(tracking_path);
+    else
+      pub_grabbing_primitive_trajectory_.publish(tracking_path);
 
     visualization_msgs::MarkerArray target_marker_array;
     visualization_msgs::Marker target_marker;
