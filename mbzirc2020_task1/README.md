@@ -12,16 +12,21 @@ catkin build
 
 ## how to use
 
-- run simulation of task1:
+- launch simulation of task1:
 ```
 $ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch
 ```
 
-- manually control hector in gazebo:
+- launch tracking module of task1:
 ```
-$ roslaunch mbzirc2020_task1_common mbzirc_arena_1.launch start:=false
-$ rosservice call /hawk/enable_motors "enable: true"
+$ roslaunch mbzirc2020_task1_tasks task_1_tracking.launch
 ```
+
+- run tracking command interface of task1:
+```
+$ rosrun mbzirc2020_task1_tasks task_command_interface.py
+```
+
 
 ## task 1 cheat mode
 
@@ -33,4 +38,12 @@ $ roslaunch mbzirc2020_task1_tasks jsk_mbzirc_task_1.launch start:=false
 - run cheat mode of task1:
 ```
 $ rosrun mbzirc2020_task1_tasks task_1_cheat.py
+```
+
+## tips
+
+- manually control hector in gazebo:
+```
+$ roslaunch mbzirc2020_task1_common mbzirc_arena_1.launch start:=false
+$ rosservice call /hawk/enable_motors "enable: true"
 ```
