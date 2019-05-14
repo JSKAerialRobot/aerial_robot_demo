@@ -100,10 +100,6 @@ namespace trajectory_tracker{
       if (period > kf_predict_horizon_)
         period = kf_predict_horizon_;
     }
-    // test
-    // period = 2.2;
-    replan_timer_period_ = period - 0.2;
-    
     if (tracking_state_ == PRE_TRACKING){
       tracking_state_ = KEEP_TRACKING;
       primitive_period_ = period;
@@ -133,7 +129,6 @@ namespace trajectory_tracker{
       if (primitive_period_ < 0.0){
         tracking_state_ = KEEP_STILL;
         primitive_period_ = 2.0;
-        replan_timer_period_ = primitive_period_ - 0.2;
       }
       /* during grapping, when period is too small, no need to replan */
       else if (primitive_period_ < 0.3)
@@ -145,18 +140,20 @@ namespace trajectory_tracker{
     else if (tracking_state_ == QUIT_TASK){
       tracking_state_ = KEEP_STILL;
       primitive_period_ = 2.0;
-      replan_timer_period_ = primitive_period_ - 0.2;
     }
     else if (tracking_state_ == RELEASE_OBJECT){
       primitive_period_ = 1.0;
-      replan_timer_period_ = primitive_period_ - 0.2;
     }
     else if (tracking_state_ == CRUISE_TREASURE_BOX){
       double dist_treasure_box = sqrt(pow(treasure_box_pos_(0) - host_robot_odom_.pose.pose.position.x, 2) +
                                       pow(treasure_box_pos_(1) - host_robot_odom_.pose.pose.position.y, 2));
       primitive_period_ = dist_treasure_box / 2.0;
-      replan_timer_period_ = primitive_period_ - 0.2;
 
+    }
+    replan_timer_period_ = primitive_period_ - 0.2;
+    if (replan_timer_period_ < 0.0){
+      ROS_ERROR("[TrajectoryTracker] replan_timer_period is less than 0");
+      replan_timer_period_ = 0.1;
     }
 
     generatePrimitive(primitive_period_);
