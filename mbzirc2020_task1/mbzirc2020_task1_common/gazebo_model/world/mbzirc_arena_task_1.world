@@ -25,6 +25,8 @@
           <speed>12</speed>
         </clouds>
       </sky>
+      <ambient>1.0 1.0 1.0 1</ambient>
+      <background>1.0 1.0 1.0 1</background>
    </scene>
 
    <include>
@@ -32,8 +34,12 @@
    </include>
 
     <!-- A ground plane -->
+    <!-- <include> -->
+    <!--   <uri>model://ground_plane</uri> -->
+    <!-- </include> -->
+
     <include>
-      <uri>model://ground_plane</uri>
+      <uri>model://arena</uri>
     </include>
 
     <model name="small_sphere_1" >
@@ -45,6 +51,9 @@
         <guardName>hawk</guardName>
         <pirateName>hydrusx</pirateName>
         <markerTopicName>/treasure/marker</markerTopicName>
+        <grabThreshold>0.3</grabThreshold>
+        <guardUavTreasureOffsetZ>0.5</guardUavTreasureOffsetZ>
+        <pirateUavTreasureOffsetZ>0.03</pirateUavTreasureOffsetZ>
       </plugin>
     </model>
 

@@ -9,6 +9,7 @@
   <arg name="control_mode" default="0" />
   <arg name="estimate_mode" default="2" />
   <arg name="uav_name" default="hawk" />
+  <arg name="start" default="true" />
 
   <include file="$(find mbzirc2020_task1_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -17,6 +18,7 @@
     <arg name="headless" default="$(arg headless)"/>
     <arg name="use_ground_truth" default="$(arg use_ground_truth)"/>
     <arg name="uav_name" value="$(arg uav_name)" />
+    <arg name="start" value="$(arg start)" />
   </include>
 
   <!-- Spawn simulated HYDRUS uav -->

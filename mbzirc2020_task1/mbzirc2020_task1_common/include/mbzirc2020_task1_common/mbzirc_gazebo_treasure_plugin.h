@@ -45,6 +45,8 @@
 #include <gazebo_msgs/ModelStates.h>
 #include <gazebo_msgs/ModelState.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Empty.h>
+#include <std_msgs/UInt8.h>
 #include <visualization_msgs/Marker.h>
 
 #include <stdio.h>
@@ -55,6 +57,8 @@
 
 #define TREASURE_CRUISE 0
 #define TREASURE_CAPTURED 1
+#define TREASURE_FORCE_INIT 2
+#define TREASURE_RELEASE 3
 
 namespace gazebo
 {
@@ -88,9 +92,11 @@ private:
   // treasure plugin for attaching the object to uav
   ros::Subscriber gazebo_model_sub_; //get the model states
   ros::Subscriber magnet_release_sub_; //release the object(disable attach)
+  ros::Subscriber treasure_force_state_sub_; // treasure state is forced to change
 
   // treasure marker for visualization
   ros::Publisher treasure_marker_pub_;
+  ros::Publisher treasure_capture_flag_pub_;
 
   gazebo_msgs::ModelStates gazebo_models_; //model states...
   int treasure_state_;
@@ -102,6 +108,9 @@ private:
 
   std::string guard_name_;
   std::string pirate_name_;
+  double grab_thre_;
+  double guard_uav_treasure_offset_z_;
+  double pirate_uav_treasure_offset_z_;
 
   //renew the data of the gazebo objects
   void gazeboCallback(const gazebo_msgs::ModelStates gazebo_model_states)
@@ -112,8 +121,10 @@ private:
   {
         this->magnet_on_ = on;
   }
+  void treasureForceStateCallback(std_msgs::UInt8 msg);
 
   void updateTreasureState(int owner_id, std::string robot_name);
+  void visualizeTreasure();
 };
 
 }  // namespace gazebo

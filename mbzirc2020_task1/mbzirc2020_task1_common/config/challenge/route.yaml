@@ -1,0 +1,10 @@
+#Route 8-shape config
+
+radius: 19.0
+cross_angle: 0.78539816339 ## angle between straight route and x axis, the angle between two straight routes should x2
+linear_velocity: 3.0
+object_height: 4.0
+uav_object_offset_z: 0.5
+
+treasure_box_x: 65.0
+treasure_box_y: -25.0

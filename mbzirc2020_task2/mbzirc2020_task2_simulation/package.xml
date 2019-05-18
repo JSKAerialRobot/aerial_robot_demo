@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mbzirc2020_task2_simulation</name>
+  <version>0.0.0</version>
+  <description>The mbzirc2020_task2_simulation package</description>
+
+  <maintainer email="anzai@jsk.imi.i.u-tokyo.ac.jp">Tomoki Anzai</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>gazebo_ros</depend>
+  <depend>hydrus</depend>
+
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/gazebo_model/models"/>
+  </export>
+</package>
