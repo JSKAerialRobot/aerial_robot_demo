@@ -41,6 +41,8 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <mbzirc2020_task1_tasks/LinearKalmanFilter.h>
+#include <random>
+#include <chrono>
 
 /* linear algebra */
 #include <math.h>
@@ -90,6 +92,10 @@ namespace trajectory_predictor{
     double filter_freq_;
     double predict_horizon_;
 
+    bool noise_flag_;
+    double noise_mean_;
+    double noise_stddev_;
+
     bool filter_init_flag_;
     Eigen::VectorXd x_post_;
     Eigen::VectorXd u_prev_;
@@ -120,6 +126,7 @@ namespace trajectory_predictor{
     Eigen::VectorXd initControlInputFromObservation(Eigen::VectorXd &z);
     void updateMapInfo();
     Eigen::VectorXd getControlInputFromMap(Eigen::Vector3d &cur_pos);
+    double getGaussNoise();
   };
 }
 
