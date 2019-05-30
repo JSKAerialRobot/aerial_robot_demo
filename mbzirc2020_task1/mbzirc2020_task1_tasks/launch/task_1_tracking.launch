@@ -8,6 +8,7 @@
     <param name="predict_horizon" value="3.0" />
     <param name="kf_method" value="0" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
     <param name="primitive_visualize_flag" value="true" />
+    <param name="primitive_candidates_num" value="6" />
   </node>
 
   <group if="$(arg fake_vision)">

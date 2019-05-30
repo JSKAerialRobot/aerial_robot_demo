@@ -104,8 +104,28 @@ namespace trajectory_tracker{
       tracking_state_ = KEEP_TRACKING;
       primitive_period_ = period;
     }
-    else if (tracking_state_ == KEEP_TRACKING)
-      primitive_period_ = period;
+    else if (tracking_state_ == KEEP_TRACKING){
+      // test
+      replan_timer_period_ = period - 0.2;
+      if (period < 2.0){
+        /* find the primitive with minimum snap energy */
+        double min_energy = -1;
+        double primitive_period_base_local = 0.1;
+        for (int i = 0; i < primitive_candidates_num_; ++i){
+          double period_candidate = primitive_period_base_local + primitive_period_step_ * i;
+          if (period_candidate > kf_predict_horizon_)
+            break;
+          generatePrimitive(period_candidate);
+          double cur_energy = primitive_->getPrimitiveEnergy();
+          if (min_energy < 0 || cur_energy < min_energy){
+            min_energy = cur_energy;
+            primitive_period_ = period_candidate;
+          }
+          if (primitive_visualize_flag_)
+            visualizationPrimitive(PRIMITIVE_MODE);
+        }
+      }
+    }
     else if (tracking_state_ == START_GRAPPING){
       tracking_state_ = IN_GRAPPING;
       // replan_timer_period_ = 0.1; // Not working
