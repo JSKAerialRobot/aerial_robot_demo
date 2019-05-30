@@ -110,7 +110,9 @@ namespace trajectory_tracker{
       if (period < 2.0){
         /* find the primitive with minimum snap energy */
         double min_energy = -1;
-        double primitive_period_base_local = 0.1;
+        double primitive_period_base_local = period - primitive_period_step_ * primitive_candidates_num_ / 2;
+        while (primitive_period_base_local < 0.1)
+          primitive_period_base_local += primitive_period_step_;
         for (int i = 0; i < primitive_candidates_num_; ++i){
           double period_candidate = primitive_period_base_local + primitive_period_step_ * i;
           if (period_candidate > kf_predict_horizon_)
