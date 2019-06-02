@@ -47,7 +47,7 @@ namespace trajectory_predictor{
     object_default_acc_value_ = pow(object_default_vel_value_, 2.0) / map_radius_;
     nhp_.param("noise_flag", noise_flag_, false);
     noise_mean_ = 0.0;
-    noise_stddev_ = 0.1;
+    noise_stddev_ = 0.2;
 
     switch (kf_method_){
     case POS_VEL:
