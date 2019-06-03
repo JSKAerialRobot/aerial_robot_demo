@@ -45,6 +45,9 @@ namespace trajectory_predictor{
     nhp_.param("object_height", object_default_height_, 2.5);
     nhp_.param("linear_velocity", object_default_vel_value_, 5.0);
     object_default_acc_value_ = pow(object_default_vel_value_, 2.0) / map_radius_;
+    nhp_.param("noise_flag", noise_flag_, false);
+    noise_mean_ = 0.0;
+    noise_stddev_ = 0.2;
 
     switch (kf_method_){
     case POS_VEL:
@@ -87,8 +90,21 @@ namespace trajectory_predictor{
 
   void TrajectoryPredictor::trackedObjectOdomCallback(const nav_msgs::OdometryConstPtr& msg){
     tracked_object_odom_ = *msg;
+    if (noise_flag_){
+      tracked_object_odom_.pose.pose.position.x += getGaussNoise();
+      tracked_object_odom_.pose.pose.position.y += getGaussNoise();
+      tracked_object_odom_.pose.pose.position.z += getGaussNoise();
+    }
 
     updatePredictorFilter();
+  }
+
+  double TrajectoryPredictor::getGaussNoise(){
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator (seed);
+    std::normal_distribution<double> distribution (noise_mean_, noise_stddev_);
+
+    return distribution(generator);
   }
 
   void TrajectoryPredictor::updatePredictorFilter(){
