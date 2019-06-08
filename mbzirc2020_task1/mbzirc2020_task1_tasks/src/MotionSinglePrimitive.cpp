@@ -69,6 +69,7 @@ namespace motion_single_primitive{
   double MotionSinglePrimitive::getPrimitiveEnergy(int derivative_order){
     double energy_sum = 0.0; // default is snap energy
 
+    /* method 1: only calculate the jerk square as trajectory cost */
     for (int i1 = derivative_order; i1 < polynomial_order_; ++i1){
       int factor1 = nMultiply(i1, derivative_order);
       for (int i2 = derivative_order; i2 < polynomial_order_; ++i2){
@@ -80,6 +81,19 @@ namespace motion_single_primitive{
             * traj_poly_param_vec_[j](i2);
       }
     }
+
+    /* method 2: follow Mueller's cost function */
+    // for (int i = 0; i < traj_poly_param_vec_.size(); ++i){
+    //   double a = traj_poly_param_vec_[i](polynomial_order_ - 1) * 120.0;
+    //   double b = traj_poly_param_vec_[i](polynomial_order_ - 2) * 24.0;
+    //   double c = traj_poly_param_vec_[i](polynomial_order_ - 3) * 6.0;
+    //   energy_sum += pow(c, 2) * period_
+    //     + b * c * pow(period_, 2)
+    //     + (pow(b, 2) + a * c) * pow(period_, 3) / 3.0
+    //     + a * b * pow(period_, 4) / 4.0
+    //     + pow(a, 2) * pow(period_, 5) / 20.0
+    //     ;
+    // }
     return energy_sum;
   }
 
