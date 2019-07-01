@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base kinematics model -->
+  <xacro:include filename="$(find hydrus)/robots/quad/default.urdf.xacro" />
+
+  <!-- oboard sensors and processors -->
+  <xacro:include filename="$(find hydrus)/robots/onboards/tx2_zed_201810/onboards.urdf.xacro" />
+  <xacro:onboards link = "2" />
+
+  <!-- add sheet as a rigid point, meanings less inertia -->
+  <xacro:property name="sheet_mass" value=".41" />
+  <xacro:extra_module name = "sheet_anchor1" parent = "leg1" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${sheet_mass/2}"/>
+      <inertia
+          ixx="0.0001" iyy="0.0001" izz="0.0002"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "sheet_anchor2" parent = "leg5" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${sheet_mass/2}"/>
+      <inertia
+          ixx="0.0001" iyy="0.0001" izz="0.0002"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+</robot>

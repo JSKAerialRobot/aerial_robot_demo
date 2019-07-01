@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="target_tf_name" default="target_object"/>
+  <arg name="log_output" default="screen"/>
+
+  <node pkg="mbzirc2020_task3_motion" type="motion.py" name="task3_motion_planner" output="$(arg log_output)">
+	<param name="target_tf_name" value="$(arg target_tf_name)"/>
+  <rosparam file="$(find mbzirc2020_task3_motion)/config/motion/motion.yaml" command="load"/>
+  </node>
+</launch>

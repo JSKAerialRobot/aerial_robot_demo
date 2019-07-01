@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name="real_fire">
+    <link name="link" >
+      <pose>0 0 0.01 0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.01</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>
+          <iyy>0.01</iyy> <iyz>0.0</iyz> <izz>0.02</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>.8 .8 .02</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>.8 .8 .02</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://real_fire/materials/scripts</uri>
+            <uri>model://real_fire/materials/textures</uri>
+            <name>fire</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

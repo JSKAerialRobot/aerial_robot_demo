@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<launch>
+  ###########  launch config  ###########
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="control_mode" default="0" />
+  <arg name="estimate_mode"  default= "0" />
+  <arg name="headless" default="True" />
+
+  <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
+  <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/virtual_fire_fighting.world" if="$(arg cheating_fire)"/>
+  <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/real_fire_fighting.world" unless="$(arg cheating_fire)"/>
+
+  ##########  basic bringup file ########
+  <include file="$(find hydrus)/launch/bringup.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="control_mode" value="$(arg control_mode)" />
+    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="worldtype" value="$(arg gazebo_world)" />
+    <arg name="direct_model" value="True" />
+    <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.urdf.xacro" if="$(eval (1 - arg('simulation')))"/>
+    <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.gazebo.xacro" if="$(eval arg('simulation'))"/>
+  </include>
+  <!-- additional param -->
+  <param name="/aerial_robot_base_node/navigator/takeoff_height" value="1.2" />
+  <param name="/sensor_plugin/vo/servo_init_angle" value="0" />
+
+  ######### open-form planner ##########
+  <include file="$(find mbzirc2020_task3_motion)/launch/open_form_planner.launch" >
+    <arg name="debug" value="false" />
+    <arg name="verbose" value="true" />
+
+    <arg name="sheet_width" value="0.85" />
+
+    <!-- adhoc configuraiton -->
+    <arg name="oneshot_search" value="true" />
+    <arg name="serach_init_angle" value="1.65" />
+
+  </include>
+
+  ########## recognition ###############
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch">
+    <arg name="image_topic" value="/zed/rgb/image_rect_color"/>
+    <arg name="camera_info_topic" value="/zed/rgb/camera_info"/>
+    <arg name="output_screen" value="true"/>
+
+    <!-- TODO: please set following paramters in yaml file -->
+    <!-- object property -->
+    <arg name="object_height" value="0.02"/>
+
+    <!-- red color object -->
+    <arg name="contour_area_size" value="0.05" if="$(eval arg('cheating_fire') * arg('real_machine'))"/>
+    <arg name="contour_area_size" value="0.2" if="$(eval arg('cheating_fire') * arg('simulation'))"/>
+    <arg name="h_limit_min" value="345" if="$(eval arg('cheating_fire') * arg('real_machine'))"/>
+    <arg name="h_limit_min" value="10" if="$(eval arg('cheating_fire') * arg('simulation'))"/>
+    <arg name="h_limit_max" value="40" if="$(arg cheating_fire)"/>
+
+    <!-- real fire -->
+    <arg name="contour_area_size" value="0.64" unless="$(arg cheating_fire)"/>
+    <arg name="h_limit_min" value="10" unless="$(arg cheating_fire)"/>
+    <arg name="h_limit_max" value="60" unless="$(arg cheating_fire)"/>
+
+    <arg name="s_limit_max" value="255" />
+    <arg name="s_limit_min" value="60" />
+    <arg name="v_limit_max" value="255" />
+    <arg name="v_limit_min" value="60" />
+  </include>
+
+  ######## trigger for zed stereo in real machine ########
+  <node pkg="rostest" type="hztest" name="image_trigger" if = "$(arg real_machine)">
+    <param name="topic" value="/zed/rgb/image_rect_color" />
+    <param name="hz" value="30.0" />
+    <param name="hzerror" value="10" />
+    <param name="test_duration" value="8.0" />
+  </node>
+
+  ########## motion planner ###############
+  <include file="$(find mbzirc2020_task3_motion)/launch/search_and_reach_single_color_object.launch">
+    <arg name="target_tf_name" value="target_object"/>
+    <arg name="log_output" default="screen"/>
+  </include>
+
+</launch>
