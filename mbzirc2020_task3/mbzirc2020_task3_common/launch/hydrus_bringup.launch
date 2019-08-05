@@ -19,6 +19,7 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="worldtype" value="$(arg gazebo_world)" />
+    <arg name="onboards_model" value="tx2_zed_201810" />
     <arg name="direct_model" value="True" />
     <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.urdf.xacro" if="$(eval (1 - arg('simulation')))"/>
     <arg name="direct_model_name" value="$(find mbzirc2020_task3_common)/robots/hydrus.gazebo.xacro" if="$(eval arg('simulation'))"/>
