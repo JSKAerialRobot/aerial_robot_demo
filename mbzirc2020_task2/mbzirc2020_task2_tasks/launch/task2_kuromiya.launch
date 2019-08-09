@@ -1,0 +1,24 @@
+<launch>
+  <arg name="image_topic" default="image" />
+  <arg name="image_depth_topic" default="image_depth" />
+  <arg name="camera_info_topic" default="cam_info" />
+  <arg name="debug_view" default="true"/>
+  <arg name="poly_array" default="polygon_array" />
+  <arg name="frame_id" default="target_object"/>
+  <arg name="camera" default="rs_d435"/>
+
+  <!-- <group ns="$(arg camera)" > -->
+  <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen"/>
+  <node pkg="nodelet" type="nodelet" name="red_object_detection_with_hsv_filter"
+        args="load mbzirc2020_task2_tasks/RedObjectDetectionWithHSVFilter object_detection_nodelet" output="screen">
+        <!-- launch-prefix="valgrind" -->
+
+    <remap from="image" to="/rs_d435/rgb/image_rect_color" />
+    <remap from="image_depth" to="/rs_d435/depth/depth_registered" />
+    <remap from="cam_info" to="/rs_d435/rgb/camera_info" />
+    <remap from="polygon_array" to="/multi_plane_estimate/output_refined_polygon" />
+    <param name="debug_view" value="$(arg debug_view)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+  </node>
+  <!-- </group> -->
+</launch>
