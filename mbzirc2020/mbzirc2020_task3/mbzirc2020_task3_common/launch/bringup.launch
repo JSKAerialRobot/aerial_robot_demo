@@ -19,6 +19,7 @@
     <arg name="control_mode" value="$(arg control_mode)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="worldtype" value="$(arg gazebo_world)" />
     <arg name="task" value="3" />
   </include>
