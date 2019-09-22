@@ -25,6 +25,9 @@ class HydrusCommander():
         self.extra_servos_ctrl_pub = rospy.Publisher("/hydrusx/extra_servos_ctrl", JointState, queue_size=1)
         self.joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
 
+        self.cover_pose = rospy.get_param('~cover_pose')
+        self.close_pose = rospy.get_param('~close_pose')
+
         # constants
         self.WAIT_TIME = 0.5
 
@@ -91,18 +94,11 @@ class HydrusCommander():
 
     def open_joints(self):
         """open links"""
-        # self.joint_publish([1.1, 1.1, 1.1])
-        rospy.wait_for_service("/send_open_form")
-        try:
-            send_open_form = rospy.ServiceProxy('/send_open_form', Trigger)
-            resp1 = send_open_form()
-            return
-        except rospy.ServiceException, e:
-            rospy.logerr("Service call failed: %s"%e)
+        self.joint_publish(self.cover_pose)
 
     def close_joints(self):
         """close links"""
-        self.joint_publish([1.56, 1.56, 1.56])
+        self.joint_publish(self.close_pose)
 
     def covering_motion(self,pos_x, pos_y, cog_yaw, covering_pre_height, covering_post_height, covering_move_dist):
         dest_yaw = cog_yaw + 0.785 # correct forward angle of open form

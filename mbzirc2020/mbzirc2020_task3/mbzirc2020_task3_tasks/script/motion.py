@@ -135,7 +135,7 @@ class Task3Motion():
         except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
             rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
 
-        rospy.loginfo(self.state.value)
+        rospy.loginfo("motion planner: phase%d ",self.state.value)
         # state machine
         if self.state == Task3MotionState.INITIAL_STATE:
             pass

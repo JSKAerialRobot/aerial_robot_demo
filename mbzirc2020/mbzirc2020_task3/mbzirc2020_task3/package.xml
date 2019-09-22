@@ -15,8 +15,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>mbzirc2020_task3_common</exec_depend>
-  <exec_depend>mbzirc2020_task3_motion</exec_depend>
-  <!-- <exec_depend>mbzirc2020_task3_simulation</exec_depend> -->
+  <exec_depend>mbzirc2020_task3_tasks</exec_depend>
 
   <export>
     <metapackage/>

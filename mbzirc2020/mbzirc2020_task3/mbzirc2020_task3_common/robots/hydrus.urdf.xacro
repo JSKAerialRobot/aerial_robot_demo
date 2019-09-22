@@ -3,13 +3,51 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
 
   <!-- base kinematics model -->
-  <xacro:include filename="$(find hydrus)/robots/quad/default.urdf.xacro" />
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "0"  />
 
-  <!-- oboard sensors and processors -->
-  <xacro:include filename="$(find hydrus)/robots/onboards/tx2_zed_201810/onboards.urdf.xacro" />
-  <xacro:onboards link = "2" />
+  <!-- processor: intel upboard -->
+  <xacro:extra_module name = "pc" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/intel_upboard_fixed_joint_unit.dae" >
+    <origin xyz="${link_length / 2 + 0.2845} 0.011 0.016" rpy="0 0 ${pi}"/>
+    <inertial>
+      <mass value = "0.117" />
+      <origin xyz="${21 * 0.001} ${4 * 0.001} ${12 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00004" ixy="0.0" ixz="0.0"
+          iyy="0.00008" iyz="0.0"
+          izz="0.00011"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: intel upboard -->
 
-  <!-- add sheet as a rigid point, meanings less inertia -->
+  <!-- sensor -->
+  <!-- 1. FLIR -->
+  <!-- TODO: accurate intertia parameters and position -->
+  <xacro:extra_module name = "flir_thermal_frame" parent = "link2" visible = "0"  >
+    <origin xyz="${link_length / 2 + 0.24455} 0.05545 -0.015" rpy="0 ${pi/2} ${3 * pi/4}"/>
+    <inertial>
+      <mass value = "0.02" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "flir_thermal_optical_frame" parent = "flir_thermal_frame">
+    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+    <inertial>
+      <mass value = "0.0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- sheet -->
+  <!--
   <xacro:property name="sheet_mass" value=".41" />
   <xacro:extra_module name = "sheet_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
@@ -32,5 +70,6 @@
           ixy="0.0" ixz="0.0"  iyz="0.0"/>
     </inertial>
   </xacro:extra_module>
+  -->
 
 </robot>
