@@ -1,7 +1,7 @@
 # MBZIRC 2020 Task2
 ## Task rule: please refer to [official website](https://www.mbzirc.com/challenge/2020)
 
-![task3](images/task2.png)
+![task3](../images/task2.png)
 
 ## Bringup
 
