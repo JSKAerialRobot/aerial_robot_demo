@@ -6,6 +6,7 @@
   <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
   <arg name="headless" default="True" />
+  <arg name="start" default="true" />
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
@@ -15,12 +16,15 @@
     <arg name="headless" value="$(arg headless)" />
   </include>
 
+  ####### tracking ##########
+  <include file="$(find mbzirc2020_task1_tasks)/launch/tracking.launch" />
+
   ####### simulation #########
   <group if="$(arg simulation)">
 
-    <arg name="x" value="2"/>
-    <arg name="y" value="2"/>
-    <arg name="z" value="0.3"/>
+    <arg name="guard_uav_x" value="-5"/>
+    <arg name="guard_uav_y" value="-5"/>
+    <arg name="guard_uav_z" value="0.3"/>
 
     <arg name="use_ground_truth" default="true" />
     <arg name="uav_name" default="hawk" />
@@ -40,12 +44,20 @@
         <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
         <arg name="tf_prefix" value="$(arg uav_name)" />
         <arg name="world_frame" value="/world" />
-        <arg name="x" value="$(arg x)"/>
-        <arg name="y" value="$(arg y)"/>
-        <arg name="z" value="$(arg z)"/>
+        <arg name="x" value="$(arg guard_uav_x)"/>
+        <arg name="y" value="$(arg guard_uav_y)"/>
+        <arg name="z" value="$(arg guard_uav_z)"/>
       </include>
       <node pkg="mbzirc2020_task1_common" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
             launch-prefix="xterm -e">
+      </node>
+
+      <node pkg="mbzirc2020_task1_common" type="guard_uav_routine_flight.py" name="guard_uav_routine_flight" output="screen" respawn="false" if="$(arg start)">
+        <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+      </node>
+
+      <node pkg="mbzirc2020_task1_common" type="visualize_uav_default_route.py" name="visualize_uav_default_route" output="screen" respawn="false">
+        <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
       </node>
     </group>
 
