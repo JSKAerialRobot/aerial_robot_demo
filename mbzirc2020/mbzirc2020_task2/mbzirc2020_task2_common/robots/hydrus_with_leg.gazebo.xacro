@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base robot model -->
+  <xacro:include filename="$(find hydrus)/robots/quad/mbzirc_default_mode_201907/hydrus_with_leg.urdf.xacro" />
+
+  <!-- <!-\- gazebo plugin for sensors -\-> -->
+  <!-- <xacro:include filename="$(find hydrus)/robots/onboards/tx2_zed_201810/onboards.gazebo.xacro" /> -->
+  <!-- gazebo plugin for default controller and sensors -->
+  <xacro:include filename="$(find hydrus)/robots/default.gazebo.xacro" />
+
+
+</robot>

@@ -24,4 +24,8 @@
 
   ########## servo for realsense d435  ########
   <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
+
+  ######### config for actuated legs #########
+  <rosparam file="$(find mbzirc2020_task2_common)/config/actuated_legs.yaml" command="load" />
+
 </launch>

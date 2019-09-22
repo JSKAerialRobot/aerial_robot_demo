@@ -1,0 +1,25 @@
+hydrusx:
+  servo_controller:
+    legs:
+      ctrl_pub_topic: /extra_servo_cmd
+      torque_pub_topic: /extra_servo_torque_enable
+
+      # for simulation
+      simulation:
+        pid: {p: 500, i: 5, d: 2.0, i_clamp_min: -50.0, i_clamp_max: 50.0}
+        init_value: 0 # m
+        type: effort_controllers/JointPositionController
+
+      controller1:
+        id: 4 
+        name: actuated_leg1_joint # on link2
+        angle_sgn: 1 # the direction of rotation of motor
+        angle_scale: 0.00006133333 # 0.092[mm] / the width of PWM  
+        zero_point_offset: 600 # the value of PWM when shrinking
+
+      controller2:
+        id: 3
+        name: actuated_leg2_joint # on link3
+        angle_sgn: -1
+        angle_scale: 0.00006814814
+        zero_point_offset: 2400

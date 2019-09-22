@@ -2,7 +2,7 @@
 <robot
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx_fixed_link" >
 
-  <xacro:macro name="hydrusx_fixed_link" params="self rotor_direction with_battery:=1 tilt_angle:=0">
+  <xacro:macro name="hydrusx_fixed_link" params="self rotor_direction with_battery:=1 tilt_angle:=0 with_leg:=1">
 
     <!-- link -->
     <link name="link${self}">
@@ -120,9 +120,12 @@
 
     <xacro:if value="${self == 2}">
       <!-- leg -->
-      <xacro:standard_leg_joint parent = "link${self}" >
-        <origin xyz="0.0 0.0 0" rpy="0 0 0"/>
-      </xacro:standard_leg_joint>
+      <xacro:if value="${with_leg == 1}">
+	<xacro:standard_leg_joint parent = "link${self}" >
+          <origin xyz="0.0 0.0 0" rpy="0 0 0"/>
+	</xacro:standard_leg_joint>
+      </xacro:if>
+      
       <!-- fixed joint  -->
       <joint name="joint${self}" type="fixed">
         <parent link="link${self}"/>
