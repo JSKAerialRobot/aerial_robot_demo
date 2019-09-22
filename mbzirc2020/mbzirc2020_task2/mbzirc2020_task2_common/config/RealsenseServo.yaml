@@ -1,0 +1,20 @@
+# for gazebo simulation of servo motor
+hydrusx:
+  servo_controller:
+    extra_servos:
+      ctrl_pub_topic: /extra_servo_cmd
+
+      angle_sgn: 1
+      angle_scale: 0.00165347
+      zero_point_offset: 1500 # min_pwm: 550; max_pwm: 2450
+
+      # for simulation
+      simulation:
+        pid: {p: 10.0, i: 0.01, d: 2.0}
+        init_value: 0 # -1.570796
+        type: effort_controllers/JointPositionController
+
+      controller1:
+        id: 1
+        name: rs_d435_servo_joint
+        angle_sgn: -1

@@ -1,15 +1,15 @@
-## Installation
+# MBZIRC 2020 Task2
+## Task rule: please refer to [official website](https://www.mbzirc.com/challenge/2020)
 
-```
-cd <catkin_ws>
-wstool merge -t src src/aerial_robot_demo/mbzirc2020_task2/mbzirc_task2.rosinstall
-wstool update -t src
-rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
-catkin build
-```
+![task3](images/task2.png)
+
+## Bringup
+
+### real machine
+TODO
 
 
-## How to run simulation
+### simulation
 Default
 ```
 $ roslaunch mbzirc2020_task2_common bringup.launch real_machine:=False simulation:=True headless:=False
@@ -18,4 +18,9 @@ $ roslaunch mbzirc2020_task2_common bringup.launch real_machine:=False simulatio
 Light world
 ```
 $ roslaunch mbzirc2020_task2_common bringup.launch real_machine:=False simulation:=True headless:=False worldtype:=light
+```
+
+Single object world
+```
+$ roslaunch mbzirc2020_task2_common bringup.launch real_machine:=False simulation:=True headless:=False worldtype:=single_object
 ```

@@ -2,38 +2,19 @@
 <robot
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
 
-  <!-- robot urdf and gazebo plugin for sensors-->
-  <xacro:include filename="$(find hydrus)/robots/default.gazebo.xacro" />
+  <!-- base robot model -->
+  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus.urdf.xacro" />
 
-    <!-- stereo camera: depth, color based on left camera -->
-  <xacro:extra_module name = "zed_left_camera_frame" parent = "zed_camera_center">
-    <origin xyz="0.002 0.03 0" rpy="0 0 0"/>
-    <inertial>
-      <mass value = "0.00001" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia
-          ixx="0.000001" ixy="0.0" ixz="0.0"
-          iyy="0.000001" iyz="0.0"
-          izz="0.000002"/>
-    </inertial>
-  </xacro:extra_module>
-  <xacro:extra_module name = "zed_left_camera_optical_frame" parent = "zed_left_camera_frame">
-    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
-    <inertial>
-      <mass value = "0.00001" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia
-          ixx="0.000001" ixy="0.0" ixz="0.0"
-          iyy="0.000001" iyz="0.0"
-          izz="0.000002"/>
-    </inertial>
-  </xacro:extra_module>
+  <!-- gazebo plugin for sensors -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
 
-  <gazebo reference="zed_left_camera_frame">
-    <sensor type="depth" name="zed_depth_camera">
-      <update_rate>20.0</update_rate>
+  <!-- gazebo for Realsense D435 -->
+  <!-- TODO: precise topic name and optical frame position -->
+  <gazebo reference="rs_d435_camera_frame">
+    <sensor type="depth" name="rs_d435_camera">
+      <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.57</horizontal_fov>
+        <horizontal_fov>1.59174027782</horizontal_fov>
         <image>
           <width>1280</width>
           <height>720</height>
@@ -53,13 +34,13 @@
         <baseline>0.06</baseline>
         <alwaysOn>true</alwaysOn>
         <updateRate>0.0</updateRate>
-        <cameraName>zed</cameraName>
-        <imageTopicName>rgb/image_rect_color</imageTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <cameraName>rs_d435</cameraName>
+        <imageTopicName>rs_d435/image_rect_color</imageTopicName>
+        <cameraInfoTopicName>rs_d435/camera_info</cameraInfoTopicName>
         <depthImageTopicName>depth/depth_registered</depthImageTopicName>
         <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
         <pointCloudTopicName>point_cloud/cloud_registered</pointCloudTopicName>
-        <frameName>zed_left_camera_optical_frame</frameName>
+        <frameName>rs_d435_camera_optical_frame</frameName>
         <pointCloudCutoff>0.05</pointCloudCutoff>
         <distortionK1>0</distortionK1>
         <distortionK2>0</distortionK2>
@@ -74,7 +55,6 @@
       </plugin>
     </sensor>
   </gazebo>
-
 
   <!-- gazebo grasp plugin -->
   <xacro:include filename="$(find mbzirc2020_task2_simulation)/urdf/gzplugin_grasp_fix.urdf.xacro" />
