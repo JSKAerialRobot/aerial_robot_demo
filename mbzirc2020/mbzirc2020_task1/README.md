@@ -3,7 +3,6 @@
 
 ![task1](../images/task1.png)
 
-## Bringup
 
 ### real machine
 **COMING SOON**
@@ -12,6 +11,7 @@
 #### bringup:
 ```
 $ roslaunch mbzirc2020_task1_tasks motion.launch  real_machine:=false simulation:=true headless:=false
+```
 
 #### run tracking command interface of task1:
 ```
