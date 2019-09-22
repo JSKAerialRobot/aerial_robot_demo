@@ -19,7 +19,12 @@
   </include>
 
   ########## recognition ###############
-  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch">
+  ########### real machine #############
+  <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(arg real_machine)">
+  </include>
+
+  ########### simulation ###############
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(arg simulation)">
     <arg name="image_topic" value="/flir/image_raw"/>
     <arg name="camera_info_topic" value="/flir/camera_info"/>
     <arg name="output_screen" value="true"/>

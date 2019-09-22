@@ -17,7 +17,7 @@
     <arg name="i2c_id" value="$(arg i2c_id)" />
     <arg name="spi_speed" value="$(arg spi_speed)" />
     <arg name="temp_thresh" value="$(arg temp_thresh)"/>
-    <param name="frame_id" value="$(arg camera_name)"/>
+    <arg name="frame_id" value="$(arg camera_name)"/>
   </include>
 
   <node pkg="nodelet" type="nodelet" name="image_proc_resize"
