@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base kinematics model -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "0"  />
+
+  <!-- processor: intel upboard -->
+  <xacro:extra_module name = "pc" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/intel_upboard_fixed_joint_unit.dae" >
+    <origin xyz="${link_length / 2 + 0.2845} 0.011 0.016" rpy="0 0 ${pi}"/>
+    <inertial>
+      <mass value = "0.117" />
+      <origin xyz="${21 * 0.001} ${4 * 0.001} ${12 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00004" ixy="0.0" ixz="0.0"
+          iyy="0.00008" iyz="0.0"
+          izz="0.00011"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: intel upboard -->
+
+  <!-- sensor -->
+  <!-- 1. RGB camera -->
+  <!-- TODO: accurate intertia parameters and position -->
+  <xacro:extra_module name = "rgb_camera_frame" parent = "link2" visible = "0"  >
+    <origin xyz="${link_length / 2 + 0.140} 0.162 0.063" rpy="0 0 ${3 * pi/4}"/>
+    <inertial>
+      <mass value = "0.001" /> <!-- temporary -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "rgb_camera_optical_frame" parent = "rgb_camera_frame">
+    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+    <inertial>
+      <mass value = "0.0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+
+  <!-- net -->
+  <!-- TODO: add net at the ends -->
+</robot>
