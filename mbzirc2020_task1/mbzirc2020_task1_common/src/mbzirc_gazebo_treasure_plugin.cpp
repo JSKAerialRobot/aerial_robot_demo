@@ -93,11 +93,32 @@ namespace gazebo
     else
       pirate_name_ = "hydrusx";
 
+    if (_sdf->HasElement("guardUavTreasureOffsetZ") && _sdf->GetElement("guardUavTreasureOffsetZ")->GetValue())
+      guard_uav_treasure_offset_z_ = _sdf->GetElement("guardUavTreasureOffsetZ")->Get<double>();
+    else
+      guard_uav_treasure_offset_z_ = 0.27;
+
+    if (_sdf->HasElement("pirateUavTreasureOffsetZ") && _sdf->GetElement("pirateUavTreasureOffsetZ")->GetValue())
+      pirate_uav_treasure_offset_z_ = _sdf->GetElement("pirateUavTreasureOffsetZ")->Get<double>();
+    else
+      pirate_uav_treasure_offset_z_ = 0.03;
+
+    if (_sdf->HasElement("grabThreshold") && _sdf->GetElement("grabThreshold")->GetValue())
+      grab_thre_ = _sdf->GetElement("grabThreshold")->Get<double>();
+    else
+      grab_thre_ = 0.3;
+
     std::string treasure_marker_topic_name;
     if (_sdf->HasElement("markerTopicName") && _sdf->GetElement("markerTopicName")->GetValue())
       treasure_marker_topic_name = _sdf->GetElement("markerTopicName")->Get<std::string>();
     else
       treasure_marker_topic_name = "/treasure/marker";
+
+    std::string treasure_capture_flag_topic_name;
+    if (_sdf->HasElement("captureFlagTopicName") && _sdf->GetElement("captureFlagTopicName")->GetValue())
+      treasure_capture_flag_topic_name = _sdf->GetElement("captureFlagTopicName")->Get<std::string>();
+    else
+      treasure_capture_flag_topic_name = "/treasure/capture_flag";
 
     // Make sure the ROS node for Gazebo has already been initialized
     if (!ros::isInitialized())
@@ -114,13 +135,23 @@ namespace gazebo
     // subscribe to the gazebo models
     gazebo_model_sub_ = node_handle_->subscribe("/gazebo/model_states",3,&GazeboTreasure::gazeboCallback,this);
     magnet_release_sub_ = node_handle_->subscribe("/mag_on",3,&GazeboTreasure::magnetCallback,this);
+    treasure_force_state_sub_ = node_handle_->subscribe("/treasure_force_state_cmd",3,&GazeboTreasure::treasureForceStateCallback,this);
 
     // publisher
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
+    treasure_capture_flag_pub_ = node_handle_->advertise<std_msgs::Bool>(treasure_capture_flag_topic_name, 1, true);
 
     update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                                 boost::bind(&GazeboTreasure::Update, this));
 
+  }
+
+  void GazeboTreasure::treasureForceStateCallback(std_msgs::UInt8 msg){
+    if (msg.data == TREASURE_RELEASE)
+      model_->SetGravityMode(true);
+    else if (treasure_state_ == TREASURE_RELEASE) // previous state is release state
+      model_->SetGravityMode(false);
+    treasure_state_ = msg.data;
   }
 
 
@@ -142,19 +173,25 @@ namespace gazebo
           else if (gazebo_models_.name.at(i) == guard_name_)
             guard_id = i;
         }
-        if (treasure_state_ == TREASURE_CRUISE){
+        if (treasure_state_ == TREASURE_FORCE_INIT){
+          if (guard_id >= 0){
+            updateTreasureState(guard_id, guard_name_);
+            treasure_state_ = TREASURE_CRUISE;
+          }
+        }
+        else if (treasure_state_ == TREASURE_CRUISE){
           if (guard_id >= 0){
             // reset object positon
             updateTreasureState(guard_id, guard_name_);
           }
           if (pirate_id >= 0){
-            // judge whether treasure is grubbed
+            // judge whether treasure is grabbed
             geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(pirate_id);
-            double grub_thre = 0.3;
-            if(fabs(pose_pirate.position.x - pose_object.pos.x)<grub_thre&&
-               fabs(pose_pirate.position.y - pose_object.pos.y)<grub_thre&&
-               fabs(pose_pirate.position.z - pose_object.pos.z)<grub_thre){
+            if(fabs(pose_pirate.position.x - pose_object.pos.x)<grab_thre_&&
+               fabs(pose_pirate.position.y - pose_object.pos.y)<grab_thre_&&
+               fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_ / 2.0){
               treasure_state_ = TREASURE_CAPTURED;
+              ROS_ERROR("TREASURE_CAPTURED");
               updateTreasureState(pirate_id, pirate_name_);
             }
           }
@@ -163,8 +200,13 @@ namespace gazebo
           if (pirate_id >= 0){
             // reset object positon
             updateTreasureState(pirate_id, pirate_name_);
+            std_msgs::Bool capture_flag_msg;
+            capture_flag_msg.data = true;
+            treasure_capture_flag_pub_.publish(capture_flag_msg);
           }
         }
+        else if (treasure_state_ == TREASURE_RELEASE)
+          visualizeTreasure();
       }
 
     if( static_object_ )
@@ -184,15 +226,23 @@ namespace gazebo
     geometry_msgs::Pose treausre_pose = gazebo_models_.pose.at(owner_id);
     double offset_z = 0.0;
     if (robot_name == std::string("hawk"))
-      offset_z = -0.27;
+      offset_z = guard_uav_treasure_offset_z_;
     else if (robot_name == std::string("hydrusx"))
-      offset_z = -0.03;
-    treausre_pose.position.z += offset_z;
+      offset_z = pirate_uav_treasure_offset_z_;
+    treausre_pose.position.z -= offset_z;
     model_->SetWorldPose(math::Pose(math::Vector3(treausre_pose.position.x,
                                                   treausre_pose.position.y,
                                                   treausre_pose.position.z),
                                     math::Quaternion(0, 0, 0, 1)));
+    visualizeTreasure();
+  }
 
+  void GazeboTreasure::visualizeTreasure(){
+    math::Pose pose_object = link_->GetWorldPose();
+    geometry_msgs::Pose treausre_pose;
+    treausre_pose.position.x = pose_object.pos.x;
+    treausre_pose.position.y = pose_object.pos.y;
+    treausre_pose.position.z = pose_object.pos.z;
     // publish the treasure marker in the rviz
     visualization_msgs::Marker treasure_marker;
     treasure_marker.ns = "treasure_marker";
