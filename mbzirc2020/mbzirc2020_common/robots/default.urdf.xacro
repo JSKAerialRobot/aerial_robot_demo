@@ -7,19 +7,19 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 horizontal_vio:=0 default_battery:=1">
+  <xacro:macro name="robot_model" params="tilt_angle:=0 horizontal_vio:=0 default_battery:=1 with_leg:=1">
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
-      <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" tilt_mode="0" />
-      <xacro:hydrusx_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" tilt_angle = "0" />
-      <xacro:hydrusx_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" tilt_angle = "0" />
-      <xacro:hydrusx_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" tilt_mode="0" />
+      <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
+      <xacro:hydrusx_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "0" />
+      <xacro:hydrusx_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "0" />
+      <xacro:hydrusx_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
     </xacro:if>
     <xacro:unless value="${tilt_angle == 0}">
-      <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" tilt_mode="1" tilt_angle="${tilt_angle}" />
-      <xacro:hydrusx_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" tilt_angle = "${tilt_angle}" />
-      <xacro:hydrusx_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" tilt_angle = "${tilt_angle}" />
-      <xacro:hydrusx_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" tilt_mode="1" tilt_angle="${tilt_angle}"/>
+      <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}" />
+      <xacro:hydrusx_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" />
+      <xacro:hydrusx_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" />
+      <xacro:hydrusx_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}"/>
     </xacro:unless>
 
     <!-- onboard -->
