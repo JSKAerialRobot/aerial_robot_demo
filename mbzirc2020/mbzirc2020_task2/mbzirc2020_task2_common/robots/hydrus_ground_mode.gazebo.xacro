@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base robot model -->
+  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_ground_mode.urdf.xacro" />
+
+  <!-- gazebo plugin for sensors -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
+
+
+  <gazebo reference="actuated_leg1_movable_part">
+    <mu1>0.11</mu1>
+    <mu2>0.11</mu2>
+    <fdir1>1 1 0</fdir1>
+    <minDepth>0.00</minDepth>
+    <selfCollide>false</selfCollide>
+  </gazebo>
+
+  <gazebo reference="actuated_leg2_movable_part">
+    <mu1>0.11</mu1>
+    <mu2>0.11</mu2>
+    <fdir1>1 1 0</fdir1>
+    <minDepth>0.00</minDepth>
+    <selfCollide>false</selfCollide>
+  </gazebo>
+
+  <gazebo reference="omni_leg1">
+    <mu1>0.11</mu1>
+    <mu2>0.11</mu2>
+    <fdir1>1 1 0</fdir1>
+    <minDepth>0.00</minDepth>
+    <selfCollide>false</selfCollide>
+  </gazebo>
+
+  <gazebo reference="omni_leg2">
+    <mu1>0.11</mu1>
+    <mu2>0.11</mu2>
+    <fdir1>1 1 0</fdir1>
+    <minDepth>0.00</minDepth>
+    <selfCollide>false</selfCollide>
+  </gazebo>
+
+  <!-- TODO: gazebo for Realsense D435 -->
+
+  <!-- gazebo grasp plugin -->
+  <xacro:include filename="$(find mbzirc2020_task2_simulation)/urdf/gzplugin_grasp_fix.urdf.xacro" />
+  <xacro:gzplugin_grasp_fix />
+
+</robot>

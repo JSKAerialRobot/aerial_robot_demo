@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base kinematics model -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "0" default_battery = "0"  />
+
+  <!-- special battery arrangement -->
+  <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.4108"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "bat2" parent = "link4" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.4108"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- processor: intel upboard -->
+  <!-- TODO: change to brix -->
+  <xacro:extra_module name = "pc" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/intel_upboard_fixed_joint_unit.dae" >
+    <origin xyz="${link_length / 2 + 0.2845} 0.011 0.016" rpy="0 0 ${pi}"/>
+    <inertial>
+      <mass value = "0.117" />
+      <origin xyz="${21 * 0.001} ${4 * 0.001} ${12 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00004" ixy="0.0" ixz="0.0"
+          iyy="0.00008" iyz="0.0"
+          izz="0.00011"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: intel upboard -->
+
+  <!-- sensor -->
+  <!-- 1. Realsense D435 -->
+  <!-- TODO: accurate intertia parameters and position -->
+  <xacro:extra_module name = "rs_d435_mount" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit2.STL">
+    <origin xyz="${link_length / 2} 0 0" rpy="0 0 0"/>
+    <inertial>
+      <mass value = "0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <joint name="rs_d435_servo_joint" type="revolute">
+    <limit effort="0.2" lower="0" upper="1.6" velocity="0.5"/>
+    <parent link="link2"/>
+    <child link="rs_d435_servo"/>
+    <origin xyz="${link_length / 2 + 0.20395} 0.02495 -0.038" rpy="0 0 ${pi/4}"/>
+    <axis xyz="-1 0 0"/>
+    <dynamics damping="0.2" friction="0.0"/>
+  </joint>
+  <link name="rs_d435_servo">
+    <inertial>
+      <mass value = "0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+
+  <xacro:extra_module name = "rs_d435_camera_frame" parent = "rs_d435_servo" visible = "1" model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit1.STL">
+    <origin xyz="0.05275 0.01005 0" rpy="0 0 ${pi / 2}"/>
+    <inertial>
+      <mass value = "0.095" />
+      <origin xyz="-0.01005 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00006" ixy="0.0" ixz="0.00006"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "rs_d435_camera_optical_frame" parent = "rs_d435_camera_frame">
+    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+    <inertial>
+      <mass value = "0.0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <transmission name="rs_d435_servo_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rs_d435_servo_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="rs_d435_servo_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <!-- gripper -->
+  <!-- TODO: add gripper at the ends -->
+</robot>

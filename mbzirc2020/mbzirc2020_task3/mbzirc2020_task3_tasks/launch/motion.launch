@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+  ###########  launch config  ###########
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="estimate_mode"  default= "0" />
+  <arg name="target_tf_name" default="target_object"/>
+  <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
+  <arg name="horizontal_vio" default="False" />
+  <arg name="headless" default="True" />
+
+  ##########  basic bringup file ########
+  <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="cheating_fire"  value= "$(arg cheating_fire)" />
+  </include>
+
+  ########## recognition ###############
+  ########### real machine #############
+  <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(arg real_machine)">
+  </include>
+
+  ########### simulation ###############
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(arg simulation)">
+    <arg name="image_topic" value="/flir/image_raw"/>
+    <arg name="camera_info_topic" value="/flir/camera_info"/>
+    <arg name="output_screen" value="true"/>
+
+    <!-- TODO: please set following paramters in yaml file -->
+    <!-- object property -->
+    <arg name="object_height" value="0.02"/>
+
+    <!-- red color object -->
+    <arg name="contour_area_size" value="0.05" if="$(eval arg('cheating_fire') * arg('real_machine'))"/>
+    <arg name="contour_area_size" value="0.2" if="$(eval arg('cheating_fire') * arg('simulation'))"/>
+    <arg name="h_limit_min" value="345" if="$(eval arg('cheating_fire') * arg('real_machine'))"/>
+    <arg name="h_limit_min" value="10" if="$(eval arg('cheating_fire') * arg('simulation'))"/>
+    <arg name="h_limit_max" value="40" if="$(arg cheating_fire)"/>
+
+    <!-- real fire -->
+    <arg name="contour_area_size" value="0.64" unless="$(arg cheating_fire)"/>
+    <arg name="h_limit_min" value="10" unless="$(arg cheating_fire)"/>
+    <arg name="h_limit_max" value="60" unless="$(arg cheating_fire)"/>
+
+    <arg name="s_limit_max" value="255" />
+    <arg name="s_limit_min" value="60" />
+    <arg name="v_limit_max" value="255" />
+    <arg name="v_limit_min" value="60" />
+  </include>
+
+  ########## motion planner ###############
+  <node pkg="mbzirc2020_task3_tasks" type="motion.py" name="task3_motion_planner" output="screen">
+    <param name="target_tf_name" value="$(arg target_tf_name)"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/motion.yaml" command="load"/>
+  </node>
+</launch>
