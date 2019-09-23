@@ -8,6 +8,6 @@
 
 ## simulation
 ```
-$ roslaunch hydrus_bringup.launch real_machine:=false simulation:=true headless:=false
+$ roslaunch hydrus bringup.launch real_machine:=false simulation:=true headless:=false
 ```
 **caution**: this launch file includes the perception part, so **DO NOT** launch perception in other terminal.
