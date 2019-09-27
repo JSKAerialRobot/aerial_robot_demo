@@ -16,10 +16,13 @@
         -->
         <arm>
           <arm_name>hydrusx_arm</arm_name>
-          <palm_link>link3</palm_link>
-          <gripper_link>link2</gripper_link>
+          <palm_link>link2</palm_link>
           <gripper_link>link4</gripper_link>
           <gripper_link>root</gripper_link>
+          <gripper_link>thrust1</gripper_link>
+          <gripper_link>thrust2</gripper_link>
+          <gripper_link>thrust3</gripper_link>
+          <gripper_link>thrust4</gripper_link>
         </arm>
         <forces_angle_tolerance>100</forces_angle_tolerance>
         <update_rate>4</update_rate>
