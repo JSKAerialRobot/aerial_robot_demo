@@ -4,6 +4,7 @@
   <arg name="real_machine" default="True" />
   <arg name="simulation" default="False" />
   <arg name="estimate_mode"  default= "0" />
+  <arg name="contour_area_min_thre"  default= "0.1" />
   <arg name="target_tf_name" default="target_object"/>
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
   <arg name="horizontal_vio" default="False" />
@@ -35,6 +36,7 @@
 
     <!-- red color object -->
     <arg name="contour_area_size" value="0.0"/>
+    <arg name="contour_area_min_thre" value="$(arg contour_area_min_thre)"/>
     <arg name="s_limit_max" value="255" />
     <arg name="s_limit_min" value="60" />
     <arg name="v_limit_max" value="255" />
