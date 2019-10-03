@@ -13,7 +13,7 @@ approach_margin : 0.15
 height_margin : 0.15
 cover_pose: [0.8, 0.8] # the joint angles for covering
 covering_pre_height : 1.2
-covering_post_height : 0.2
-covering_move_dist : 0.4
+covering_post_height : 1.2
+covering_move_dist : 0.6
 
 close_pose: [1.56, 1.56] # the joint angles  for closing

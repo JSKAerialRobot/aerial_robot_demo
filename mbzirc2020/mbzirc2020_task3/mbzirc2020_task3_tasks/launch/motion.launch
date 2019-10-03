@@ -16,6 +16,7 @@
     <arg name="simulation" value="$(arg simulation)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="cheating_fire"  value= "$(arg cheating_fire)" />
   </include>
 
