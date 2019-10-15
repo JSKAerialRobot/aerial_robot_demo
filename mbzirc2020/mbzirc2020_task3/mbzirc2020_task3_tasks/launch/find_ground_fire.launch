@@ -1,0 +1,49 @@
+<launch>
+  <!-- default for upboard -->
+  <arg name="spi_id" default="2.0" />
+  <arg name="i2c_id" default="1" />
+  <arg name="spi_speed" default="10000000" />
+  <arg name="camera_name" default="lepton_camera"/>
+  <arg name="output_screen" default="false"/>
+  <arg name="frame_id" default="target_object"/>
+
+  <arg name="temp_thresh" default="100"/>
+
+  <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen" if="$(arg output_screen)"/>
+  <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" unless="$(arg output_screen)"/>
+
+  <include file="$(find lepton_thermal_sensor)/launch/nodelet.launch">
+    <arg name="spi_id" value="$(arg spi_id)" />
+    <arg name="i2c_id" value="$(arg i2c_id)" />
+    <arg name="spi_speed" value="$(arg spi_speed)" />
+    <arg name="temp_thresh" value="$(arg temp_thresh)"/>
+    <arg name="frame_id" value="$(arg camera_name)"/>
+  </include>
+
+  <node pkg="nodelet" type="nodelet" name="image_proc_resize"
+    args="load image_proc/resize object_detection_nodelet">
+    <remap from="image" to="$(arg camera_name)/threshold/image" />
+    <remap from="camera_info" to="/$(arg camera_name)/threshold/camera_info"/>
+
+    <remap from="image_proc_resize/image" to="$(arg camera_name)/threshold/camera_resize/image_mono"/>
+    <remap from="image_proc_resize/camera_info" to="$(arg camera_name)/threshold/camera_resize/camera_info"/>
+  </node>
+
+  <node name="$(anon dynparam)" pkg="dynamic_reconfigure"
+    type="dynparam" args="set_from_parameters image_proc_resize">
+    <param name="use_scale" type="int" value="0"/>
+    <param name="width" type="int" value="160"/>
+    <param name="height" type="int" value="120" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="find_ground_fire"
+    args="load aerial_robot_perception/GroundObjectDetection object_detection_nodelet" output="screen">
+    <remap from="image" to="$(arg camera_name)/threshold/camera_resize/image_mono" />
+    <remap from="camera_info" to="$(arg camera_name)/threshold/camera_resize/camera_info"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="object_height" value="0.0"/>
+    <param name="contour_area_size" value="0.0"/>
+    <param name="contour_area_margin" value="0.0"/>
+    <param name="debug_view" value="false"/>
+  </node>
+</launch>
