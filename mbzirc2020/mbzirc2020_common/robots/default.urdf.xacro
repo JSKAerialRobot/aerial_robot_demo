@@ -7,7 +7,7 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 horizontal_vio:=0 default_battery:=1 with_leg:=1">
+  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1">
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
       <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
@@ -95,18 +95,20 @@
     <!-- end: gps -->
 
     <!-- 2.3 downwards rs-t265 (VIO) -->
-    <xacro:extra_module name = "realsense1_pose_frame" parent = "link2" visible = "1"
-                        model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/downward_realsense_unit.STL">
-      <origin xyz="${link_length/2 + 0.127} 0.0 -0.022" rpy="0 ${pi/2} ${pi/2}"/>
-      <inertial>
-        <mass value = "0.065" /> <!-- sensor + usb-cable -->
-        <origin xyz="-0.009 -0.01 0" rpy="0 0 0"/>
-        <inertia
-            ixx="0.0" ixy="0.0" ixz="0.0"
-            iyy="0.0" iyz="0.0"
-            izz="0.0"/>
-      </inertial>
-    </xacro:extra_module>
+    <xacro:if value="${downward_vio == 1}">
+      <xacro:extra_module name = "realsense1_pose_frame" parent = "link2" visible = "1"
+                          model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/downward_realsense_unit.STL">
+	<origin xyz="${link_length/2 + 0.127} 0.0 -0.022" rpy="0 ${pi/2} ${pi/2}"/>
+	<inertial>
+          <mass value = "0.065" /> <!-- sensor + usb-cable -->
+          <origin xyz="-0.009 -0.01 0" rpy="0 0 0"/>
+          <inertia
+              ixx="0.0" ixy="0.0" ixz="0.0"
+              iyy="0.0" iyz="0.0"
+              izz="0.0"/>
+	</inertial>
+      </xacro:extra_module>
+    </xacro:if>
     <!-- end: rs-5265 -->
 
     <!-- 2.4 horizontal rs-t265 (option VIO) -->
@@ -124,6 +126,7 @@
         </inertial>
         </xacro:extra_module>
     </xacro:if>
+    <!-- end: rs-5265 -->
 
   </xacro:macro>
 
