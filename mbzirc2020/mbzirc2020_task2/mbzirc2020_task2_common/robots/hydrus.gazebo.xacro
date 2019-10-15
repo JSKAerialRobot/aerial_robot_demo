@@ -13,6 +13,9 @@
   <!--  The following values model the aluminum peripherial case for the
         D435 camera, with the camera joint represented by the actual
         peripherial camera tripod mount -->
+  <xacro:property name="d435_cam_depth_to_left_ir_offset" value="0.0"/>
+  <xacro:property name="d435_cam_depth_to_right_ir_offset" value="-0.050"/>
+  <xacro:property name="d435_cam_depth_to_color_offset" value="0.015"/>
   <xacro:property name="d435_cam_width" value="0.090"/>
   <xacro:property name="d435_cam_height" value="0.025"/>
   <xacro:property name="d435_cam_depth" value="0.02505"/>
