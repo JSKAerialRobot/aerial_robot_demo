@@ -5,8 +5,8 @@ hydrusx:
       ctrl_pub_topic: /extra_servo_cmd
 
       angle_sgn: 1
-      angle_scale: 0.00165347
-      zero_point_offset: 1500 # min_pwm: 550; max_pwm: 2450
+      angle_scale: 0.0018055 # pi/2 / (1490 - 620)
+      zero_point_offset: 1490 # sample: [min_pwm: 550; max_pwm: 2450]
 
       # for simulation
       simulation:
@@ -15,6 +15,6 @@ hydrusx:
         type: effort_controllers/JointPositionController
 
       controller1:
-        id: 1
         name: rs_d435_servo_joint
         angle_sgn: -1
+        id: 0 # yellow
