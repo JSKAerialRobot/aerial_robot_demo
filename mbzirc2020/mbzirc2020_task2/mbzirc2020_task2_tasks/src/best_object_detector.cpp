@@ -33,8 +33,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include </home/kuromiya/ros/aerial_robot_demo_ws/src/aerial_robot_demo/mbzirc2020_task2/mbzirc2020_task2_tasks/include/recognize.h>
-#include </home/kuromiya/ros/aerial_robot_demo_ws/src/aerial_robot_demo/mbzirc2020_task2/mbzirc2020_task2_tasks/include/kmeans.cpp>
+#include <mbzirc2020_task2_tasks/recognize.h>
+#include <mbzirc2020_task2_tasks/kmeans.h>
+
 namespace mbzirc2020_task2_tasks
 {
 
