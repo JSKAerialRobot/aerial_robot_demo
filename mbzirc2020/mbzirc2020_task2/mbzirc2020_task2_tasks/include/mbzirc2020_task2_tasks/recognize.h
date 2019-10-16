@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/algorithm/algorithm.hpp>
 #include <unistd.h>
 #include <iostream>
 #include <ros/ros.h>
@@ -11,6 +10,7 @@
 #include <jsk_recognition_utils/pcl_conversion_util.h>
 #include <jsk_recognition_utils/sensor_model/camera_depth_sensor.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/JointState.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <opencv2/opencv.hpp>
@@ -21,7 +21,20 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Int32.h>
 #include <visualization_msgs/Marker.h>
+#include <nav_msgs/Odometry.h>
+#include <aerial_robot_msgs/FlightNav.h>
+#include <chrono>
+#include <thread>
+
+enum Phase
+  {
+   Phase0,
+   Phase1,
+   Phase2,
+   Phase3
+  };
 
 namespace mbzirc2020_task2_tasks
 {
@@ -39,11 +52,17 @@ namespace mbzirc2020_task2_tasks
     ros::Publisher area_pub;
     ros::Publisher marker_pub;
     ros::Publisher angle_pub;
-
+    ros::Publisher working_fhase_pub;
+    ros::Publisher object_marker_pub;
+    ros::Publisher target_pos_pub;    
+    ros::Publisher jointstate_pub;
+    
     image_transport::Subscriber image_sub_;
     image_transport::Subscriber image_depth_sub_;
     ros::Subscriber cam_info_sub_;
     ros::Subscriber plane_sub_;
+    ros::Subscriber working_fhase_sub_;
+    ros::Subscriber uav_odom_sub_;
 
     boost::shared_ptr<image_transport::ImageTransport> it_;
 
@@ -66,11 +85,24 @@ namespace mbzirc2020_task2_tasks
     cv::Mat depth_img;
 
     int working_fhase;
+    int working_fhase_py;
+    std_msgs::Int32 working_fhase_msg;
 
+    double hydrus_angle = 0.0;
+
+    double target_x_ = 0.0;
+    double target_y_ = 0.0;
+    double target_z_ = 0.0;
+    double target_angle_ = 0.0;
+    
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void imagedepthCallback(const sensor_msgs::ImageConstPtr& msg);
     void cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
     void planeCallback(const jsk_recognition_msgs::PolygonArray::ConstPtr& msg);
+    void workingfhaseCallback(const std_msgs::Int32 msg);
+    void uavodomCallback(const nav_msgs::Odometry::ConstPtr& msg);
+    void openjoints();
+    
     virtual void onInit();
     virtual void subscribe();
     virtual void unsubscribe();
