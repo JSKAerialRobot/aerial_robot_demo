@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base kinematics model -->
+  <xacro:arg name="horizontal_vio" default="0" />
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
+  <xacro:robot_model tilt_angle = "10" downward_vio = "1" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"  />
+
+  <!-- special battery arrangement -->
+  <xacro:extra_module name = "bat1" parent = "link2" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.4108"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "bat2" parent = "link3" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.4108"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- processor: intel upboard -->
+  <xacro:extra_module name = "pc" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/intel_upboard_fixed_joint_unit.dae" >
+    <origin xyz="${link_length / 2 + 0.2845} 0.011 0.016" rpy="0 0 ${pi}"/>
+    <inertial> <mass value = "0.120" /> <origin xyz="${21 * 0.001} ${4 * 0.001} ${12 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00004" ixy="0.0" ixz="0.0"
+          iyy="0.00008" iyz="0.0"
+          izz="0.00011"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: intel upboard -->
+
+  <!-- sensor -->
+  <!-- 1. downward rs-t265 (VIO) -->
+  <!-- <xacro:extra_module name = "realsense1_pose_frame" parent = "link3" visible = "1" -->
+  <!--                     model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/downward_realsense_unit.STL"> -->
+  <!--   <origin xyz="0.173 0.0 -0.022" rpy="${pi} ${pi/2} ${pi/2}"/> -->
+  <!--   <inertial> -->
+	<!--     <mass value = "0.065" /> -->
+  <!--     <origin xyz="-0.009 -0.01 0" rpy="0 0 0"/> -->
+  <!--     <inertia -->
+  <!--         ixx="0.0" ixy="0.0" ixz="0.0" -->
+  <!--         iyy="0.0" iyz="0.0" -->
+  <!--         izz="0.0"/> -->
+  <!--   </inertial> -->
+  <!-- </xacro:extra_module> -->
+  <!-- end: rs-5265 -->
+
+
+  <!-- 2. FLIR -->
+  <xacro:extra_module name = "lepton_camera" parent = "link2" visible = "0"  >
+    <origin xyz="${link_length / 2 + 0.24455} 0.05545 -0.015" rpy="0 ${pi/2} ${3 * pi/4}"/>
+    <inertial>
+      <mass value = "0.02" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "lepton_camera_optical" parent = "lepton_camera">
+    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+    <inertial>
+      <mass value = "0.0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- sheet -->
+  <xacro:property name="sheet_mass" value=".68" />
+  <xacro:extra_module name = "sheet_anchor1" parent = "leg1" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${sheet_mass/2}"/>
+      <inertia
+          ixx="0.0001" iyy="0.0001" izz="0.0002"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "sheet_anchor2" parent = "leg5" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${sheet_mass/2}"/>
+      <inertia
+          ixx="0.0001" iyy="0.0001" izz="0.0002"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- hokuyo ust201x laser -->
+  <xacro:include filename="$(find hector_sensors_description)/urdf/hokuyo_utm30lx.urdf.xacro" />
+  <xacro:hokuyo_utm30lx_model name="laser0" parent="link2">
+    <origin xyz="${link_length / 2 + 0.3} 0.0 0.1" rpy="0 0 ${-1 * pi/4}"/>
+  </xacro:hokuyo_utm30lx_model>
+
+</robot>
