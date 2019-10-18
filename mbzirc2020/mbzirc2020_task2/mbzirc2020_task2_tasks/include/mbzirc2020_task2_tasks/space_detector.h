@@ -258,53 +258,69 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
   
   int limit = 2000;
 
-  std::vector<int> possible_answer = {0, 1, 2, 3}; // 0:left, 1:right, 2:up, 3:down
+  std::vector<int> possible_answer; // 0:left, 1:right, 2:up, 3:down
+  possible_answer.push_back(0);
+  possible_answer.push_back(1);
+  possible_answer.push_back(2);
+  possible_answer.push_back(3);
+  
   int delete_time = 0;
 
   std::cout << "OK1" << std::endl;
   
   if(left_count > limit){
-    delete_time++;
+    std::cout << "left" << std::endl;
     if(delete_time == 0){
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 1);
       possible_answer.erase(possible_answer.begin() + 1);
+
+      std::cout << possible_answer[0] << ":left" <<std::endl;
     }
+    delete_time++;
   }
 
   std::cout << "OK2" << std::endl;
   
   if(right_count > limit){
-    delete_time++;
+    std::cout << "right" << std::endl;
+
     if(delete_time == 0){
       possible_answer.erase(possible_answer.begin() + 1);
       possible_answer.erase(possible_answer.begin() + 1);
       possible_answer.erase(possible_answer.begin() + 1);
     }
+    delete_time++;
   }
 
   std::cout << "OK3" << std::endl;
   
   if(up_count > limit){
-    delete_time++;
+    std::cout << "up" << std::endl;
+
     if(delete_time == 0){
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 0);
     }
+    delete_time++;
   }
   std::cout << "OK4" << std::endl;
   
   if(down_count > limit){
-    delete_time++;    
+    std::cout << "down" << std::endl;
+    
     if(delete_time == 0){
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 1);
     }
+    delete_time++;    
   }
 
   std::cout << "OK5" << std::endl;
+  
+  std::cout << delete_time << std::endl;
   
   if(delete_time > 1){
     answer.push_back(graspable);

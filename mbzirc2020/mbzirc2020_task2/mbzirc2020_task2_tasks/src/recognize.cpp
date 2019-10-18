@@ -334,8 +334,9 @@ namespace mbzirc2020_task2_tasks
 	    marker_obj_msg.scale.z = 0.30;
 	    marker_obj_msg.pose.position.x = tar_pos_msg1.vector.x;
             marker_obj_msg.pose.position.y = tar_pos_msg1.vector.y;
-            marker_obj_msg.pose.position.z = tar_pos_msg1.vector.z -0.16;
-	    marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[0] * M_PI / 180 + hydrus_angle);
+            marker_obj_msg.pose.position.z = tar_pos_msg1.vector.z -0.15;
+	    // marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[0] * M_PI / 180 + hydrus_angle);
+	    marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[0] * M_PI / 180 + cam_angle);
             ROS_INFO("object yaw w.r.t robot: %f; robot yaw: %f", answer[0] * M_PI / 180, hydrus_angle);
 	    marker_obj_msg.color.g = 1.0f;
 	    marker_obj_msg.color.a = 1.0f;
@@ -345,11 +346,12 @@ namespace mbzirc2020_task2_tasks
 	
 	    std_msgs::Float64 angle;
             angle.data = angle_rad;  // degree -> rad
-	    double target_angle = hydrus_angle + angle_rad + 1.57;
+	    // double target_angle = hydrus_angle + angle_rad + 1.57;
+	    double target_angle = cam_angle + angle_rad + 1.57;
 	    angle.data = target_angle;  // degree -> rad
             angle_pub.publish(angle);
             answer.erase(answer.begin(), answer.end());
-	    double margin = 0.6;  // distance from the target object to the destination
+	    double margin = 0.7;  // distance from the target object to the destination
 	    double target_x = x;
 	    double target_y = y;
 	    double target_z = z;
@@ -374,9 +376,10 @@ namespace mbzirc2020_task2_tasks
             tar_pos_msg2.vector = tf2::toMsg(cam_tf * target_xyz);
 	    target_pos_pub_.publish(tar_pos_msg2);
 	
-	    std::cout << "target_x : " << target_x << std::endl;
-	    std::cout << "target_y : " << target_y << std::endl;
-	    std::cout << "target_z : " << target_z << std::endl;
+	    std::cout << "target_x : " << target_x_ << std::endl;
+	    std::cout << "target_y : " << target_y_ << std::endl;
+	    std::cout << "target_z : " << target_z_ << std::endl;
+	    std::cout << "target_angle : " << target_angle_ - 0.78 << std::endl;
 
 	    visualization_msgs::Marker marker;
 	    marker.header.frame_id = "/world";
@@ -415,58 +418,153 @@ namespace mbzirc2020_task2_tasks
     //  motion
     if(working_fhase == 4){
       //  xy > rotate > z > go up
-      aerial_robot_msgs::FlightNav msg;
+      
+      target_angle_ -= 0.785 * 3;  // initially based on link2 -> link3
 
-      msg.pos_xy_nav_mode = msg.POS_MODE;
-      msg.psi_nav_mode = msg.NO_NAVIGATION;
-      msg.pos_z_nav_mode = msg.POS_MODE;
-      msg.header.stamp = ros::Time(0);
-      msg.control_frame = msg.WORLD_FRAME;
-      msg.target = msg.BASELINK;
-      msg.target_pos_x = target_x_;
-      msg.target_pos_y = target_y_;
-      msg.target_pos_z = 2.5;
+      int go_check = 0; // decide whether to go to the target
+      int go_pos_limit = 30;
+      std::vector<double> target_pos_v;
+      target_pos_v.push_back(target_x_);
+      target_pos_v.push_back(target_y_);
+      target_pos_v.push_back(target_z_);
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+      std::cout << "target_pos_cnd_size : " << target_pos_cnd.size() << std::endl;
+      
+      if(target_pos_cnd.size() > 0){
+	int cnt = 0;
+	int add_check = 0;
+	for(const auto trg : target_pos_cnd){
+	  if(std::abs(trg[0] - target_x_) < 0.1 && std::abs(trg[1] - target_y_) < 0.1 && std::abs(trg[2] - target_z_) < 0.1){
+	    target_count[cnt]++;
+	    std::cout << "target_count: "<< target_count[cnt] << std::endl;
+	    if(target_count[cnt] > go_pos_limit){  //  go to the target
+	      go_check = 1;
+	    }
+	    add_check++;
+	    break;
+	  }
+	  cnt++;
+	}
 
-      msg.pos_xy_nav_mode = msg.NO_NAVIGATION;
-      msg.psi_nav_mode = msg.POS_MODE;
-      msg.pos_z_nav_mode = msg.NO_NAVIGATION;
-      msg.target_psi = target_angle_;
+	if(add_check == 0){
+	  target_pos_cnd.push_back(target_pos_v);
+	  target_angle_cnd.push_back(target_angle_);
+	  target_count.push_back(1);
+	}
+      }
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+      else if(target_pos_cnd.size() == 0 && target_pos_v[0] != 0.0){
+	target_pos_cnd.push_back(target_pos_v);
+	target_angle_cnd.push_back(target_angle_);
+	target_count.push_back(1);
+      }
 
-      openjoints();
+      if(go_check == 1){
 
-      msg.pos_xy_nav_mode = msg.NO_NAVIGATION;
-      msg.psi_nav_mode = msg.NO_NAVIGATION;
-      msg.pos_z_nav_mode = msg.POS_MODE;
-      msg.target_pos_z = target_z_ + 1.0;
+	openjoints();
+	
+	aerial_robot_msgs::FlightNav msg;
+      
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;
+	msg.target_pos_x = target_x_;
+	msg.target_pos_y = target_y_;
+	msg.target_pos_z = 2.5;
+	msg.target_psi = target_angle_;
+	
+	std::cout << "final x : " << msg.target_pos_x << std::endl;
+	std::cout << "final y : " << msg.target_pos_y << std::endl;
+	
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;
+	msg.pos_xy_nav_mode = msg.NO_NAVIGATION;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.NO_NAVIGATION;
+	msg.target_psi = target_angle_;
 
-      msg.target_pos_z = target_z_ + 0.5;
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;
+	msg.pos_xy_nav_mode = msg.NO_NAVIGATION;
+	msg.psi_nav_mode = msg.NO_NAVIGATION;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.target_pos_z = target_z_ + 1.0;
 
-      msg.target_pos_z = target_z_;
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;	
+	msg.target_pos_z = target_z_ + 0.5;
 
-      msg.target_pos_z = target_z_ - 0.1;
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
-      target_pos_pub.publish(msg);
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;	
+	msg.target_pos_z = target_z_;
+
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(10));
+
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;	
+	msg.target_pos_z = target_z_ - 0.1;
+
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(40));
+
+	msg.pos_xy_nav_mode = msg.POS_MODE;
+	msg.psi_nav_mode = msg.POS_MODE;
+	msg.pos_z_nav_mode = msg.POS_MODE;
+	msg.header.stamp = ros::Time(0);
+	msg.control_frame = 0;
+	msg.target = 0;	
+	msg.target_pos_z = target_z_ + 1.0;
+
+	target_pos_pub.publish(msg);
+	std::this_thread::sleep_for(std::chrono::seconds(40));
 
       // closejoints();
+      }
+      
+      working_fhase = 0;
+      
+      if(go_check == 1){
+	std::cout << "reach michael" << std::endl;
+	working_fhase = 5;
+      }
 
     }
-
   }
 
   void RedObjectDetectionWithHSVFilter::imagedepthCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -508,6 +606,11 @@ namespace mbzirc2020_task2_tasks
       }
 
       tf2::Matrix3x3 cam_tf_rotation(cam_tf.getRotation());
+      
+      double roll, pitch, yaw;
+      cam_tf_rotation.getRPY(roll, pitch, yaw);  //rpy are Pass by Reference
+      cam_angle = yaw;
+      
       geometry_msgs::Vector3Stamped obj_pos;
       double highest_x = 0.0;
       double highest_y = 0.0;
