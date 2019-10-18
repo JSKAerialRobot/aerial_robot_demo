@@ -89,7 +89,12 @@ namespace mbzirc2020_task2_tasks
     std_msgs::Int32 working_fhase_msg;
 
     double hydrus_angle = 0.0;
+    double cam_angle = 0.0;
 
+    std::vector<std::vector<double>> target_pos_cnd;
+    std::vector<double> target_angle_cnd;
+    std::vector<int> target_count;
+    
     double target_x_ = 0.0;
     double target_y_ = 0.0;
     double target_z_ = 0.0;
