@@ -15,3 +15,7 @@
     local-name: general-message-pkgs
     uri: https://github.com/JenniferBuehler/general-message-pkgs
     version: 1.0.0
+- git:
+    local-name: roboticsgroup_gazebo_plugins
+    uri: https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins.git
+    version: master
