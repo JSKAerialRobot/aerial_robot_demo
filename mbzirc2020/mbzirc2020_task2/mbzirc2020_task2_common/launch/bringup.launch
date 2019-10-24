@@ -7,6 +7,7 @@
   <arg name="estimate_mode"  default= "0" />
   <arg name="horizontal_vio" default="False" />
   <arg name="ground_mode" default="False" />
+  <arg name="passive_gripper" default="False"/>
   <arg name="worldtype" default="light" />
   <arg name="headless" default="True" />
 
@@ -21,17 +22,21 @@
     <arg name="worldtype" value="$(find mbzirc2020_task2_simulation)/gazebo_model/world/mbzirc2020_task2_$(arg worldtype).world" />
     <arg name="task" value="2" />
     <arg name="model_suffix" value="_ground_mode" if="$(arg ground_mode)"/>
+    <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
   </include>
- 
+
   ######### config for actuated legs #########
   <rosparam file="$(find mbzirc2020_task2_common)/config/_ground_mode/ActuatedLegs.yaml" command="load" if="$(arg ground_mode)"/>
 
   ########## servo for realsense d435  ########
+
   <group unless="$(arg ground_mode)">
     <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
     <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" if="$(arg real_machine)">
       <arg name="camera" value="rs_d435" />
     </include>
   </group>
-  
+
+  <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load"/>
+
 </launch>
