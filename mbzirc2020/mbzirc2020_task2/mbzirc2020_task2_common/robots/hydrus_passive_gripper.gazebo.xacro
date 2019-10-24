@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base robot model -->
+  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_passive_gripper.urdf.xacro" />
+
+  <!-- gazebo plugin for sensors -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
+
+  <!-- gazebo for Realsense D435 -->
+  <!-- TODO: precise topic name and optical frame position -->
+  <gazebo reference="rs_d435_camera_frame">
+    <sensor type="depth" name="rs_d435_camera">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.59174027782</horizontal_fov>
+        <image>
+          <width>1280</width>
+          <height>720</height>
+          <format>B8G8R8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="depth_camera" filename="libgazebo_ros_openni_kinect.so">
+        <baseline>0.06</baseline>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>rs_d435</cameraName>
+        <imageTopicName>rs_d435/image_rect_color</imageTopicName>
+        <cameraInfoTopicName>rs_d435/camera_info</cameraInfoTopicName>
+        <depthImageTopicName>depth/depth_registered</depthImageTopicName>
+        <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
+        <pointCloudTopicName>point_cloud/cloud_registered</pointCloudTopicName>
+        <frameName>rs_d435_camera_optical_frame</frameName>
+        <pointCloudCutoff>0.05</pointCloudCutoff>
+        <distortionK1>0</distortionK1>
+        <distortionK2>0</distortionK2>
+        <distortionK3>0</distortionK3>
+        <distortionT1>0</distortionT1>
+        <distortionT2>0</distortionT2>
+        <CxPrime>0</CxPrime>
+        <Cx>0</Cx>
+        <Cy>0</Cy>
+        <focalLength>0</focalLength>
+        <hackBaseline>0</hackBaseline>
+      </plugin>
+    </sensor>
+b  </gazebo>
+
+  <!-- gazebo grasp plugin -->
+  <xacro:include filename="$(find mbzirc2020_task2_simulation)/urdf/gzplugin_grasp_fix.urdf.xacro" />
+  <xacro:gzplugin_grasp_fix />
+
+  <xacro:macro name="mimic_joint_plugin_gazebo" params="name_prefix parent_joint mimic_joint has_pid:=false multiplier:=1.0 offset:=0 sensitiveness:=0.0 max_effort:=1.0 robot_namespace:=''">
+    <gazebo>
+      <plugin name="${name_prefix}mimic_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+        <joint>${parent_joint}</joint>
+        <mimicJoint>${mimic_joint}</mimicJoint>
+        <xacro:if value="${has_pid}">
+          <hasPID />
+        </xacro:if>
+        <multiplier>${multiplier}</multiplier>
+        <offset>${offset}</offset>
+        <sensitiveness>${sensitiveness}</sensitiveness>
+        <maxEffort>${max_effort}</maxEffort>
+        <xacro:unless value="${robot_namespace == ''}">
+          <robotNamespace>($robot_namespace)</robotNamespace>
+        </xacro:unless>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:mimic_joint_plugin_gazebo name_prefix="passive_gripper_left"
+                                   parent_joint="joint1" mimic_joint="passive_gripper_joint_left"
+                                   has_pid="true" multiplier="1.0" offset="${5*pi/4}" max_effort="3.3" />
+
+  <xacro:mimic_joint_plugin_gazebo name_prefix="passive_gripper_right"
+                                   parent_joint="joint3" mimic_joint="passive_gripper_joint_right"
+                                   has_pid="true" multiplier="1.0" offset="${pi/4}" max_effort="3.3" />
+
+</robot>
