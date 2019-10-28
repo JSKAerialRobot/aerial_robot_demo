@@ -52,7 +52,7 @@ namespace mbzirc2020_task2_tasks
     ros::Publisher area_pub;
     ros::Publisher marker_pub;
     ros::Publisher angle_pub;
-    ros::Publisher working_fhase_pub;
+    ros::Publisher working_phase_pub;
     ros::Publisher object_marker_pub;
     ros::Publisher target_pos_pub;    
     ros::Publisher jointstate_pub;
@@ -61,7 +61,7 @@ namespace mbzirc2020_task2_tasks
     image_transport::Subscriber image_depth_sub_;
     ros::Subscriber cam_info_sub_;
     ros::Subscriber plane_sub_;
-    ros::Subscriber working_fhase_sub_;
+    ros::Subscriber working_phase_sub_;
     ros::Subscriber uav_odom_sub_;
 
     boost::shared_ptr<image_transport::ImageTransport> it_;
@@ -84,9 +84,9 @@ namespace mbzirc2020_task2_tasks
     std::vector<jsk_recognition_utils::Vertices> vertice_highest;
     cv::Mat depth_img;
 
-    int working_fhase;
-    int working_fhase_py;
-    std_msgs::Int32 working_fhase_msg;
+    int working_phase;
+    int working_phase_py;
+    std_msgs::Int32 working_phase_msg;
 
     double hydrus_angle = 0.0;
     double cam_angle = 0.0;
@@ -99,12 +99,14 @@ namespace mbzirc2020_task2_tasks
     double target_y_ = 0.0;
     double target_z_ = 0.0;
     double target_angle_ = 0.0;
+
+    tf2::Vector3 cam_target_xyz;
     
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void imagedepthCallback(const sensor_msgs::ImageConstPtr& msg);
     void cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
     void planeCallback(const jsk_recognition_msgs::PolygonArray::ConstPtr& msg);
-    void workingfhaseCallback(const std_msgs::Int32 msg);
+    void workingphaseCallback(const std_msgs::Int32 msg);
     void uavodomCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void openjoints();
     
