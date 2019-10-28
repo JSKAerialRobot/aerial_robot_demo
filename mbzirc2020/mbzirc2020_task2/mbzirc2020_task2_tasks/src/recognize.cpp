@@ -27,12 +27,12 @@ namespace mbzirc2020_task2_tasks
     area_pub = advertise<std_msgs::Float64>(*nh_, "area", 1);
     marker_pub = advertise<visualization_msgs::Marker>(*nh_, "marker", 1);
     angle_pub = advertise<std_msgs::Float64>(*nh_, "target_object/angle", 1);
-    working_fhase_pub = advertise<std_msgs::Int32>(*nh_, "working_fhase/cpp", 1);
+    working_phase_pub = advertise<std_msgs::Int32>(*nh_, "working_phase/cpp", 1);
     target_pos_pub = advertise<aerial_robot_msgs::FlightNav>(*nh_, "/uav/nav", 1);
     jointstate_pub = advertise<sensor_msgs::JointState>(*nh_, "/hydrusx/joints_ctrl", 1);
 
-    working_fhase = 0;
-    working_fhase_py = 0;
+    working_phase = 5;
+    working_phase_py = 0;
 
     ros::Duration(1.0).sleep();
 
@@ -45,7 +45,7 @@ namespace mbzirc2020_task2_tasks
     cam_info_sub_ = nh_->subscribe("cam_info", 1, &RedObjectDetectionWithHSVFilter::cameraInfoCallback, this);
     plane_sub_ = nh_->subscribe("polygon_array", 1, &RedObjectDetectionWithHSVFilter::planeCallback, this);
     image_depth_sub_ = it_->subscribe("image_depth", 1, &RedObjectDetectionWithHSVFilter::imagedepthCallback, this);
-    working_fhase_sub_ = nh_->subscribe("working_fhase/py", 1, &RedObjectDetectionWithHSVFilter::workingfhaseCallback, this);
+    working_phase_sub_ = nh_->subscribe("working_phase/py", 1, &RedObjectDetectionWithHSVFilter::workingphaseCallback, this);
     uav_odom_sub_ =  nh_->subscribe("/uav/baselink/odom", 1, &RedObjectDetectionWithHSVFilter::uavodomCallback, this);
 
   }
@@ -122,7 +122,7 @@ namespace mbzirc2020_task2_tasks
       ROS_WARN("%s", ex.what());
       return;
     }
-
+    
     tf2::Transform leg_cog_tf;
     try{
       geometry_msgs::TransformStamped leg_cog_msg = tf_buff_.lookupTransform("cog", "leg5", ros::Time(0));
@@ -142,7 +142,7 @@ namespace mbzirc2020_task2_tasks
 
     // detect the target objects
 
-    if(working_fhase == 0 && working_fhase_py == -1){
+    if(working_phase == 0 && working_phase_py == -1){
       cv::Mat hsv_image;
       cvtColor(src_image, hsv_image, cv::COLOR_BGR2HSV);
 
@@ -248,10 +248,10 @@ namespace mbzirc2020_task2_tasks
       obj_pos_msg.header = obj_tf_msg.header;
       obj_pos_msg.vector = obj_tf_msg.transform.translation;
 
-      // go to approach fhase
+      // go to approach phase
 
-      working_fhase_msg.data = 0;
-      working_fhase_pub.publish(working_fhase_msg);
+      working_phase_msg.data = 0;
+      working_phase_pub.publish(working_phase_msg);
 
     }
 
@@ -273,7 +273,7 @@ namespace mbzirc2020_task2_tasks
     }
 
     // draw polygon line
-    if(working_fhase == 3){
+    if(working_phase == 3){
       int count = 0;
       if(vertice_highest.size() != 0){
         for(const auto v_highest : vertice_highest){
@@ -300,11 +300,13 @@ namespace mbzirc2020_task2_tasks
             float y = line_img_polygon.centroid()(1);
             float z = line_img_polygon.centroid()(2);
 
-            tf2::Vector3 target_xyz;
+            tf2::Vector3 target_xyz;  // target position on cam_tf
             target_xyz.setX(x);
             target_xyz.setY(y);
             target_xyz.setZ(z);
 
+	    cam_target_xyz = target_xyz;
+	    
             geometry_msgs::Vector3Stamped tar_pos_msg1;
             tar_pos_msg1.header = msg->header;
             tar_pos_msg1.vector = tf2::toMsg(cam_tf * target_xyz);
@@ -406,17 +408,21 @@ namespace mbzirc2020_task2_tasks
           image_pub_.publish(cv_ptr->toImageMsg());
           count++;
         }
+	if(count == 1){
+	  break;  //  graspable object once detected -> finish
+	}
         }
       }
        vertice_highest.erase(vertice_highest.begin(), vertice_highest.end());
 
-      working_fhase_msg.data = 3;
-      working_fhase_pub.publish(working_fhase_msg);
-      working_fhase = 4;
+      working_phase_msg.data = 3;
+      working_phase_pub.publish(working_phase_msg);
+      working_phase = 4;
     }
 
+    
     //  motion
-    if(working_fhase == 4){
+    if(working_phase == 4){
       //  xy > rotate > z > go up
       
       target_angle_ -= 0.785 * 3;  // initially based on link2 -> link3
@@ -557,21 +563,138 @@ namespace mbzirc2020_task2_tasks
       // closejoints();
       }
       
-      working_fhase = 0;
+      working_phase = 0;
       
       if(go_check == 1){
 	std::cout << "reach michael" << std::endl;
-	working_fhase = 5;
+	working_phase = 5;
       }
 
     }
+
+    //  xy and z adjust(p control)
+    if(working_phase == 6){
+      double target_x = cam_target_xyz.x();
+      double target_y = cam_target_xyz.y();
+      double target_z = std::abs(cam_target_xyz.z());
+
+      double coef_x  = 0.1;
+      double coef_y  = 0.2;
+      double coef_z  = 0.3;
+
+      double margin = 0.70;
+      double limit = 0.10;
+
+      // double dif_x = std::abs(target_x);
+      // double dif_y = std::abs(target_y);
+      // double dif_z = std::abs(target_z);
+
+      tf2::Vector3 new_target_xyz;  // target position on cam_tf
+
+      std::cout << "cam_target_x : "<< target_x << std::endl;
+      std::cout << "cam_target_y : "<< target_y << std::endl;
+      std::cout << "cam_target_z : "<< target_z << std::endl;
+
+      tf2::Transform camera_base_tf;
+      try{
+	geometry_msgs::TransformStamped camera_base_msg = tf_buff_.lookupTransform("rs_d435_color_optical_frame", "link3", ros::Time(0));
+
+	tf2::convert(camera_base_msg.transform, camera_base_tf);
+      }
+      catch (tf2::TransformException &ex) {
+	ROS_WARN("%s", ex.what());
+	return;
+      }
+
+      tf2::Vector3 camera_base_translation = camera_base_tf.getOrigin();
+      geometry_msgs::Vector3Stamped camera_base_translation_world_msg;
+      camera_base_translation_world_msg.header = msg->header;
+      camera_base_translation_world_msg.vector = tf2::toMsg(cam_tf * camera_base_translation);
+      
+      if(std::abs(target_x) > limit){
+	new_target_xyz.setX(coef_x * target_x);
+	new_target_xyz.setY(0.0000);
+	new_target_xyz.setZ(0.0000);
+
+	std::cout << "x shift" << std::endl;
+      }
+
+      else if(std::abs(target_z - margin) > limit){
+      	new_target_xyz.setX(0.00000);
+	new_target_xyz.setY(0.00000);
+      	new_target_xyz.setZ(coef_z * (target_z - margin));
+
+	
+      	std::cout << "y shift" << std::endl;
+      }
+
+      else if(std::abs(target_y) > limit){
+      	new_target_xyz.setX(0.0);
+      	new_target_xyz.setY(coef_y * target_y);
+	new_target_xyz.setZ(0.0);
+
+      	std::cout << "z shift" << std::endl;
+      }
+
+      else{
+	new_target_xyz.setX(0.0);
+	new_target_xyz.setY(0.0);
+	new_target_xyz.setZ(0.0);
+      }
+      
+      geometry_msgs::Vector3Stamped tar_pos_msg;
+      tar_pos_msg.header = msg->header;
+      tar_pos_msg.vector = tf2::toMsg(cam_tf * new_target_xyz);
+      
+      aerial_robot_msgs::FlightNav msg;
+      
+      msg.pos_xy_nav_mode = msg.POS_MODE;
+      msg.psi_nav_mode = msg.NO_NAVIGATION;
+      msg.pos_z_nav_mode = msg.NO_NAVIGATION;
+      msg.header.stamp = ros::Time(0);
+      msg.control_frame = 0;
+      
+      // msg.target_pos_x = (tar_pos_msg.vector.x + camera_base_translation_world_msg.vector.x) * coef_x;
+      // msg.target_pos_y = (tar_pos_msg.vector.y + camera_base_translation_world_msg.vector.y) * coef_y;
+      // msg.target_pos_z = (tar_pos_msg.vector.z + camera_base_translation_world_msg.vector.z) * coef_z;
+
+      // msg.target_pos_x = (tar_pos_msg.vector.x  * coef_x) + camera_base_translation_world_msg.vector.x;
+      // msg.target_pos_y = (tar_pos_msg.vector.y  * coef_y) + camera_base_translation_world_msg.vector.y;
+      // msg.target_pos_z = (tar_pos_msg.vector.z  * coef_z) + camera_base_translation_world_msg.vector.z;
+
+      msg.target_pos_x = (tar_pos_msg.vector.x * 1.0) + camera_base_translation.x();
+      msg.target_pos_y = (tar_pos_msg.vector.y * 1.0) + camera_base_translation.y();
+      msg.target_pos_z = (tar_pos_msg.vector.z * 1.0) + camera_base_translation.z();
+
+      // std::cout << camera_base_translation_world_msg.vector.x << std::endl;
+      // std::cout << camera_base_translation_world_msg.vector.y << std::endl;
+      // std::cout << camera_base_translation_world_msg.vector.z << std::endl;
+
+      std::cout << camera_base_translation.x() << std::endl;
+      std::cout << camera_base_translation.y() << std::endl;
+      std::cout << camera_base_translation.z() << std::endl;
+
+      target_pos_pub.publish(msg);
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+      
+      std::cout << "target_x : "<< msg.target_pos_x << std::endl;
+      std::cout << "target_y : "<< msg.target_pos_y << std::endl;
+      std::cout << "target_z : "<< msg.target_pos_z << std::endl;
+      
+      std::cout << "working_phase : 6" << std::endl;
+      std::cout << " " << std::endl;
+      
+      working_phase = 5;
+    }
+
+
   }
 
   void RedObjectDetectionWithHSVFilter::imagedepthCallback(const sensor_msgs::ImageConstPtr& msg)
   {
-    if(working_fhase == 0 && working_fhase_py == 0){
+    if(working_phase == 0 && working_phase_py == 0){
 
-      working_fhase = 1;
+      working_phase = 1;
       cv_bridge::CvImagePtr cv_ptr;
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_32FC1);
       cv::Mat src_image = cv_ptr->image;
@@ -580,30 +703,31 @@ namespace mbzirc2020_task2_tasks
       cv::normalize(src_image, src_image, 255, 0, cv::NORM_MINMAX);
       depth_img = src_image;
       cv::imwrite("/home/kuromiya/depth.png", depth_img);
-      working_fhase = 2;
+      working_phase = 2;
     }
   }
 
-  void RedObjectDetectionWithHSVFilter::workingfhaseCallback(const std_msgs::Int32 msg)
+  void RedObjectDetectionWithHSVFilter::workingphaseCallback(const std_msgs::Int32 msg)
   {
-    // working_fhase_py = msg.data;
+    // working_phase_py = msg.data;
   }
 
   void RedObjectDetectionWithHSVFilter::planeCallback(const jsk_recognition_msgs::PolygonArray::ConstPtr& msg)
   {
-    if(working_fhase == 2){
+    tf2::Transform cam_tf;
+    try{
+      geometry_msgs::TransformStamped cam_pose_msg = tf_buff_.lookupTransform("world", "rs_d435_color_optical_frame", ros::Time(0));
+      tf2::convert(cam_pose_msg.transform, cam_tf);
+    }
+    catch (tf2::TransformException &ex) {
+      ROS_WARN("%s", ex.what());
+      return;
+    }
+
+    
+    if(working_phase == 2){
       geometry_msgs::PolygonStamped polygons_stamped[sizeof(msg->polygons) / sizeof(msg->polygons[0])];
       geometry_msgs::Polygon image_plane;
-
-      tf2::Transform cam_tf;
-      try{
-	geometry_msgs::TransformStamped cam_pose_msg = tf_buff_.lookupTransform("world", "rs_d435_color_optical_frame", ros::Time(0));
-        tf2::convert(cam_pose_msg.transform, cam_tf);
-      }
-      catch (tf2::TransformException &ex) {
-        ROS_WARN("%s", ex.what());
-        return;
-      }
 
       tf2::Matrix3x3 cam_tf_rotation(cam_tf.getRotation());
       
@@ -696,7 +820,72 @@ namespace mbzirc2020_task2_tasks
             }
           }
         }
-    working_fhase = 3;
+    working_phase = 3;
+    }
+
+    if(working_phase == 5){
+      geometry_msgs::PolygonStamped polygons_stamped[sizeof(msg->polygons) / sizeof(msg->polygons[0])];
+      geometry_msgs::Polygon image_plane;
+
+      tf2::Matrix3x3 cam_tf_rotation(cam_tf.getRotation());
+      
+      double roll, pitch, yaw;
+      cam_tf_rotation.getRPY(roll, pitch, yaw);  //rpy are Pass by Reference
+      cam_angle = yaw;
+      
+      geometry_msgs::Vector3Stamped obj_pos;
+      double highest_x = 0.0;
+      double highest_y = 0.0;
+      std::vector<double> highest_z;
+      tf2::Vector3 highest_normal_world;
+
+      for(const auto polygon_stamped : msg->polygons)
+        {
+          geometry_msgs::Polygon polygon = polygon_stamped.polygon;
+
+          jsk_recognition_utils::Vertices vertice;
+          for (size_t i = 0; i < polygon.points.size(); i++) {
+            Eigen::Vector3f v;
+            jsk_recognition_utils::pointFromXYZToVector<geometry_msgs::Point32, Eigen::Vector3f>(polygon.points[i], v);
+            vertice.push_back(v);
+          }
+          jsk_recognition_utils::Polygon area_polygon(vertice);
+          Eigen::Vector3f normal_cam = area_polygon.getNormalFromVertices();
+          tf2::Vector3 normal;
+          normal.setX(normal_cam(0));
+          normal.setY(normal_cam(1));
+          normal.setZ(normal_cam(2));
+          tf2::Vector3 normal_world = cam_tf_rotation * normal;
+
+          Eigen::Vector3f center_cam = area_polygon.centroid();
+	  
+	  tf2::Vector3 center;
+
+	  center.setX(center_cam(0));
+	  center.setY(center_cam(1));
+	  center.setZ(center_cam(2));
+
+	  tf2::Vector3 center_world = cam_tf * center;
+
+	  std::cout << "world target_x : " << center_world.x() << std::endl;
+	  std::cout << "world target_y : " << center_world.y() << std::endl;
+	  std::cout << "world target_z : " << center_world.z() << std::endl;
+	  
+	  if(normal_world.z() < 0.1 && center_world.z() > 0.3){
+	  
+	    cam_target_xyz = center;
+
+	    std::cout << "Approach" << std::endl;
+
+	    std::cout << "working_phase : 5" << std::endl;
+	    working_phase = 6;
+
+	    break;
+	  }
+
+	  std::cout << "working_phase : 5" << std::endl;
+	  working_phase = 6;
+	}
     }
   }
 }
