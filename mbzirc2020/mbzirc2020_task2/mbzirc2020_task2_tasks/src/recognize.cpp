@@ -31,7 +31,7 @@ namespace mbzirc2020_task2_tasks
     target_pos_pub = advertise<aerial_robot_msgs::FlightNav>(*nh_, "/uav/nav", 1);
     jointstate_pub = advertise<sensor_msgs::JointState>(*nh_, "/hydrusx/joints_ctrl", 1);
 
-    working_phase = 5;
+    working_phase = 0;
     working_phase_py = 0;
 
     ros::Duration(1.0).sleep();
@@ -428,7 +428,7 @@ namespace mbzirc2020_task2_tasks
       target_angle_ -= 0.785 * 3;  // initially based on link2 -> link3
 
       int go_check = 0; // decide whether to go to the target
-      int go_pos_limit = 30;
+      int go_pos_limit = 300;
       std::vector<double> target_pos_v;
       target_pos_v.push_back(target_x_);
       target_pos_v.push_back(target_y_);
@@ -547,18 +547,18 @@ namespace mbzirc2020_task2_tasks
 	msg.target_pos_z = target_z_ - 0.1;
 
 	target_pos_pub.publish(msg);
-	std::this_thread::sleep_for(std::chrono::seconds(40));
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
-	msg.pos_xy_nav_mode = msg.POS_MODE;
-	msg.psi_nav_mode = msg.POS_MODE;
-	msg.pos_z_nav_mode = msg.POS_MODE;
-	msg.header.stamp = ros::Time(0);
-	msg.control_frame = 0;
-	msg.target = 0;	
-	msg.target_pos_z = target_z_ + 1.0;
+	// msg.pos_xy_nav_mode = msg.POS_MODE;
+	// msg.psi_nav_mode = msg.POS_MODE;
+	// msg.pos_z_nav_mode = msg.POS_MODE;
+	// msg.header.stamp = ros::Time(0);
+	// msg.control_frame = 0;
+	// msg.target = 0;	
+	// msg.target_pos_z = target_z_ + 1.0;
 
-	target_pos_pub.publish(msg);
-	std::this_thread::sleep_for(std::chrono::seconds(40));
+	// target_pos_pub.publish(msg);
+	// std::this_thread::sleep_for(std::chrono::seconds(10));
 
       // closejoints();
       }
@@ -567,7 +567,7 @@ namespace mbzirc2020_task2_tasks
       
       if(go_check == 1){
 	std::cout << "reach michael" << std::endl;
-	working_phase = 5;
+	working_phase = 0;
       }
 
     }
