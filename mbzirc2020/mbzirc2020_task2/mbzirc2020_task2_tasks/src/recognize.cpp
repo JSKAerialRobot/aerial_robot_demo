@@ -53,20 +53,6 @@ namespace mbzirc2020_task2_tasks
   void RedObjectDetectionWithHSVFilter::openjoints()
   {
     sensor_msgs::JointState msg;
-    // // msg.position = [1.40, 1.57, 1.40];
-    // msg.position.push_back(1.40);
-    // msg.position.push_back(1.40);
-    
-    // jointstate_pub.publish(msg);
-    // std::this_thread::sleep_for(std::chrono::seconds(5));
-    // // msg.position = [1.25, 1.57, 1.25];
-    // msg.position.push_back(1.25);
-    // msg.position.push_back(1.25);
-    
-    // jointstate_pub.publish(msg);
-    // std::this_thread::sleep_for(std::chrono::seconds(5));
-    
-    // msg.position = [1.0, 1.57, 1.0];
     msg.position.push_back(1.0);
     msg.position.push_back(1.0);    
     jointstate_pub.publish(msg);
@@ -74,10 +60,6 @@ namespace mbzirc2020_task2_tasks
     
   }
 
-  //   void RedObjectDetectionWithHSVFilter::closejoints()
-  // {
-  //   sensor_msgs::JointState msg;
-  // }
 
   void RedObjectDetectionWithHSVFilter::unsubscribe()
   {
@@ -289,12 +271,12 @@ namespace mbzirc2020_task2_tasks
           std::vector<float> answer = space_detector(canvas, depth_img);
 	  double target_distance_z = v_highest[0].z();  // distane to target object
 	  // std::vector<float> answer = space_detector_ground(canvas, depth_img, target_distance_z);
-	  int graspable = int(answer[1]);
-          if(graspable == 0){  // answer[1]
+	  int graspable = int(answer[0]);
+          if(graspable == 0){  // answer[0]
             continue;
           }
-          else if(graspable == 1){  // answer[1]
-	    ROS_INFO("good! : %d", int(answer[1]));
+          else if(graspable == 1){  // answer[0]
+	    ROS_INFO("good! : %d", int(answer[0]));
 	
             float x = line_img_polygon.centroid()(0);
             float y = line_img_polygon.centroid()(1);
@@ -338,13 +320,13 @@ namespace mbzirc2020_task2_tasks
             marker_obj_msg.pose.position.y = tar_pos_msg1.vector.y;
             marker_obj_msg.pose.position.z = tar_pos_msg1.vector.z -0.15;
 	    // marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[0] * M_PI / 180 + hydrus_angle);
-	    marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[0] * M_PI / 180 + cam_angle);
-            ROS_INFO("object yaw w.r.t robot: %f; robot yaw: %f", answer[0] * M_PI / 180, hydrus_angle);
+	    marker_obj_msg.pose.orientation =  tf::createQuaternionMsgFromYaw(answer[1] * M_PI / 180 + cam_angle);
+            ROS_INFO("object yaw w.r.t robot: %f; robot yaw: %f", answer[1] * M_PI / 180, hydrus_angle);
 	    marker_obj_msg.color.g = 1.0f;
 	    marker_obj_msg.color.a = 1.0f;
 	    object_marker_pub.publish(marker_obj_msg);
 	
-	    double angle_rad = answer[0] * M_PI / 180;
+	    double angle_rad = answer[1] * M_PI / 180;
 	
 	    std_msgs::Float64 angle;
             angle.data = angle_rad;  // degree -> rad
