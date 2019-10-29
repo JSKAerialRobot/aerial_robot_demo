@@ -43,12 +43,17 @@ class HydrusGraspingOnGround(object):
             return False
 
     def controlCallback(self, event):
-        if not self.grasp("joint3", 3.0):
-            rospy.loginfo("joint3 grasping")
+        # if not self.grasp("joint3", 3.0):
+        #     rospy.loginfo("joint3 grasping")
+        #     return
+        # elif not self.grasp("joint1", 3.0):
+        #     rospy.loginfo("joint1 grasping")
+        #     return
+
+        if not self.grasp("joint3", 3.0) and not self.grasp("joint1", 3.0):
+            rospy.loginfo("joints grasping")
             return
-        elif not self.grasp("joint1", 3.0):
-            rospy.loginfo("joint1 grasping")
-            return
+        
         else:
             rospy.loginfo("finish grasping")
             return
