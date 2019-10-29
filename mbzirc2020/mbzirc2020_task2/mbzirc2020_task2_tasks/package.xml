@@ -49,11 +49,30 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>cv_bridge</depend>
+  <depend>geometry_msgs</depend>
+  <depend>jsk_topic_tools</depend>
+  <depend>nav_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>nodelet</depend>
+  <depend>image_view</depend>
+  <depend>jsk_perception</depend>
+
+  <build_depend>aerial_robot_msgs</build_depend>
+
+  <exec_depend>tf</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+  <exec_depend>rostest</exec_depend>
+  <exec_depend>python-gdown-pip</exec_depend>
+  <exec_depend>aerial_robot_msgs</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-
+    <nodelet plugin="/home/kuromiya/ros/aerial_robot_demo_ws/src/aerial_robot_demo/mbzirc2020/mbzirc2020_task2/mbzirc2020_task2_tasks/plugins/nodelet/mbzirc2020_task2_tasks_nodelet.xml"/>
   </export>
 </package>

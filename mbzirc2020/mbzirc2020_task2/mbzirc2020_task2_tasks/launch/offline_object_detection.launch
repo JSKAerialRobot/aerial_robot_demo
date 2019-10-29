@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  #### robot model ####
+  <!-- <include file="$(find mbzirc2020_task2_common)/launch/offline_robot_model.launch" /> -->
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch" />
+
+  ### depth + color image -> point cloud ###
+  <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
+        args="standalone depth_image_proc/point_cloud_xyzrgb" >
+    <remap from="rgb/camera_info" to="/rs_d435/aligned_depth_to_color/camera_info"/>
+    <remap from="rgb/image_rect_color" to="/rs_d435/color/image_rect_color"/>
+    <remap from="depth_registered/image_rect" to="/rs_d435/aligned_depth_to_color/image_raw"/>
+    <remap from="depth_registered/points" to="/kuromiya/points"/>
+  </node>
+
+  ### plane detection ###
+  <arg name="gui" default="true"/>
+
+  <arg name="INPUT_CLOUD" value="/kuromiya/points" />
+
+  <node name="sample_manager"
+        pkg="nodelet" type="nodelet"
+        args="manager"/>
+
+  <node pkg="nodelet" type="nodelet" name="hsi_filter_red" respawn="true"
+        args="load jsk_pcl/HSIColorFilter sample_manager" >
+    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <rosparam>
+      use_indices: false
+      keep_organized: true
+    </rosparam>
+    <param name="h_limit_max" value="50" />
+    <param name="h_limit_min" value="-50" />
+    <param name="s_limit_max" value="255" />
+    <param name="s_limit_min" value="100" />
+    <param name="i_limit_max" value="255" />
+    <param name="i_limit_min" value="0" />
+  </node>
+
+  <node name="passthrough_filter_right"
+        pkg="nodelet" type="nodelet"
+        args="load pcl/PassThrough /sample_manager">
+    <!-- <remap from="~input" to="$(arg INPUT_CLOUD)" /> -->
+    <remap from="~input" to="hsi_filter_red/output" />
+    <rosparam>
+      keep_organized: true
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 1.2
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node name="input_relay" pkg="nodelet" type="nodelet" respawn="true"
+        args="load jsk_topic_tools/Relay /sample_manager">
+    <remap from="~input" to="passthrough_filter_right/output" />
+  </node>
+
+  <node name="multi_plane_estimate" pkg="nodelet" type="nodelet"
+        args="load jsk_pcl/OrganizedMultiPlaneSegmentation /sample_manager">
+    <remap from="~input" to="input_relay/output" />
+    <rosparam>
+      publish_normal: True
+      max_curvature: 0.03
+      min_size: 300
+      angular_threshold: 0.10
+      distance_threshold: 0.10
+      connect_plane_angle_threshold: 0.3
+      connect_distance_threshold: 0.03
+      min_refined_area_threshold: 0.01
+    </rosparam>
+  </node>
+
+
+  ### object detection
+  <include file="$(find mbzirc2020_task2_tasks)/launch/object_detection_from_plane.launch" />
+
+  ### rviz #####
+  <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find mbzirc2020_task2_tasks)/config/object_detection.rviz" respawn="true" />
+
+</launch>
