@@ -117,8 +117,102 @@
 	  izz="0.0"/>
     </inertial>
   </xacro:extra_module>
-  
-  
+
+  ########## gripper ############
+  <xacro:extra_module name = "passive_gripper_left_fixed_part" parent = "link1" visible = "1" model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_fixed_part_left.dae">
+    <origin xyz="0.061 0.0 -0.022" rpy="${pi/2} 0 ${-pi/2}"/>
+    <inertial>
+      <mass value = "0.18499778" />
+      <origin xyz="-0.03987797 -0.00012342 0.11788941" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00046" ixy="-0.00001" ixz="-0.00014"
+          iyy="0.00046" iyz="0.00001" izz="0.00033"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <joint name="passive_gripper_joint_left" type="continuous">
+    <limit effort="3.0" lower="${-pi}" upper="${pi}" velocity="0.5"/>
+    <parent link="link1"/>
+    <child link="passive_gripper_left_moving_part"/>
+    <origin xyz="-0.0854 0.0696 -0.01966" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="joint1" multiplier="1.0" offset="${5*pi/4}"/>
+  </joint>
+
+  <link name="passive_gripper_left_moving_part">
+    <inertial>
+      <mass value="0.08769"/>
+      <origin xyz="-0.00619 0.00589 -0.00114" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0017" iyy="0.0015" izz="0.005"
+          ixy="0.000" ixz="0.000" iyz="0.000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_moving_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_moving_part.dae"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="passive_gripper_left_moving_part">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+
+
+  <xacro:extra_module name = "passive_gripper_right_fixed_part" parent = "link4" visible = "1" model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_fixed_part_right.dae">
+    <origin xyz="0.539 0.0 -0.022" rpy="${pi/2} 0 ${pi/2}"/>
+    <inertial>
+      <mass value = "0.185000" />
+      <origin xyz="0.03988 -0.00121 0.11789" rpy="0 0 0"/>
+      <inertia
+          ixx="0.00046" ixy="0.0" ixz="0.00014"
+          iyy="0.00046" iyz="0.00001" izz="0.00033"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <joint name="passive_gripper_joint_right" type="continuous">
+    <limit effort="3.0" lower="${-pi}" upper="${pi}" velocity="0.5"/>
+    <parent link="link4"/>
+    <child link="passive_gripper_right_moving_part"/>
+    <origin xyz="0.6854 0.0696 -0.01966" rpy="${pi} 0 0"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="joint3" multiplier="1.0" offset="${pi/4}"/>
+  </joint>
+
+  <link name="passive_gripper_right_moving_part">
+    <inertial>
+      <mass value="0.08769"/>
+      <origin xyz="-0.00619 0.00589 -0.00114" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0017" iyy="0.0015" izz="0.005"
+          ixy="0.000" ixz="0.000" iyz="0.000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_moving_part.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_gripper_moving_part.dae"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="passive_gripper_right_moving_part">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+
+
   <transmission name="rs_d435_servo_joint_tran">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="rs_d435_servo_joint">
@@ -130,7 +224,4 @@
     </actuator>
   </transmission>
 
-
-  <!-- gripper -->
-  <!-- TODO: add gripper at the ends -->
 </robot>
