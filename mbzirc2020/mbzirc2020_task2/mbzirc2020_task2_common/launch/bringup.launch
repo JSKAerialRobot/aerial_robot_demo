@@ -33,6 +33,9 @@
   <group unless="$(arg ground_mode)">
     <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
     <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" if="$(arg real_machine)">
+      <arg name="depth_fps" value="15" />
+      <arg name="infra_fps" value="15" />
+      <arg name="color_fps" value="15" />
       <arg name="camera" value="rs_d435" />
     </include>
   </group>

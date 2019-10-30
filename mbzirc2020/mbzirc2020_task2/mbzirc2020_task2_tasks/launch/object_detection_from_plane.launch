@@ -17,7 +17,7 @@
     <!-- <remap from="image_depth" to="/rs_d435/depth/depth_registered" /> -->
     <!-- <remap from="cam_info" to="/rs_d435/rgb/camera_info" /> -->
 
-    <remap from="image" to="/rs_d435/color/image_rect_color" />
+    <remap from="image" to="/rs_d435/color/image_rect_color_throttle" />
     <remap from="image_depth" to="/rs_d435/aligned_depth_to_color/image_raw" />
     <remap from="cam_info" to="/rs_d435/aligned_depth_to_color/camera_info" />
     <remap from="polygon_array" to="/multi_plane_estimate/output_refined_polygon" />

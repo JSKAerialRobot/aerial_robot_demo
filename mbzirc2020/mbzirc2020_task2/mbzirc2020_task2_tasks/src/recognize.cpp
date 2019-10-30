@@ -285,9 +285,6 @@ namespace mbzirc2020_task2_tasks
         cv::Mat canvas(src_image.rows, src_image.cols, CV_8UC3, cv::Scalar(255, 255, 255));
         line_img_polygon.drawLineToImage(camdep, cv_ptr->image, cv::Scalar(0, 255, 0), 1);
         line_img_polygon.drawLineToImage(camdep, canvas, cv::Scalar(0, 255, 0), 1);
-        if(count == 0){
-          cv::imwrite("/home/kuromiya/draw_plane.png", canvas);
-        }
 
         if(depth_img.cols != 0 && depth_img.rows != 0){
           // std::vector<float> answer = space_detector(canvas, depth_img);
@@ -489,7 +486,7 @@ namespace mbzirc2020_task2_tasks
 	std::cout << "final x : " << msg.target_pos_x << std::endl;
 	std::cout << "final y : " << msg.target_pos_y << std::endl;
 	
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -503,7 +500,7 @@ namespace mbzirc2020_task2_tasks
 	msg.pos_z_nav_mode = msg.NO_NAVIGATION;
 	msg.target_psi = target_angle_;
 
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -517,7 +514,7 @@ namespace mbzirc2020_task2_tasks
 	msg.pos_z_nav_mode = msg.POS_MODE;
 	msg.target_pos_z = target_z_ + 1.0;
 
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -528,7 +525,7 @@ namespace mbzirc2020_task2_tasks
 	msg.target = 0;	
 	msg.target_pos_z = target_z_ + 0.5;
 
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -539,7 +536,7 @@ namespace mbzirc2020_task2_tasks
 	msg.target = 0;	
 	msg.target_pos_z = target_z_;
 
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -550,7 +547,7 @@ namespace mbzirc2020_task2_tasks
 	msg.target = 0;	
 	msg.target_pos_z = target_z_ - 0.1;
 
-	target_pos_pub.publish(msg);
+	// target_pos_pub.publish(msg);
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	// msg.pos_xy_nav_mode = msg.POS_MODE;
@@ -570,7 +567,7 @@ namespace mbzirc2020_task2_tasks
       working_phase = 0;
       
       if(go_check == 1){
-	std::cout << "reach michael" << std::endl;
+	std::cout << "reached" << std::endl;
 	working_phase = 0;
       }
 
@@ -702,11 +699,9 @@ namespace mbzirc2020_task2_tasks
       cv_bridge::CvImagePtr cv_ptr;
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_32FC1);
       cv::Mat src_image = cv_ptr->image;
-      cv::imwrite("/home/kuromiya/depth_org.png", src_image);
       cv::Mat mask = cv::Mat(src_image != src_image);
       cv::normalize(src_image, src_image, 255, 0, cv::NORM_MINMAX);
       depth_img = src_image;
-      cv::imwrite("/home/kuromiya/depth.png", depth_img);
       working_phase = 2;
     }
   }

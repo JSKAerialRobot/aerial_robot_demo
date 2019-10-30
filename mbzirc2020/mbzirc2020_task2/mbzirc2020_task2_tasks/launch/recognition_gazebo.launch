@@ -9,9 +9,38 @@
         pkg="nodelet" type="nodelet"
         args="manager"/>
 
+  <node pkg="nodelet" type="nodelet" name="throttle" respawn="true"
+	args="load jsk_topic_tools/LightweightThrottle sample_manager">
+    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <remap from="~output" to="$(arg INPUT_CLOUD)_throttle" />
+    <param name="update_rate" value="1.0" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="throttle2" respawn="true"
+	args="load jsk_topic_tools/LightweightThrottle sample_manager">
+    <remap from="~input" to="/rs_d435/color/image_rect_color" />
+    <remap from="~output" to="/rs_d435/color/image_rect_color_throttle" />
+    <param name="update_rate" value="0.5" />
+  </node>
+
+  
+  <node name="passthrough_filter_right"
+        pkg="nodelet" type="nodelet"
+        args="load pcl/PassThrough /sample_manager">
+    <!--<remap from="~input" to="$(arg INPUT_CLOUD)" />-->
+    <remap from="~input" to="$(arg INPUT_CLOUD)_throttle" />
+    <rosparam>
+      keep_organized: true
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 1.3
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+  
   <node pkg="nodelet" type="nodelet" name="hsi_filter_red" respawn="true"
         args="load jsk_pcl/HSIColorFilter sample_manager" >
-    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <remap from="~input" to="passthrough_filter_right/output" />
     <rosparam>
       use_indices: false
       keep_organized: true
@@ -24,23 +53,9 @@
     <param name="i_limit_min" value="0" />
   </node>
 
-  <node name="passthrough_filter_right"
-        pkg="nodelet" type="nodelet"
-        args="load pcl/PassThrough /sample_manager">
-    <!-- <remap from="~input" to="$(arg INPUT_CLOUD)" /> -->
-    <remap from="~input" to="hsi_filter_red/output" />
-    <rosparam>
-      keep_organized: true
-      filter_field_name: z
-      filter_limit_min: 0.0
-      filter_limit_max: 1.0
-      filter_limit_negative: False
-    </rosparam>
-  </node>
-
   <node name="input_relay" pkg="nodelet" type="nodelet" respawn="true"
         args="load jsk_topic_tools/Relay /sample_manager">
-    <remap from="~input" to="passthrough_filter_right/output" />
+    <remap from="~input" to="hsi_filter_red/output" />
   </node>
 
   <node name="multi_plane_estimate" pkg="nodelet" type="nodelet"
@@ -57,7 +72,6 @@
       min_refined_area_threshold: 0.01
     </rosparam>
   </node>
-
 
   ### object detection
   <include file="$(find mbzirc2020_task2_tasks)/launch/object_detection_from_plane.launch" />
