@@ -4,33 +4,57 @@
 
   <!-- base kinematics model -->
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
-  <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "0"  />
 
+  <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "0"  />
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
-                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+                      model_url = "package://hydrus/urdf/mesh/battery/VOLTON-PG-1300LP2-6s.stl" scale="0.001">
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.4108"/>
+      <mass value="0.194"/>
       <inertia
-          ixx="0.0001" iyy="0.0006" izz="0.0006"
-          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+          ixx="0.00005" iyy="0.00012" izz="0.00011"
+          ixy="0.0" ixz="0.0" iyz="0.0"/>
     </inertial>
   </xacro:extra_module>
 
-  <xacro:extra_module name = "bat2" parent = "link4" visible = "1"
-                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
+  <xacro:extra_module name = "bat2" parent = "link2" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/VOLTON-PG-1300LP2-6s.stl" scale="0.001">
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.4108"/>
+      <mass value="0.194"/>
       <inertia
-          ixx="0.0001" iyy="0.0006" izz="0.0006"
-          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+          ixx="0.00005" iyy="0.00012" izz="0.00011"
+          ixy="0.0" ixz="0.0" iyz="0.0"/>
     </inertial>
   </xacro:extra_module>
 
+  <xacro:extra_module name = "bat3" parent = "link3" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/VOLTON-PG-1300LP2-6s.stl" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.194"/>
+      <inertia
+          ixx="0.00005" iyy="0.00012" izz="0.00011"
+          ixy="0.0" ixz="0.0" iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "bat4" parent = "link4" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/VOLTON-PG-1300LP2-6s.stl" scale="0.001">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.194"/>
+      <inertia
+          ixx="0.00005" iyy="0.00012" izz="0.00011"
+          ixy="0.0" ixz="0.0" iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  
   <!-- processor: intel upboard -->
   <!-- TODO: change to brix -->
   <xacro:extra_module name = "pc" parent = "link2" visible = "1"
