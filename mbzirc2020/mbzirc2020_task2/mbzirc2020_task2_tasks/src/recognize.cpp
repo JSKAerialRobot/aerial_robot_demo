@@ -53,6 +53,20 @@ namespace mbzirc2020_task2_tasks
   void RedObjectDetectionWithHSVFilter::openjoints()
   {
     sensor_msgs::JointState msg;
+    // // msg.position = [1.40, 1.57, 1.40];
+    // msg.position.push_back(1.40);
+    // msg.position.push_back(1.40);
+    
+    // jointstate_pub.publish(msg);
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
+    // // msg.position = [1.25, 1.57, 1.25];
+    // msg.position.push_back(1.25);
+    // msg.position.push_back(1.25);
+    
+    // jointstate_pub.publish(msg);
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
+    
+    // msg.position = [1.0, 1.57, 1.0];
     msg.position.push_back(1.0);
     msg.position.push_back(1.0);    
     jointstate_pub.publish(msg);
@@ -60,6 +74,10 @@ namespace mbzirc2020_task2_tasks
     
   }
 
+  //   void RedObjectDetectionWithHSVFilter::closejoints()
+  // {
+  //   sensor_msgs::JointState msg;
+  // }
 
   void RedObjectDetectionWithHSVFilter::unsubscribe()
   {
@@ -73,6 +91,10 @@ namespace mbzirc2020_task2_tasks
     quaternionMsgToTF(msg->pose.pose.orientation, quat);
     tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);  //rpy are Pass by Reference
     hydrus_angle = yaw;
+
+    hydrus_x = msg->pose.pose.position.x;
+    hydrus_y = msg->pose.pose.position.y;
+    hydrus_z = msg->pose.pose.position.z;
   }
 
   void RedObjectDetectionWithHSVFilter::cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg)
@@ -268,7 +290,8 @@ namespace mbzirc2020_task2_tasks
         }
 
         if(depth_img.cols != 0 && depth_img.rows != 0){
-          std::vector<float> answer = space_detector(canvas, depth_img);
+          // std::vector<float> answer = space_detector(canvas, depth_img);
+	  std::vector<float> answer = space_detector(line_img_polygon, depth_img, hydrus_z, camdep);
 	  double target_distance_z = v_highest[0].z();  // distane to target object
 	  // std::vector<float> answer = space_detector_ground(canvas, depth_img, target_distance_z);
 	  int graspable = int(answer[0]);
@@ -331,7 +354,7 @@ namespace mbzirc2020_task2_tasks
 	    std_msgs::Float64 angle;
             angle.data = angle_rad;  // degree -> rad
 	    // double target_angle = hydrus_angle + angle_rad + 1.57;
-	    double target_angle = cam_angle + angle_rad + 1.57;
+	    double target_angle = cam_angle + angle_rad;
 	    angle.data = target_angle;  // degree -> rad
             angle_pub.publish(angle);
             answer.erase(answer.begin(), answer.end());
@@ -410,13 +433,11 @@ namespace mbzirc2020_task2_tasks
       target_angle_ -= 0.785 * 3;  // initially based on link2 -> link3
 
       int go_check = 0; // decide whether to go to the target
-      int go_pos_limit = 300;
+      int go_pos_limit = 30;
       std::vector<double> target_pos_v;
       target_pos_v.push_back(target_x_);
       target_pos_v.push_back(target_y_);
       target_pos_v.push_back(target_z_);
-
-      std::cout << "target_pos_cnd_size : " << target_pos_cnd.size() << std::endl;
       
       if(target_pos_cnd.size() > 0){
 	int cnt = 0;
@@ -440,7 +461,7 @@ namespace mbzirc2020_task2_tasks
 	  target_count.push_back(1);
 	}
       }
-
+      
       else if(target_pos_cnd.size() == 0 && target_pos_v[0] != 0.0){
 	target_pos_cnd.push_back(target_pos_v);
 	target_angle_cnd.push_back(target_angle_);
@@ -463,7 +484,8 @@ namespace mbzirc2020_task2_tasks
 	msg.target_pos_y = target_y_;
 	msg.target_pos_z = 2.5;
 	msg.target_psi = target_angle_;
-	
+
+	std::cout << "target_angle : " << target_angle_ << std::endl;
 	std::cout << "final x : " << msg.target_pos_x << std::endl;
 	std::cout << "final y : " << msg.target_pos_y << std::endl;
 	

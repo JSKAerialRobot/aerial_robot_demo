@@ -3,22 +3,27 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <numeric>
+#include <jsk_recognition_utils/geo/polygon.h>
+#include <jsk_recognition_utils/sensor_model/camera_depth_sensor.h>
 
 using namespace std;
 using namespace cv;
 
+// (Polygon, depth, robot_height, depth_paremeter) -> (graspable, angle)  (angle : camera_coordinate)
 
-// (Polygon, depth, robot_height) -> (graspable, angle)
-
-std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
+std::vector<float> space_detector(jsk_recognition_utils::Polygon line_img_polygon, cv::Mat depth_org, double robot_height, jsk_recognition_utils::CameraDepthSensor camdep){
   std::vector<float> answer;
   int graspable = 0; // whether possible to grasp or not
-  
+  std::string image_folder = "/home/kuromiya";  //  images will be saved in this directory(necessary)
+
+  cv::Mat src(depth_org.rows, depth_org.cols, CV_8UC3, cv::Scalar(255, 255, 255));          
+  line_img_polygon.drawLineToImage(camdep, src, cv::Scalar(0, 255, 0), 1);
+
   cv::Mat gray;
   cv::cvtColor(src, gray, cv::COLOR_BGR2GRAY);
   cv::Mat bw;
   cv::threshold(gray, bw, 50, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-  std::vector<cv::Point>  contour;
+  std::vector<cv::Point> contour;
   cv::Mat depth;
 
   cv::cvtColor(depth_org, depth, cv::COLOR_GRAY2BGR);  // depth : color
@@ -39,10 +44,11 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
   }
 
   cv::RotatedRect box ;
-  cv::RotatedRect box1 ;
+  
   int width = 0;
   int height = 0;
 
+  //  get rect (if impossible -> fail)
   try{
     box = cv::minAreaRect(contour);
   }
@@ -61,16 +67,13 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
 
   int center_x = box.center.x;
   int center_y = box.center.y;
-
-  cv::circle(src, cv::Point(center_x, center_y), 10, cv::Scalar(0, 0, 255), 10);
   
+  cv::circle(src, cv::Point(center_x, center_y), 10, cv::Scalar(0, 0, 255), 10);
+  //  rotate image so that the contour is horizontal to the image 
   cv::Mat rotate_org;
   cv::Mat transform_m = cv::getRotationMatrix2D(cv::Point(depth.cols/2, depth.rows/2), angle, 1);
 
   angle = M_PI * angle / 180;  // degree -> radian
-    
-  center_x = (center_x - depth.cols/2) * std::cos(angle) + (center_y - depth.rows/2) * std::sin(angle) + depth.cols/2; 
-  center_y = (center_y - depth.rows/2) * std::cos(angle) + ((-1) * center_x + depth.cols/2) * std::sin(angle)  + depth.rows/2;
 
   cv::warpAffine(depth, rotate, transform_m, depth.size());
   cv::warpAffine(src, rotate_org, transform_m, depth.size());
@@ -89,15 +92,15 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     }
   }
 
+  //  contour center atfer rotation
   center_x = int(std::accumulate(red_x.begin(), red_x.end(), 0) / red_x.size());
   center_y = int(std::accumulate(red_y.begin(), red_y.end(), 0) / red_y.size());
-    
-  cv::imwrite("/home/kuromiya/debug/rotate.png", rotate);
-  cv::imwrite("/home/kuromiya/debug/rotate_org.png", rotate_org);
- 
-  cv::circle(rotate, cv::Point(center_x, center_y), 10, cv::Scalar(255, 0, 0), 10);
-  cv::imwrite("/home/kuromiya/center_img_org.png", rotate);
 
+  std::cout << "center_x :" << center_x << std::endl;
+  std::cout << "center_y :" << center_y << std::endl;
+  
+  cv::circle(rotate, cv::Point(center_x, center_y), 10, cv::Scalar(255, 0, 0), 10);
+  
   angle = -angle;  //  reverse(camera -> hydrus)
   angle = angle * 180 / M_PI;
 
@@ -105,18 +108,9 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
   height = box.size.height;
 
   // have to write -> read (you will get strange image without this)
-  cv::imwrite("/home/kuromiya/rotate.png", rotate);
-  cv::Mat rotating = cv::imread("/home/kuromiya/rotate.png", 1);
-
-  std::cout << "angle : " << angle  << std::endl;
-  std::cout << "height : " << height << std::endl;
-  std::cout << "width : " << width << std::endl;
-
+  cv::imwrite(image_folder + "/rotate.png", rotate);
+  cv::Mat rotating = cv::imread(image_folder + "/rotate.png", 1);
   length = std::max(width, height);
-
-  std::cout << "x : " << box.center.x << std::endl;
-  std::cout << "y : " << box.center.y << std::endl;
-  std::cout << "length : " << length << std::endl;
   
   //  revised cut
   cv::Mat cut(cv::Size(4*length, 4*length), CV_8UC3, cv::Scalar(255, 255, 255));  // initialize with black(black area : object existing area)
@@ -149,8 +143,8 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
   }
 
   // have to write -> read (you will get strange image without this)
-  cv::imwrite("/home/kuromiya/correct_cut.png", cut);
-  cv::Mat cutt = cv::imread("/home/kuromiya/correct_cut.png", 1);
+  cv::imwrite(image_folder + "/correct_cut.png", cut);
+  cv::Mat cutt = cv::imread(image_folder + "/correct_cut.png", 1);
 
 
   int c = 0;  // threshold pixel value(around the center of contour)
@@ -166,7 +160,7 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
   }
   
   std::cout << "threshold : " << c << std::endl;
-  cv::threshold(cutt, thresh, c + 30, 255, cv::THRESH_BINARY);  // 12 = 255 / 4.0 * 0.2 (altitude : 4.0[m], height : 0.2[m])
+  cv::threshold(cutt, thresh, c + (255 / robot_height) * 0.2, 255, cv::THRESH_BINARY);  // 12 = 255 / x * 0.2 (robot_height : x[m], height : 0.2[m])
 
   // check whether hydrus can grasp the object
 
@@ -219,8 +213,8 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     }
   }
 
-  
-  int object_exist = 2000;
+
+  int object_exist = 2000; //  number of black pixel in each region exceeds this -> exist
 
   std::vector<int> possible_answer; // 0:left, 1:right, 2:up, 3:down
   possible_answer.push_back(0);
@@ -236,8 +230,6 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
       possible_answer.erase(possible_answer.begin() + 0);
       possible_answer.erase(possible_answer.begin() + 1);
       possible_answer.erase(possible_answer.begin() + 1);
-
-      std::cout << possible_answer[0] << ":left" <<std::endl;
     }
     delete_times++;
   }
@@ -277,22 +269,21 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     delete_times++;    
   }
   
-  std::cout << delete_times << std::endl;
+  std::cout << "delete times : "<< delete_times << std::endl;
   
-  if(delete_times > 1){ // multiple object exits -> unable to grasp
+  if(delete_times > 1){ // multiple object exists -> unable to grasp
     answer.push_back(graspable);
     answer.push_back(0.0);
     
     return answer;
   }
 
-  std::cout << "OK6" << std::endl;
   if(left_lower_count < object_exist && right_lower_count < object_exist && std::find(possible_answer.begin(), possible_answer.end(), 3) != possible_answer.end()){
     //  down
     graspable = 1;
     std::cout << "down" << std::endl;
     answer.push_back(graspable);
-    answer.push_back(angle+0);
+    answer.push_back(angle+90);
     
     return answer;
   }
@@ -301,7 +292,7 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     //  up
     graspable = 1;
     answer.push_back(graspable);
-    answer.push_back(angle+180);
+    answer.push_back(angle+270);
     std::cout << "up" << std::endl;
     
     return answer;
@@ -311,7 +302,7 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     //  left
     graspable = 1;
     answer.push_back(graspable);
-    answer.push_back(angle-90);
+    answer.push_back(angle+0);
     std::cout << "left" << std::endl;
 
     return answer;
@@ -321,7 +312,7 @@ std::vector<float> space_detector(cv::Mat src, cv::Mat depth_org){
     //  right
     graspable = 1;
     answer.push_back(graspable);
-    answer.push_back(angle+90);
+    answer.push_back(angle+180);
     std::cout << "right" << std::endl;
 
     return answer;
