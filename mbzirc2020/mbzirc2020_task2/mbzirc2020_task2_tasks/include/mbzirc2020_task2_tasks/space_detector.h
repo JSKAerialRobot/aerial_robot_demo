@@ -6,9 +6,6 @@
 #include <jsk_recognition_utils/geo/polygon.h>
 #include <jsk_recognition_utils/sensor_model/camera_depth_sensor.h>
 
-using namespace std;
-using namespace cv;
-
 // (Polygon, depth, robot_height, depth_paremeter) -> (graspable, angle)  (angle : camera_coordinate)
 
 std::vector<float> space_detector(jsk_recognition_utils::Polygon line_img_polygon, cv::Mat depth_org, double robot_height, jsk_recognition_utils::CameraDepthSensor camdep){

@@ -24,7 +24,17 @@
 #include <std_msgs/Int32.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
+#include <aerial_robot_msgs/FlightNav.h>
+#include <chrono>
+#include <thread>
 
+enum Phase
+  {
+   Phase0,
+   Phase1,
+   Phase2,
+   Phase3
+  };
 
 namespace mbzirc2020_task2_tasks
 {

@@ -9,9 +9,24 @@
         pkg="nodelet" type="nodelet"
         args="manager"/>
 
+  <node name="passthrough_filter_right"
+        pkg="nodelet" type="nodelet"
+        args="load pcl/PassThrough /sample_manager">
+    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <!-- <remap from="~input" to="hsi_filter_red/output" /> -->
+    <rosparam>
+      keep_organized: true
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 1.0
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+  
   <node pkg="nodelet" type="nodelet" name="hsi_filter_red" respawn="true"
         args="load jsk_pcl/HSIColorFilter sample_manager" >
-    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <!-- <remap from="~input" to="$(arg INPUT_CLOUD)" /> -->
+    <remap from="~input" to="passthrough_filter_right/output" />
     <rosparam>
       use_indices: false
       keep_organized: true
@@ -24,23 +39,11 @@
     <param name="i_limit_min" value="0" />
   </node>
 
-  <node name="passthrough_filter_right"
-        pkg="nodelet" type="nodelet"
-        args="load pcl/PassThrough /sample_manager">
-    <!-- <remap from="~input" to="$(arg INPUT_CLOUD)" /> -->
-    <remap from="~input" to="hsi_filter_red/output" />
-    <rosparam>
-      keep_organized: true
-      filter_field_name: z
-      filter_limit_min: 0.0
-      filter_limit_max: 1.0
-      filter_limit_negative: False
-    </rosparam>
-  </node>
 
   <node name="input_relay" pkg="nodelet" type="nodelet" respawn="true"
         args="load jsk_topic_tools/Relay /sample_manager">
-    <remap from="~input" to="passthrough_filter_right/output" />
+    <!-- <remap from="~input" to="passthrough_filter_right/output" /> -->
+    <remap from="~input" to="hsi_filter_red/output" />
   </node>
 
   <node name="multi_plane_estimate" pkg="nodelet" type="nodelet"
@@ -60,6 +63,6 @@
 
 
   ### object detection
-  <include file="$(find mbzirc2020_task2_tasks)/launch/object_detection_from_plane.launch" />
+  <!-- <include file="$(find mbzirc2020_task2_tasks)/launch/object_detection_from_plane.launch" /> -->
 
 </launch>

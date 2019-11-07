@@ -2,7 +2,7 @@
 <launch>
   #### robot model ####
   <!-- <include file="$(find mbzirc2020_task2_common)/launch/offline_robot_model.launch" /> -->
-  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch" />
+  <!-- <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch" /> -->
 
   ### depth + color image -> point cloud ###
   <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
