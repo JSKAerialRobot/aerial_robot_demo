@@ -1,4 +1,4 @@
-<library path="/home/kuromiya/ros/aerial_robot_demo_ws/devel/lib/libmbzirc2020_task2_tasks">
+<library path="lib/libmbzirc2020_task2_tasks">
   <class name="mbzirc2020_task2_tasks/RedObjectDetectionWithHSVFilter"
          type="mbzirc2020_task2_tasks::RedObjectDetectionWithHSVFilter"
          base_class_type="nodelet::Nodelet">

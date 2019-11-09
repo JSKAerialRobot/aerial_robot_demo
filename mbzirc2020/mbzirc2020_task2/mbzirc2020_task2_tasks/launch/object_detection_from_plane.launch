@@ -7,24 +7,36 @@
   <arg name="frame_id" default="target_object"/>
   <arg name="camera" default="rs_d435"/>
 
+  
   <!-- <group ns="$(arg camera)" > -->
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen"/>
+  
   <node pkg="nodelet" type="nodelet" name="red_object_detection_with_hsv_filter"
         args="load mbzirc2020_task2_tasks/RedObjectDetectionWithHSVFilter object_detection_nodelet" output="screen">
-        <!-- launch-prefix="valgrind" -->
-
-    <!-- <remap from="image" to="/rs_d435/rgb/image_rect_color" /> -->
-    <!-- <remap from="image_depth" to="/rs_d435/depth/depth_registered" /> -->
-    <!-- <remap from="cam_info" to="/rs_d435/rgb/camera_info" /> -->
 
     <remap from="image" to="/rs_d435/color/image_rect_color" />
-    <remap from="image_depth" to="/rs_d435/aligned_depth_to_color/image_raw" />
     <remap from="cam_info" to="/rs_d435/aligned_depth_to_color/camera_info" />
-    <remap from="polygon_array" to="/multi_plane_estimate/output_refined_polygon" />
+    
     <param name="debug_view" value="$(arg debug_view)"/>
     <param name="frame_id" value="$(arg frame_id)"/>
   </node>
+  
   <!-- </group> -->
+  
+  <!-- <node pkg="nodelet" type="nodelet" name="cluttered_brick_detection" -->
+  <!--       args="load aerial_robot_perception/ClutteredBrickDetection object_detection_nodelet" output="screen" > -->
+  <!--   <remap from="cam_info" to="/rs_d435/aligned_depth_to_color/camera_info" /> -->
+  <!--   <remap from="depth_image" to="/rs_d435/aligned_depth_to_color/image_raw" /> -->
+  <!--   <remap from="polygon_array" to="/multi_plane_estimate/output_refined_polygon" /> -->
+  <!--   <param name="debug_view" value="$(arg debug_view)"/> -->
+  <!--   <param name="frame_id" value="$(arg frame_id)"/> -->
+
+  <!-- </node> -->
+
+  <!-- <node pkg="mbzirc2020_task2_tasks" type="gopos.py" name="gopos"/> -->
+    
+  <!-- <node pkg="mbzirc2020_task2_tasks" type="grasp.py" name="grasp"/> -->
+    
 </launch>
 
 

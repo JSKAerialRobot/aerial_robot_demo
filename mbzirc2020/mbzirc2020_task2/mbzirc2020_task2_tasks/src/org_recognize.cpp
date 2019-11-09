@@ -1,7 +1,6 @@
-#include <mbzirc2020_task2_tasks/recognize.h>
+#include <mbzirc2020_task2_tasks/org_recognize.h>
 #include <mbzirc2020_task2_tasks/kmeans.h>
 #include <mbzirc2020_task2_tasks/space_detector.h>
-#include <mbzirc2020_task2_tasks/space_detector_ground.h>
 
 namespace mbzirc2020_task2_tasks
 {

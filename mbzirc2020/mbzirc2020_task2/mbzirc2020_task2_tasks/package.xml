@@ -69,10 +69,9 @@
   <exec_depend>python-gdown-pip</exec_depend>
   <exec_depend>aerial_robot_msgs</exec_depend>
 
-
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-    <nodelet plugin="/home/kuromiya/ros/aerial_robot_demo_ws/src/aerial_robot_demo/mbzirc2020/mbzirc2020_task2/mbzirc2020_task2_tasks/plugins/nodelet/mbzirc2020_task2_tasks_nodelet.xml"/>
+    <nodelet plugin="${prefix}/plugins/nodelet/mbzirc2020_task2_tasks_nodelet.xml"/>
   </export>
 </package>

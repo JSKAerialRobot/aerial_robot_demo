@@ -3,6 +3,8 @@
 import rospy
 import sys, time
 from mylib import Propeller, Joint
+from std_msgs.msg import String
+
 
 class HydrusGraspingOnGround(object):
     thrust = {
@@ -20,9 +22,11 @@ class HydrusGraspingOnGround(object):
         self.propeller = Propeller()
         self.joint = Joint()
 
-        #self.target_vector = RvizMarker("target_vector","vector")
-        #self.target_vector1 = RvizMarker("uav_yaw","vector")
+        self.message = ""
 
+        self.message_pub = rospy.Publisher("/message", String, queue_size=1)
+        self.message_sub = rospy.Subscriber("/message", String, self.messageCallback, queue_size=1, buff_size=1)
+        
         # when test this python script or not
         if name != "":
             rospy.init_node(name, anonymous=True)
@@ -31,9 +35,11 @@ class HydrusGraspingOnGround(object):
             rospy.Timer(rospy.Duration(1.0/control_rate), self.controlCallback)
         else:
             pass
+
         
         rospy.Timer(rospy.Duration(0.5), self.controlCallback)
 
+        
     def grasp(self, joint_name, torque = 0):
         if (self.joint.data["torque"][joint_name] > torque) or (self.joint.data["angle"][joint_name] >= 1.56):
             return True
@@ -42,21 +48,24 @@ class HydrusGraspingOnGround(object):
             self.joint.set([self.joint.data["angle"][joint_name] + HydrusGraspingOnGround.angle["delta"]], [joint_name])
             return False
 
-    def controlCallback(self, event):
-        # if not self.grasp("joint3", 3.0):
-        #     rospy.loginfo("joint3 grasping")
-        #     return
-        # elif not self.grasp("joint1", 3.0):
-        #     rospy.loginfo("joint1 grasping")
-        #     return
-
-        if not self.grasp("joint3", 3.0) and not self.grasp("joint1", 3.0):
-            rospy.loginfo("joints grasping")
-            return
         
-        else:
-            rospy.loginfo("finish grasping")
-            return
+    def messageCallback(self, msg):
+        self.message = msg.data
+            
+    def controlCallback(self, event):
+
+        if self.message == "target reached":
+            if not self.grasp("joint3", 3.0) and not self.grasp("joint1", 3.0):
+                rospy.loginfo("joints grasping")
+                return
+        
+            else:
+                msg = String()
+                msg.data = "grasped"
+                self.message_pub.publish(msg)
+            
+                rospy.loginfo("finish grasping")
+                return
 
 class HydrusGraspingOnGroundOnSimulator(HydrusGraspingOnGround):
     pass

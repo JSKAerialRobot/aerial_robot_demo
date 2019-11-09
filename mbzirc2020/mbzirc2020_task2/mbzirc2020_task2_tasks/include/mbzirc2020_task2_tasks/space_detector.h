@@ -6,11 +6,16 @@
 #include <jsk_recognition_utils/geo/polygon.h>
 #include <jsk_recognition_utils/sensor_model/camera_depth_sensor.h>
 
+
+using namespace std;
+using namespace cv;
+
 // (Polygon, depth, robot_height, depth_paremeter) -> (graspable, angle)  (angle : camera_coordinate)
 
 std::vector<float> space_detector(jsk_recognition_utils::Polygon line_img_polygon, cv::Mat depth_org, double robot_height, jsk_recognition_utils::CameraDepthSensor camdep){
   std::vector<float> answer;
   int graspable = 0; // whether possible to grasp or not
+  
   std::string image_folder = "/home/kuromiya";
 
   cv::Mat src(depth_org.rows, depth_org.cols, CV_8UC3, cv::Scalar(255, 255, 255));          
@@ -117,7 +122,7 @@ std::vector<float> space_detector(jsk_recognition_utils::Polygon line_img_polygo
     if(yy < 0 || yy > rotating.rows){
       continue;
     }
-
+    
     cv::Vec3b * th = cut.ptr<cv::Vec3b>(i);
     cv::Vec3b * org = rotating.ptr<cv::Vec3b>(yy);
 
@@ -155,9 +160,10 @@ std::vector<float> space_detector(jsk_recognition_utils::Polygon line_img_polygo
       }
     }
   }
+
   
   std::cout << "threshold : " << c << std::endl;
-  cv::threshold(cutt, thresh, c + 30, 255, cv::THRESH_BINARY);  // 12 = 255 / 4.0 * 0.2 (altitude : 4.0[m], height : 0.2[m])
+  cv::threshold(cutt, thresh, c + (255 / robot_height) * 0.2, 255, cv::THRESH_BINARY);  // 12 = 255 / x * 0.2 (robot_height : x[m], height : 0.2[m])
 
   // check whether hydrus can grasp the object
 

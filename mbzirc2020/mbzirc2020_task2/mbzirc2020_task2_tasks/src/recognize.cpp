@@ -1,10 +1,81 @@
 #include <mbzirc2020_task2_tasks/recognize.h>
 #include <mbzirc2020_task2_tasks/kmeans.h>
 
-
 namespace mbzirc2020_task2_tasks
 {
+
+  void RedObjectDetectionWithHSVFilter::onInit()
+  {
+    DiagnosticNodelet::onInit();
+
+    pnh_->param("debug_view", debug_view_, true);
+    pnh_->param("frame_id_", frame_id_, std::string("target_object"));
+    always_subscribe_ = true;
+    
+    if (debug_view_) image_pub_ = advertiseImage(*pnh_, "debug_image", 1);
+    target_pos_pub_ = advertise<geometry_msgs::Vector3Stamped>(*nh_, frame_id_ + std::string("/pos"), 1);
+    message_pub_ = advertise<std_msgs::String>(*nh_, "/message1", 1);
+    
+    it_ = boost::make_shared<image_transport::ImageTransport>(*nh_);
+    tf_ls_ = boost::make_shared<tf2_ros::TransformListener>(tf_buff_);
+    
+    ros::Duration(1.0).sleep();
+
+    onInitPostProcess();
+  }
+
+  void RedObjectDetectionWithHSVFilter::subscribe()
+  {
+    image_sub_ = it_->subscribe("image", 1, &RedObjectDetectionWithHSVFilter::imageCallback, this);
+    cam_info_sub_ = nh_->subscribe("cam_info", 1, &RedObjectDetectionWithHSVFilter::cameraInfoCallback, this);
+    message_sub_ = nh_->subscribe("/message2", 1, &RedObjectDetectionWithHSVFilter::messageCallback, this);
+    
+
+  }
+
+  void RedObjectDetectionWithHSVFilter::unsubscribe()
+  {
+    image_sub_.shutdown();
+  }
+
+  void RedObjectDetectionWithHSVFilter::messageCallback(const std_msgs::String::ConstPtr& msg)
+  {
+    message = msg->data;
+  }
+    
+  void RedObjectDetectionWithHSVFilter::cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg)
+  {
+    /* the following process is executed once */
+    NODELET_DEBUG_STREAM("receive camera info");
+    tf2::Matrix3x3 camera_K_normal(msg->K[0], msg->K[1], msg->K[2],
+                            msg->K[3], msg->K[4], msg->K[5],
+                            msg->K[6], msg->K[7], msg->K[8]);
+    
+    camera_K_inv_ = camera_K_normal.inverse();
+    camera_K = camera_K_normal;
+    real_size_scale_ = msg->K[0] * msg->K[4];
+    object_distance = 5.0;  // change according to the target distance
+    cam_info_sub_.shutdown();
+  }
+
+  void RedObjectDetectionWithHSVFilter::imageCallback(const sensor_msgs::ImageConstPtr& msg)
+  {
     if(real_size_scale_ == 0) return; // no receive camera_info yet.
+
+    if(message != "start") return;
+    if(message == "going"){
+      phase = 2;
+      return;
+    }
+    if(phase == 1){
+      target_pos_pub_.publish(obj_pos_msg);
+      
+      std_msgs::String new_message;
+      new_message.data = "red object detected";
+      message_pub_.publish(new_message);
+
+      return;
+    }
 
     tf2::Transform cam_tf;
     try{
@@ -75,7 +146,6 @@ namespace mbzirc2020_task2_tasks
       xy_center.y = 0.0;
       xy_center.z = 0.0;
     }
-    xy_pub.publish(xy_center);
 
     target_obj_uv.setX(xy_center.x);
     target_obj_uv.setY(xy_center.y);
@@ -91,9 +161,13 @@ namespace mbzirc2020_task2_tasks
     obj_tf_msg.transform.rotation.w = 1.0;
     tf_br_.sendTransform(obj_tf_msg);
 
-    geometry_msgs::Vector3Stamped obj_pos_msg;
+    // geometry_msgs::Vector3Stamped obj_pos_msg;
     obj_pos_msg.header = obj_tf_msg.header;
     obj_pos_msg.vector = obj_tf_msg.transform.translation;
+
+    phase = 1;
+    // go to approach phase
+
   }
 }
 
