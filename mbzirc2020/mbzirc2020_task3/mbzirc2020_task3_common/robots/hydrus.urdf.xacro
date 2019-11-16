@@ -3,8 +3,9 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
 
   <!-- base kinematics model -->
+  <xacro:arg name="horizontal_vio" default="0" />
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
-  <xacro:robot_model tilt_angle = "10" horizontal_vio = "1"  />
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)"  />
 
   <!-- processor: intel upboard -->
   <xacro:extra_module name = "pc" parent = "link2" visible = "1"
