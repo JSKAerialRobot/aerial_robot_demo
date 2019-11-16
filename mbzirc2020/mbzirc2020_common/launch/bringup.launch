@@ -76,6 +76,8 @@
     <arg name="headless" value="$(arg headless)" />
     <arg name="need_joint_state" value="false" if ="$(eval arg('simulation') + arg('real_machine') > 0)"/>
     <arg name="description_mode" value="gazebo" if="$(arg simulation)"/>
+    <arg name="horizontal_vio" value="1" if="$(arg horizontal_vio)" />
+    <arg name="horizontal_vio" value="0" unless="$(arg horizontal_vio)" />
   </include >
 
   ###########  Servo Bridge  ###########
