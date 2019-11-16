@@ -150,11 +150,11 @@ class Task3Motion():
                     self.searched_grid[self.current_grid_idx[0],self.current_grid_idx[1]] = True
                     self.move_to_next_idx()
         elif self.state == Task3MotionState.APROACHING_ONTOP:
-            # if self.target_pos is None or rospy.Time.now() - self.target_pos.header.stamp > rospy.Duration(self.target_timeout) :  # TODO check timestamp of target to check if loosing sight
-            #     rospy.logerr("lost target_object, returning to searching")
-            #     self.target_pos = None
-            #     self.state = Task3MotionState.SEARCHING
-            #     return
+            if self.target_pos is None or rospy.Time.now() - self.target_pos.header.stamp > rospy.Duration(self.target_timeout) :  # TODO check timestamp of target to check if loosing sight
+                rospy.logerr("lost target_object, returning to searching")
+                self.target_pos = None
+                self.state = Task3MotionState.SEARCHING
+                return
             self.commander.change_height(self.approach_height)
             self.commander.move_to(self.target_pos.vector.x, self.target_pos.vector.y)
             if abs(self.target_pos.vector.x - self.cog_pos.transform.translation.x) < self.approach_margin and abs(self.target_pos.vector.y - self.cog_pos.transform.translation.y) < self.approach_margin:
