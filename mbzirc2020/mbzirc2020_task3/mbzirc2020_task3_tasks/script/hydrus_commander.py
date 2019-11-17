@@ -106,9 +106,9 @@ class HydrusCommander():
         self.move_to(pos_x-forward_dir[0], pos_y-forward_dir[1])
         time.sleep(5)
         self.open_joints()
-        time.sleep(2)
+        time.sleep(1)
         self.change_height(covering_pre_height)
-        time.sleep(2)
+        time.sleep(1)
 
         back = 1.2
         self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1])

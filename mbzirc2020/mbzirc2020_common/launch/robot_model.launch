@@ -3,7 +3,10 @@
   <arg name="description_mode" default="urdf"/>
   <arg name="need_joint_state" default="true" />
   <arg name="task" default="1" />
+  <arg name="horizontal_vio" default="0" />
   <arg name="model_suffix" default="" />
+
+  <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).urdf.xacro" />
 
   <group ns="hydrusx" >
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
@@ -13,7 +16,7 @@
       <param name="use_gui" value="true" />
       <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
         <param name="robot_description"
-               command="$(find xacro)/xacro '$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).urdf.xacro'" />
+               command="$(find xacro)/xacro '$(arg robot_model)' horizontal_vio:=$(arg horizontal_vio)" />
       </node >
     </group>
 
@@ -21,9 +24,10 @@
 
   </group>
 
-  <include file="$(find aerial_robot_model)/launch/aerial_robot_model.launch" >
-    <arg name="headless" value="$(arg headless)" />
-    <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).$(arg description_mode).xacro" />
-  </include>
+  <!-- not good -->
+  <!-- global namespace -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' horizontal_vio:=$(arg horizontal_vio)" />
 
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" unless="$(arg headless)"
+        args="-d $(find aerial_robot_model)/launch/rviz_config" respawn="true" />
 </launch>

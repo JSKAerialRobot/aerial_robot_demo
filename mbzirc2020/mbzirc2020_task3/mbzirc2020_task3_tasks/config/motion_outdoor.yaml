@@ -1,19 +1,19 @@
-# parameters for script/motion.py
+# parameters for script/motion.py in outdoor mode
 
 control_rate : 1.0
 
-area_corners : [[0, 0], [1, 1]]
-search_height : 1.2
-search_grid_size : 0.25
+area_corners : [[0, 0], [5, 5]]
+search_height : 2.0
+search_grid_size : 1.0
 reach_margin : 0.15
-target_timeout : 1.0
-approach_height : 1.2
+target_timeout : 3.0
+approach_height : 1.8
 descending_height : 1.2
 approach_margin : 0.15
 height_margin : 0.15
 cover_pose: [0.8, 0.8] # the joint angles for covering
 covering_pre_height : 1.2
-covering_post_height : 0.2
-covering_move_dist : 0.4
+covering_post_height : 1.2
+covering_move_dist : 0.6
 
 close_pose: [1.56, 1.56] # the joint angles  for closing
