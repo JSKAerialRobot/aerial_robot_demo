@@ -6,7 +6,7 @@
   <arg name="horizontal_vio" default="0" />
   <arg name="model_suffix" default="" />
 
-  <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).urdf.xacro" />
+  <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).$(arg description_mode).xacro" />
 
   <group ns="hydrusx" >
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
