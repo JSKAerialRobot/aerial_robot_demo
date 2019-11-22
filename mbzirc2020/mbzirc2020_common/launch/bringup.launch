@@ -96,6 +96,17 @@
     <param name="verbose" value="false"/>
   </node>
 
+  ###########  MPC Control  ###########
+  <group if="$(arg mpc)">
+    <node pkg="hydrus" type="transform_mpc_control_node" name="hydrusx_mpc"  output="screen" respawn="false">
+      <rosparam file="$(arg config_path)/Hydrus.yaml" command="load" />
+      <remap from="joint_states" to="hydrusx/joint_states"/>
+      <param name="control_rate" value="30.0"/>
+    </node>
+    <node pkg="hydrus" type="mpc_to_nav_node" name="hydrusx_mpc_to_nav"  output="screen" respawn="false">
+    </node>
+  </group>
+
   ########## Simulation in Gazebo #########
   <include file="$(find aerial_robot_simulation)/launch/simulation.launch" if = "$(eval arg('simulation') * (1 - arg('real_machine')))" >
     <arg name="model" default="hydrusx" />
