@@ -16,6 +16,7 @@
   <arg name="spawn_z" default="0.0"/>
   <arg name="spawn_yaw" default="0.0"/>
   <arg name="config_path" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/config/$(arg model_suffix)"/>
+  <arg name="mpc" default="False" />
 
   ###########  UAV Config  ###########
   # HYDRUS = 16 # 0x10, hydrus type with  4dof underactuated property
@@ -93,6 +94,17 @@
     <param name="debug_verbose" value="false" />
     <param name="verbose" value="false"/>
   </node>
+
+  ###########  MPC Control  ###########
+  <group if="$(arg mpc)">
+    <node pkg="hydrus" type="transform_mpc_control_node" name="hydrusx_mpc"  output="screen" respawn="false">
+      <rosparam file="$(arg config_path)/Hydrus.yaml" command="load" />
+      <remap from="joint_states" to="hydrusx/joint_states"/>
+      <param name="control_rate" value="30.0"/>
+    </node>
+    <node pkg="hydrus" type="mpc_to_nav_node" name="hydrusx_mpc_to_nav"  output="screen" respawn="false">
+    </node>
+  </group>
 
   ########## Simulation in Gazebo #########
   <include file="$(find aerial_robot_simulation)/launch/simulation.launch" if = "$(eval arg('simulation') * (1 - arg('real_machine')))" >
