@@ -100,7 +100,7 @@
     <node pkg="hydrus" type="transform_mpc_control_node" name="hydrusx_mpc"  output="screen" respawn="false">
       <rosparam file="$(arg config_path)/Hydrus.yaml" command="load" />
       <remap from="joint_states" to="hydrusx/joint_states"/>
-      <param name="control_rate" value="30.0"/>
+      <param name="control_rate" value="100.0"/>
     </node>
     <node pkg="hydrus" type="mpc_to_nav_node" name="hydrusx_mpc_to_nav"  output="screen" respawn="false">
     </node>
