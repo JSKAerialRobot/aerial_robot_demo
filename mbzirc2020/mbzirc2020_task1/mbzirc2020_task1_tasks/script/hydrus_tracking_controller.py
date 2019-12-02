@@ -34,10 +34,13 @@ from __future__ import print_function
 import sys
 import rospy
 import math
+import tf
 from std_msgs.msg import Empty
+from std_msgs.msg import Bool
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped
 from aerial_robot_msgs.msg import FlightNav
+from aerial_robot_msgs.msg import MpcWaypointList
 from mbzirc2020_task1_tasks.msg import PrimitiveParams
 from sensor_msgs.msg import JointState
 
@@ -45,9 +48,19 @@ __author__ = 'shifan@jsk.imi.i.u-tokyo.ac.jp (Fan Shi)'
 POS_VEL = 0
 POS = 1
 POS_VEL_PSI = 2
+MPC = 3
 class hydrusTrackingController:
     def init(self):
         rospy.init_node('hydrus_tracking_controller', anonymous=True)
+
+        self.__hydrus_controller_freq = rospy.get_param('~hydrus_controller_freq', 100.0)
+        self.__control_mode = rospy.get_param('~control_model', POS_VEL)
+        self.__mpc_flag = rospy.get_param('~mpc', False)
+        self.__mpc_horizon = rospy.get_param('~mpc_horizon', 1.0)
+
+        if self.__mpc_flag:
+            rospy.loginfo("[hydrus_tracking_controller] MPC mode")
+            self.__control_mode = MPC
         self.__hydrus_odom = Odometry()
         self.__object_odom = Odometry()
         self.__primitive_params = PrimitiveParams()
@@ -63,6 +76,8 @@ class hydrusTrackingController:
         self.__hydrusx_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
         self.__hydrusx_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
         self.__hydrusx_joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
+        self.__mpc_stop_flag_pub = rospy.Publisher('/mpc/stop_cmd', Bool, queue_size=1)
+        self.__mpc_target_waypoints_pub = rospy.Publisher('/mpc/target_waypoints', MpcWaypointList, queue_size=1)
         rospy.sleep(1.0)
         self.__hydrus_nav_cmd = FlightNav()
         self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
@@ -91,15 +106,25 @@ class hydrusTrackingController:
             rospy.sleep(1.0)
             self.__hydrusx_takeoff_pub.publish(Empty())
             rospy.loginfo("Hydrus arming and takeoff command is sent.")
-            rospy.sleep(22.0)
+            rospy.sleep(21.0)
             rospy.loginfo("Hydrus takeoff finsihed.")
             self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
-            rospy.sleep(3.0)
+            rospy.sleep(9.0)
+            rospy.loginfo("Hydrus moved to initial position.")
+            if self.__control_mode == MPC:
+                mpc_stop_msg = Bool()
+                mpc_stop_msg.data = True
+                self.__mpc_stop_flag_pub.publish(mpc_stop_msg)
+                rospy.sleep(0.2)
+                self.__sendMpcTargetOdom([0.0, 0.0, 0.0], self.__mpc_horizon)
+                rospy.sleep(0.2)
+                mpc_stop_msg.data = False
+                self.__mpc_stop_flag_pub.publish(mpc_stop_msg)
+                rospy.loginfo("Start MPC control.")
+                rospy.sleep(0.2)
+                self.__mpc_start_odom = self.__hydrus_odom
 
         self.__hydrus_motion_init_flag_pub.publish(Empty())
-
-        self.__hydrus_controller_freq = rospy.get_param('~hydrus_controller_freq', 100.0)
-        self.__control_mode = rospy.get_param('~control_model', POS_VEL)
         rospy.Timer(rospy.Duration(1.0 / self.__hydrus_controller_freq), self.__hydrusControllerCallback)
 
     def __hydrusControllerCallback(self, event):
@@ -131,14 +156,19 @@ class hydrusTrackingController:
             if self.__control_mode == POS_VEL_PSI:
                 target_psi = self.__getPsiFromPrimitive(cur_time)
                 self.__hydrus_nav_cmd.target_psi = target_psi
+            self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
 
         elif self.__control_mode == POS:
             self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
             self.__hydrus_nav_cmd.target_pos_x = target_pos[0]
             self.__hydrus_nav_cmd.target_pos_y = target_pos[1]
             self.__hydrus_nav_cmd.target_pos_z = target_pos[2]
+            self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
 
-        self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
+        elif self.__control_mode == MPC:
+            # future 1 seconds waypoints
+            self.__sendMpcWaypointsFromPrimitive()
+
 
         if self.__primitive_params.grap_flag:
             ## todo: better joints trajectory planning
@@ -200,6 +230,84 @@ class hydrusTrackingController:
         for i in range(0, self.__primitive_params.order):
             psi += math.pow(t, i) * self.__primitive_params.psi_params[i]
         return psi
+
+    def __sendMpcTargetOdom(self, pos_offset, period):
+        mpc_waypoints = MpcWaypointList()
+        mpc_waypoints.mode = mpc_waypoints.FULL
+        mpc_waypoints.header.stamp = rospy.Time.now()
+
+        mpc_waypoints.list.append(Odometry())
+        mpc_waypoints.list[0].header.stamp = rospy.Time.now() + rospy.Duration(period)
+        mpc_waypoints.list[0].pose.pose.position.x = self.__hydrus_odom.pose.pose.position.x + pos_offset[0]
+        mpc_waypoints.list[0].pose.pose.position.y = self.__hydrus_odom.pose.pose.position.y + pos_offset[1]
+        mpc_waypoints.list[0].pose.pose.position.z = self.__hydrus_odom.pose.pose.position.z + pos_offset[2]
+        current_quaternion = (
+            self.__hydrus_odom.pose.pose.orientation.x,
+            self.__hydrus_odom.pose.pose.orientation.y,
+            self.__hydrus_odom.pose.pose.orientation.z,
+            self.__hydrus_odom.pose.pose.orientation.w)
+        current_euler = tf.transformations.euler_from_quaternion(current_quaternion)
+        roll = current_euler[0]
+        pitch = current_euler[1]
+        yaw = current_euler[2]
+
+        target_quaternion = tf.transformations.quaternion_from_euler(0, 0, yaw)
+        mpc_waypoints.list[0].pose.pose.orientation.x = target_quaternion[0]
+        mpc_waypoints.list[0].pose.pose.orientation.y = target_quaternion[1]
+        mpc_waypoints.list[0].pose.pose.orientation.z = target_quaternion[2]
+        mpc_waypoints.list[0].pose.pose.orientation.w = target_quaternion[3]
+
+        mpc_waypoints.list[0].twist.twist.linear.x = 0.0
+        mpc_waypoints.list[0].twist.twist.linear.y = 0.0
+        mpc_waypoints.list[0].twist.twist.linear.z = 0.0
+        mpc_waypoints.list[0].twist.twist.angular.x = 0.0
+        mpc_waypoints.list[0].twist.twist.angular.y = 0.0
+        mpc_waypoints.list[0].twist.twist.angular.z = 0.0
+
+        self.__mpc_target_waypoints_pub.publish(mpc_waypoints)
+
+    def __sendMpcWaypointsFromPrimitive(self):
+        candidate = 21
+        time_gap = self.__mpc_horizon / (candidate - 1.0)
+        mpc_waypoints = MpcWaypointList()
+        mpc_waypoints.mode = mpc_waypoints.FULL
+        mpc_waypoints.header.stamp = rospy.Time.now()
+
+        for i in range(0, candidate):
+            mpc_waypoints.list.append(Odometry())
+            mpc_waypoints.list[i].header.stamp = mpc_waypoints.header.stamp + rospy.Duration(time_gap * i)
+            current_time = mpc_waypoints.list[i].header.stamp.to_sec()
+            pos = self.__getPositionFromPrimitive(current_time)
+            mpc_waypoints.list[i].pose.pose.position.x = pos[0]
+            mpc_waypoints.list[i].pose.pose.position.y = pos[1]
+            mpc_waypoints.list[i].pose.pose.position.z = pos[2]
+            current_quaternion = (
+                self.__mpc_start_odom.pose.pose.orientation.x,
+                self.__mpc_start_odom.pose.pose.orientation.y,
+                self.__mpc_start_odom.pose.pose.orientation.z,
+                self.__mpc_start_odom.pose.pose.orientation.w)
+            current_euler = tf.transformations.euler_from_quaternion(current_quaternion)
+            roll = current_euler[0]
+            pitch = current_euler[1]
+            yaw = current_euler[2]
+            ## target yaw from primitive
+            ## yaw = self.__getPsiFromPrimitive(current_time)
+
+            target_quaternion = tf.transformations.quaternion_from_euler(0, 0, yaw)
+            mpc_waypoints.list[i].pose.pose.orientation.x = target_quaternion[0]
+            mpc_waypoints.list[i].pose.pose.orientation.y = target_quaternion[1]
+            mpc_waypoints.list[i].pose.pose.orientation.z = target_quaternion[2]
+            mpc_waypoints.list[i].pose.pose.orientation.w = target_quaternion[3]
+
+            vel = self.__getVelocityFromPrimitive(current_time)
+            mpc_waypoints.list[i].twist.twist.linear.x = vel[0]
+            mpc_waypoints.list[i].twist.twist.linear.y = vel[1]
+            mpc_waypoints.list[i].twist.twist.linear.z = vel[2]
+            mpc_waypoints.list[i].twist.twist.angular.x = 0.0
+            mpc_waypoints.list[i].twist.twist.angular.y = 0.0
+            mpc_waypoints.list[i].twist.twist.angular.z = 0.0
+
+        self.__mpc_target_waypoints_pub.publish(mpc_waypoints)
 
 if __name__ == '__main__':
     try:
