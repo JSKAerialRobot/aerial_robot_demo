@@ -3,7 +3,10 @@ project(mbzirc2020_task2_tasks)
 
 add_compile_options(-std=c++14)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  smach
+  smach_ros
+  mbzirc2020_common)
 
 catkin_package(
 #  INCLUDE_DIRS include
