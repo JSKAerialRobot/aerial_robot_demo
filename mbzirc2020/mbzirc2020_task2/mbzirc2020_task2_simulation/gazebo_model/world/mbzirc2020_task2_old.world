@@ -72,46 +72,20 @@
       </link>
     </model>
 
-    <model name='object'>
-      <pose>0 1 0.5 0 0 0</pose>
-      <static>false</static>
-      <link name='object_link'>
-        <inertial>
-          <mass>1.0</mass>
-          <inertia> <!-- inertias are tricky to compute -->
-            <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
-            <ixx>0.008255</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
-            <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
-            <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-            <iyy>0.008255</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
-            <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-            <izz>0.005</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
-          </inertia>
-        </inertial>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>0.2 0.2 0.3</size>
-            </box>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-          </surface>
-        </collision>
+    <model name='goal1'>
+      <static>1</static>
+      <pose>0.1 17.0 0.05 0 0 0</pose>
+      <link name='link'>
         <visual name='visual'>
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-              <size>0.2 0.2 0.3</size>
+              <size>10 0.2 0.01</size>
             </box>
           </geometry>
           <material>
-            <ambient>1.0 0.0 0.0 1</ambient>
-            <diffuse>1.0 0.0 0.0 1</diffuse>
+            <ambient>1.0 1.0 1.0 1</ambient>
+            <diffuse>1.0 1.0 1.0 1</diffuse>
             <specular>0.01 0.01 0.01 1</specular>
             <emissive>0 0 0 1</emissive>
           </material>
@@ -121,10 +95,66 @@
         <gravity>1</gravity>
       </link>
     </model>
-    <gazebo reference='object'>
-      <mu1>0.5</mu1>
-      <mu2>0.5</mu2>
-    </gazebo>
+
+    <model name='goal2'>
+      <static>1</static>
+      <pose>5.0 22.1 0.05 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <box>
+              <size>0.2 10 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1.0 1.0 1.0 1</ambient>
+            <diffuse>1.0 1.0 1.0 1</diffuse>
+            <specular>0.01 0.01 0.01 1</specular>
+            <emissive>0 0 0 1</emissive>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+
+    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble1">
+      <bottom_right>8.0 40.0 0.0</bottom_right>
+      <top_left>10.0 42.0 1.0</top_left>
+      <brick_size>0.3 0.2 0.2</brick_size>
+      <brick_color>1.0 0.0 0.0</brick_color>
+      <brick_mass>0.381</brick_mass>
+      <count>50</count>
+    </plugin>
+
+    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble2">
+      <bottom_right>2.0 40.0 0.0</bottom_right>
+      <top_left>4.0 42.0 1.0</top_left>
+      <brick_size>0.6 0.2 0.2</brick_size>
+      <brick_color>0.0 1.0 0.0</brick_color>
+      <brick_mass>0.485</brick_mass>
+      <count>50</count>
+    </plugin>
+
+    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble3">
+      <bottom_right>-4.0 40 0.0</bottom_right>
+      <top_left>-2.0 42.0 1.0</top_left>
+      <brick_size>1.2 0.2 0.2</brick_size>
+      <brick_color>0.0 0.0 1.0</brick_color>
+      <brick_mass>0.907</brick_mass>
+      <count>50</count>
+    </plugin>
+
+    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble4">
+      <bottom_right>-10.0 40 0.0</bottom_right>
+      <top_left>-8.0 42.0 1.0</top_left>
+      <brick_size>1.8 0.2 0.2</brick_size>
+      <brick_color>1.0 0.647 0.0</brick_color>
+      <brick_mass>1.2</brick_mass>
+      <count>50</count>
+    </plugin>
 
   </world>
 </sdf>
