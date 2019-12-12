@@ -141,12 +141,12 @@
   </xacro:extra_module>
 
 
-  <!-- actuated and omni leg when ground_mode -->
+  <!-- actuated and handmade caster when ground_mode -->
   <!-- actuated legs -->
   <!-- in the second link -->
   <xacro:extra_module name = "actuated_leg1_stationary_part" parent = "link2" visible = "1"
-                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
-    <origin xyz="${head_leg_offset} 0 0" rpy="${-pi/2} 0 0"/>
+                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_servo.STL">
+    <origin xyz="${head_leg_offset+0.011} ${-0.028} -0.1024" rpy="${pi/2} 0 ${pi}"/>
     <inertial>
       <mass value = "0.142" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -186,12 +186,12 @@
           ixx="0.002466" iyy="0.003026" izz="0.000699"
           ixy="0.000150" ixz="0.001147" iyz="0.000280"/>
     </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
-      <geometry>
-        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/>
-      </geometry>
-    </visual>
+    <!-- <visual> -->
+    <!--   <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/> -->
+    <!--   <geometry> -->
+    <!--     <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/> -->
+    <!--   </geometry> -->
+    <!-- </visual> -->
     <collision>
       <origin rpy="0 0 0" xyz="0.0025 0 -0.128"/>
       <geometry>
@@ -256,67 +256,166 @@
     </collision>
   </link>
 
-  <!-- omniwheel normal legs -->
+  <!-- handmade caster -->
   <!-- in the first link -->
-  <joint name="link1_to_leg1" type="fixed">
+  <joint name="link1_to_handmade_caster1" type="fixed">
     <parent link="link1"/>
-    <child link="omni_leg1"/>
-    <origin xyz="${head_leg_offset} 0.0 0" rpy="0 0 0"/>
-    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
-    <axis xyz="0 0 0"/>
+    <child link="handmade_caster1_pipe"/>
+    <origin xyz="${head_leg_offset+0.001} 0.0 -0.012" rpy="0 0 0"/>
   </joint>
 
-  <link name="omni_leg1">
+  <link name="handmade_caster1_pipe">
     <inertial>
       <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
-      <mass value="0.072000"/>
+      <mass value="0.012000"/>
       <inertia
-          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
+          ixx="0.00000089523" iyy="0.000035581" izz="0.000035888"
           ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
       <geometry>
-        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/caster_pipe.STL"/>
       </geometry>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
+      <origin rpy="0 0 0" xyz="0 0 ${-0.131/2}"/>
       <geometry>
-        <sphere radius="${55 / 2 * 0.001}"/>
+        <cylinder length="0.131" radius="0.006"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="handmade_caster1_pipe_to_connector_joint" type="continuous">
+    <parent link="handmade_caster1_pipe"/>
+    <child link="handmade_caster1_connector"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0.0 0.0 -0.131" rpy="0 0 0"/>
+  </joint>
+
+  <link name="handmade_caster1_connector">
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <mass value="0.009"/>
+      <inertia
+          ixx="0.000002235" iyy="0.000002515" izz="0.00000298"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/caster_connector.STL"/>
+      </geometry>
+    </visual>
+  </link>
+
+    <joint name="handmade_caster1_connector_to_wheel_joint" type="continuous">
+    <parent link="handmade_caster1_connector"/>
+    <child link="handmade_caster1_wheel"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="0.019 0.0 -0.006" rpy="0 0 0"/>
+  </joint>
+
+  <link name="handmade_caster1_wheel">
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <mass value="0.056"/>
+      <inertia
+          ixx="0.0000253" iyy="0.0000166" izz="0.0000253"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+   </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/wheel.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="${60 / 2 * 0.001}"/>
       </geometry>
     </collision>
   </link>
 
   <!-- in the forth link -->
-  <joint name="link4_to_leg3" type="fixed">
+  <joint name="link4_to_handmade_caster2" type="fixed">
     <parent link="link4"/>
-    <child link="omni_leg2"/>
-    <origin xyz="${end_leg_offset} 0.0 0" rpy="0 0 0"/>
-    <origin rpy="0 0 0" xyz="-0.0115 0 -0.0115"/>
-    <axis xyz="0 0 0"/>
+    <child link="handmade_caster2_pipe"/>
+    <origin xyz="${end_leg_offset-0.001} 0.0 -0.012" rpy="0 0 0"/>
   </joint>
 
-  <link name="omni_leg2">
+  <link name="handmade_caster2_pipe">
     <inertial>
-      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
-      <mass value="0.072000"/>
+      <origin xyz="0.000000 0.000000 0.000000" rpy="0 0 0"/>
+      <mass value="0.012000"/>
       <inertia
-          ixx="-0.000617" iyy="-0.000627" izz="0.0000"
+          ixx="0.00000089523" iyy="0.000035581" izz="0.000035888"
           ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
       <geometry>
-        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/passive_stationary_part.dae"/>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/caster_pipe.STL"/>
       </geometry>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 -0.002 -0.14"/>
+      <origin rpy="0 0 0" xyz="0 0 ${-0.131/2}"/>
       <geometry>
-        <sphere radius="${55 / 2 * 0.001}"/>
+        <cylinder length="0.131" radius="0.006"/>
       </geometry>
     </collision>
   </link>
 
+  <joint name="handmade_caster2_pipe_to_connector_joint" type="continuous">
+    <parent link="handmade_caster2_pipe"/>
+    <child link="handmade_caster2_connector"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0.0 0.0 -0.131" rpy="0 0 0"/>
+  </joint>
+
+  <link name="handmade_caster2_connector">
+    <inertial>
+      <origin xyz="0.000000 0.000000 0.00000" rpy="0 0 0"/>
+      <mass value="0.009"/>
+      <inertia
+          ixx="0.000002235" iyy="0.000002515" izz="0.00000298"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/caster_connector.STL"/>
+      </geometry>
+    </visual>
+  </link>
+
+    <joint name="handmade_caster2_connector_to_wheel_joint" type="continuous">
+    <parent link="handmade_caster2_connector"/>
+    <child link="handmade_caster2_wheel"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="0.019 0.0 -0.006" rpy="0 0 0"/>
+  </joint>
+
+  <link name="handmade_caster2_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.056"/>
+      <inertia
+          ixx="0.0000253" iyy="0.0000166" izz="0.0000253"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/wheel.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="${60 / 2 * 0.001}"/>
+      </geometry>
+    </collision>
+  </link>
 </robot>
