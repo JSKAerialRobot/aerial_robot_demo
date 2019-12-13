@@ -9,7 +9,7 @@
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
 
 
-  <gazebo reference="actuated_leg1_movable_part">
+  <gazebo reference="actuated_leg1_wheel">
     <mu1>0.11</mu1>
     <mu2>0.11</mu2>
     <fdir1>1 1 0</fdir1>
@@ -17,7 +17,7 @@
     <selfCollide>false</selfCollide>
   </gazebo>
 
-  <gazebo reference="actuated_leg2_movable_part">
+  <gazebo reference="actuated_leg2_wheel">
     <mu1>0.11</mu1>
     <mu2>0.11</mu2>
     <fdir1>1 1 0</fdir1>
@@ -25,7 +25,7 @@
     <selfCollide>false</selfCollide>
   </gazebo>
 
-  <gazebo reference="omni_leg1">
+  <gazebo reference="handmade_caster1_wheel">
     <mu1>0.11</mu1>
     <mu2>0.11</mu2>
     <fdir1>1 1 0</fdir1>
@@ -33,7 +33,7 @@
     <selfCollide>false</selfCollide>
   </gazebo>
 
-  <gazebo reference="omni_leg2">
+  <gazebo reference="handmade_caster2_wheel">
     <mu1>0.11</mu1>
     <mu2>0.11</mu2>
     <fdir1>1 1 0</fdir1>
