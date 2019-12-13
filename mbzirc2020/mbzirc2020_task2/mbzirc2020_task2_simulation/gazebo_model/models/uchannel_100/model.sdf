@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <model name='uchannel_100'>
+    <static>1</static>
+    <link name='link'>
+      <pose>0 0 0 0 0 0</pose>
+      <collision name='collision'>
+        <geometry>
+          <mesh>
+            <uri>model://uchannel_100/mesh/uchannel_100.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+        <geometry>
+          <mesh>
+            <uri>model://uchannel_100/mesh/uchannel_100.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
