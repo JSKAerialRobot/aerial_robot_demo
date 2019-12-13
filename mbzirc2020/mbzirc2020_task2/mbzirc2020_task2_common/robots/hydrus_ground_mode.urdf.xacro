@@ -112,7 +112,7 @@
           ixx="0.0" ixy="0.0" ixz="0.0"
           iyy="0.0" iyz="0.0"
           izz="0.0"/>
-    </inertial>
+     </inertial>
   </xacro:extra_module>
 
   <!-- special battery arrangement -->
@@ -145,24 +145,24 @@
   <!-- actuated legs -->
   <!-- in the second link -->
   <xacro:extra_module name = "actuated_leg1_stationary_part" parent = "link2" visible = "1"
-                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_servo.STL">
-    <origin xyz="${head_leg_offset+0.011} ${-0.028} -0.1024" rpy="${pi/2} 0 ${pi}"/>
+                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/l16_100mm_in.STL">
+    <origin xyz="${head_leg_offset} -0.019 0.0186" rpy="${pi/2} 0 ${pi}"/>
     <inertial>
-      <mass value = "0.142" />
+      <mass value = "0.0719" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia
-          ixx="0.0001" ixy="0.0" ixz="0.0"
-          iyy="0.0001" iyz="0.0"
-          izz="0.0001"/>
+          ixx="0.000155" ixy="0.0" ixz="0.0"
+          iyy="0.000004" iyz="0.0"
+          izz="0.000154"/>
     </inertial>
   </xacro:extra_module>
 
   <joint name="actuated_leg1_joint" type="prismatic">
-    <limit effort="50" lower="0" upper="0.0927" velocity="1"/>
+    <limit effort="50" lower="0" upper="0.1" velocity="1"/>
     <parent link="actuated_leg1_stationary_part"/>
     <child link="actuated_leg1_movable_part"/>
-    <origin rpy="${-pi/2} 0 ${pi}" xyz="-0.0115 0 0"/> <!-- TODO: tune -y -->
-    <axis xyz="0 0 -1"/>
+    <origin rpy="0 0 0" xyz="0 -0.112 0"/>
+    <axis xyz="0 -1 0"/>
     <dynamics damping="0.1" friction="0.01"/>
   </joint>
 
@@ -180,46 +180,81 @@
 
   <link name="actuated_leg1_movable_part">
     <inertial>
-      <origin xyz="-0.002860 0.000000 -0.089840" rpy="0 0 0"/>
-      <mass value="0.107000"/>
+      <origin xyz="0 0.000000 0" rpy="0 0 0"/>
+      <mass value="0.01871"/>
       <inertia
-          ixx="0.002466" iyy="0.003026" izz="0.000699"
-          ixy="0.000150" ixz="0.001147" iyz="0.000280"/>
+          ixx="0.0000320" iyy="0.0000308" izz="0.00000174"
+          ixy="0.000" ixz="0.000" iyz="0.000"/>
     </inertial>
-    <!-- <visual> -->
-    <!--   <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/> -->
-    <!--   <geometry> -->
-    <!--     <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/> -->
-    <!--   </geometry> -->
-    <!-- </visual> -->
-    <collision>
-      <origin rpy="0 0 0" xyz="0.0025 0 -0.128"/>
+    <visual>
+      <origin xyz="0 0 0" rpy="${-pi/2} ${pi*3/4} 0"/>
       <geometry>
-        <sphere radius="${55 / 2 * 0.001}"/>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_pipe_mirror.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="${pi/2} 0 0" xyz="0 ${0.1435/2-0.0435} 0"/>
+      <geometry>
+        <cylinder length="0.1435" radius="0.0045"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="actuated_leg1_wheel_joint" type="fixed">
+    <parent link="actuated_leg1_movable_part"/>
+    <child link="actuated_leg1_wheel"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${-0.00147/1.41421356237} -0.0375 ${-0.00147/1.41421356237}" rpy="${-pi/2} ${-pi/4} 0"/>
+  </joint>
+
+  <link name="actuated_leg1_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.05282"/>
+      <inertia
+          ixx="0.0000222" iyy="0.0000180" izz="0.0000222"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_wheel.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="${pi/2} 0 0" xyz="0 0.01435 0"/>
+      <geometry>
+        <cylinder length="0.008" radius="0.02816"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="${pi/2} 0 0" xyz="0 -0.01435 0"/>
+      <geometry>
+        <cylinder length="0.008" radius="0.02816"/>
       </geometry>
     </collision>
   </link>
 
   <!-- in the thrid links -->
   <xacro:extra_module name = "actuated_leg2_stationary_part" parent = "link3" visible = "1"
-                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_stationary_part.dae">
-    <origin xyz="${end_leg_offset} 0.0 0" rpy="${-pi/2} 0 ${pi}"/>
+                      model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/l16_100mm_in.STL">
+    <origin xyz="${end_leg_offset} -0.019 0.0186" rpy="${pi/2} 0 ${pi}"/>
     <inertial>
-      <mass value = "0.142" />
+      <mass value = "0.0719" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia
-          ixx="0.0001" ixy="0.0" ixz="0.0"
-          iyy="0.0001" iyz="0.0"
-          izz="0.0001"/>
+          ixx="0.000155" ixy="0.0" ixz="0.0"
+          iyy="0.000004" iyz="0.0"
+          izz="0.000154"/>
     </inertial>
   </xacro:extra_module>
 
   <joint name="actuated_leg2_joint" type="prismatic">
-    <limit effort="50" lower="0" upper="0.0927" velocity="1"/>
+    <limit effort="50" lower="0" upper="0.1" velocity="1"/>
     <parent link="actuated_leg2_stationary_part"/>
     <child link="actuated_leg2_movable_part"/>
-    <origin rpy="${-pi/2} 0 ${pi}" xyz="-0.0115 0 0"/> <!-- TODO: tune -y -->
-    <axis xyz="0 0 -1"/>
+    <origin rpy="0 0 0" xyz="0 -0.112 0"/>
+    <axis xyz="0 -1 0"/>
     <dynamics damping="0.1" friction="0.01"/>
   </joint>
 
@@ -236,22 +271,57 @@
 
   <link name="actuated_leg2_movable_part">
     <inertial>
-      <origin xyz="-0.002860 0.000000 -0.089840" rpy="0 0 0"/>
-      <mass value="0.107000"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01871"/>
       <inertia
-          ixx="0.002466" iyy="0.003026" izz="0.000699"
-          ixy="0.000150" ixz="0.001147" iyz="0.000280"/>
+          ixx="0.0000320" iyy="0.0000308" izz="0.00000174"
+          ixy="0.000" ixz="0.000" iyz="0.000"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="${-pi/2} ${-pi*3/4} 0"/>
       <geometry>
-        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_movable_part.dae"/>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_pipe.STL"/>
       </geometry>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0.0025 0 -0.128"/>
+      <origin rpy="${pi/2} 0 0" xyz="0 ${0.1435/2-0.0435} 0"/>
       <geometry>
-        <sphere radius="${55 / 2 * 0.001}"/>
+        <cylinder length="0.1435" radius="0.0045"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="actuated_leg2_wheel_joint" type="fixed">
+    <parent link="actuated_leg2_movable_part"/>
+    <child link="actuated_leg2_wheel"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${0.00147/1.41421356237} -0.0375 ${-0.00147/1.41421356237}" rpy="${-pi/2} ${-pi*3/4} 0"/>
+  </joint>
+
+  <link name="actuated_leg2_wheel">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.05282"/>
+      <inertia
+          ixx="0.0000222" iyy="0.0000180" izz="0.0000222"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mbzirc2020_task2_common/urdf/mesh/modules/mechanical/actuated_leg_wheel.STL"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="${pi/2} 0 0" xyz="0 0.01435 0"/>
+      <geometry>
+        <cylinder length="0.008" radius="0.02816"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="${pi/2} 0 0" xyz="0 -0.01435 0"/>
+      <geometry>
+        <cylinder length="0.008" radius="0.02816"/>
       </geometry>
     </collision>
   </link>
@@ -266,7 +336,7 @@
 
   <link name="handmade_caster1_pipe">
     <inertial>
-      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.012000"/>
       <inertia
           ixx="0.00000089523" iyy="0.000035581" izz="0.000035888"
@@ -293,9 +363,20 @@
     <origin xyz="0.0 0.0 -0.131" rpy="0 0 0"/>
   </joint>
 
+  <transmission name="handmade_caster1_pipe_to_connector_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="handmade_caster1_pipe_to_connector_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="handmade_caster1_pipe_to_connector_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
   <link name="handmade_caster1_connector">
     <inertial>
-      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.009"/>
       <inertia
           ixx="0.000002235" iyy="0.000002515" izz="0.00000298"
@@ -309,7 +390,7 @@
     </visual>
   </link>
 
-    <joint name="handmade_caster1_connector_to_wheel_joint" type="continuous">
+  <joint name="handmade_caster1_connector_to_wheel_joint" type="fixed">
     <parent link="handmade_caster1_connector"/>
     <child link="handmade_caster1_wheel"/>
     <axis xyz="0 1 0"/>
@@ -318,7 +399,7 @@
 
   <link name="handmade_caster1_wheel">
     <inertial>
-      <origin xyz="0.000000 0.000000 -0.093340" rpy="0 0 0"/>
+      <origin xyz="0.000000 0.000000 0.000000" rpy="0 0 0"/>
       <mass value="0.056"/>
       <inertia
           ixx="0.0000253" iyy="0.0000166" izz="0.0000253"
@@ -374,6 +455,17 @@
     <origin xyz="0.0 0.0 -0.131" rpy="0 0 0"/>
   </joint>
 
+  <transmission name="handmade_caster2_pipe_to_connector_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="handmade_caster2_pipe_to_connector_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="handmade_caster2_pipe_to_connector_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
   <link name="handmade_caster2_connector">
     <inertial>
       <origin xyz="0.000000 0.000000 0.00000" rpy="0 0 0"/>
@@ -390,7 +482,7 @@
     </visual>
   </link>
 
-    <joint name="handmade_caster2_connector_to_wheel_joint" type="continuous">
+  <joint name="handmade_caster2_connector_to_wheel_joint" type="fixed">
     <parent link="handmade_caster2_connector"/>
     <child link="handmade_caster2_wheel"/>
     <axis xyz="0 1 0"/>
