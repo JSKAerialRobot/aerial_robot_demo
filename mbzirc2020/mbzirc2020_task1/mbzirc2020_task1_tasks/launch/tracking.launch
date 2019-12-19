@@ -5,7 +5,7 @@
   <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
     <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
     <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
-    <param name="replan_timer_period" value="2.0" />
+    <param name="replan_timer_period" value="0.2" />
     <param name="predict_horizon" value="3.0" />
     <param name="kf_method" value="2" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
     <param name="primitive_visualize_flag" value="true" />
