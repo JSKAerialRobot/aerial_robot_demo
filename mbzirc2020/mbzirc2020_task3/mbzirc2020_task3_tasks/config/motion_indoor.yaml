@@ -17,3 +17,5 @@ covering_post_height : 1.2
 covering_move_dist : 0.6
 
 close_pose: [1.56, 1.56] # the joint angles  for closing
+
+initial_waypoints: [[0.1, 0.1, 0.5], [0, 0.1, 1]]
