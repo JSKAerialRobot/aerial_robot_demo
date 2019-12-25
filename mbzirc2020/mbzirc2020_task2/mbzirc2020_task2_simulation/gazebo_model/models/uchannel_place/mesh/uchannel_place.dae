@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0 commit date:2018-03-22, commit time:14:10, hash:f4dc9f9d68b</authoring_tool>
     </contributor>
-    <created>2019-12-04T17:34:31</created>
-    <modified>2019-12-04T17:34:31</modified>
+    <created>2019-12-25T19:13:43</created>
+    <modified>2019-12-25T19:13:43</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -102,36 +102,103 @@
     </light>
   </library_lights>
   <library_images/>
+  <library_effects>
+    <effect id="Material_001-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.45 0.106 0.015 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="Material_002-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.3999999 0.3999999 0.3999999 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="Material_001-material" name="Material_001">
+      <instance_effect url="#Material_001-effect"/>
+    </material>
+    <material id="Material_002-material" name="Material_002">
+      <instance_effect url="#Material_002-effect"/>
+    </material>
+  </library_materials>
   <library_geometries>
-    <geometry id="Uchannel_1700-mesh" name="Uchannel 1700">
+    <geometry id="uchannel_place-mesh" name="uchannel place">
       <mesh>
-        <source id="Uchannel_1700-mesh-positions">
-          <float_array id="Uchannel_1700-mesh-positions-array" count="48">-0.155 -1.705 4.005 -0.155 0.1 -0.004999995 -0.155 -1.705 -0.004999995 0.155 -1.705 -0.004999995 0.155 -1.705 4.005 0.155 0.1 -0.004999995 -0.155 0.1 4.005 0.155 0.1 4.005 -0.15 0 4 0.15 0 4 -0.15 0 0 0.15 0 0 -0.15 0.1 0 0.15 0.1 0 -0.15 0.1 4 0.15 0.1 4</float_array>
+        <source id="uchannel_place-mesh-positions">
+          <float_array id="uchannel_place-mesh-positions-array" count="60">-2 -0.2 1.8 -2 -0.15 1.693292 -2 -0.2026833 1.798658 2 -0.2026833 1.798658 2 -0.2 1.8 2 -0.15 1.7 2 -0.15 1.693292 -2 -0.15 1.7 -2 0.15 1.693292 -2 0.15 0 -2 -0.15 0 2 -0.15 0 2 0.15 0 -2 0.15 1.7 2 0.15 1.693292 2 0.15 1.7 -2 0.2026833 1.798658 2 0.2026833 1.798658 2 0.2 1.8 -2 0.2 1.8</float_array>
           <technique_common>
-            <accessor source="#Uchannel_1700-mesh-positions-array" count="16" stride="3">
+            <accessor source="#uchannel_place-mesh-positions-array" count="20" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Uchannel_1700-mesh-normals">
-          <float_array id="Uchannel_1700-mesh-normals-array" count="33">-1 0 0 0 0 -1 0 -1 0 1 0 0 0 0 1 0 1 0 0 0 -1 0 1 0 0 1 2.40341e-6 0 1 -5.43271e-7 0 1 -1.87762e-6</float_array>
+        <source id="uchannel_place-mesh-normals">
+          <float_array id="uchannel_place-mesh-normals-array" count="48">-1 0 0 0 -0.4472295 0.8944193 0 -0.4472255 0.8944212 0 -0.8944272 -0.4472136 1 0 0 0 0.8944273 0.4472134 0 0.8944272 0.4472136 0 -1 0 0 0 -1 0 0 1 0 1 0 0 0.8944272 -0.4472136 0 -0.8944272 0.4472136 0 -0.8944273 0.4472134 0 0.4472255 0.8944212 0 0.4472295 0.8944193</float_array>
           <technique_common>
-            <accessor source="#Uchannel_1700-mesh-normals-array" count="11" stride="3">
+            <accessor source="#uchannel_place-mesh-normals-array" count="16" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <vertices id="Uchannel_1700-mesh-vertices">
-          <input semantic="POSITION" source="#Uchannel_1700-mesh-positions"/>
+        <vertices id="uchannel_place-mesh-vertices">
+          <input semantic="POSITION" source="#uchannel_place-mesh-positions"/>
         </vertices>
-        <triangles count="28">
-          <input semantic="VERTEX" source="#Uchannel_1700-mesh-vertices" offset="0"/>
-          <input semantic="NORMAL" source="#Uchannel_1700-mesh-normals" offset="1"/>
-          <p>0 0 1 0 2 0 1 1 3 1 2 1 4 2 0 2 2 2 3 2 4 2 2 2 5 3 4 3 3 3 1 1 5 1 3 1 6 0 1 0 0 0 4 4 7 4 0 4 7 4 6 4 0 4 5 3 7 3 4 3 8 5 9 5 10 5 9 5 11 5 10 5 12 3 8 3 10 3 13 4 12 4 10 4 11 4 13 4 10 4 12 3 14 3 8 3 14 1 15 1 8 1 15 6 9 6 8 6 9 0 15 0 11 0 15 0 13 0 11 0 14 7 12 7 1 7 6 7 14 7 1 7 12 8 5 8 1 8 13 7 7 7 5 7 12 9 13 9 5 9 15 7 7 7 13 7 6 7 15 7 14 7 6 10 7 10 15 10</p>
+        <triangles material="Material_001-material" count="10">
+          <input semantic="VERTEX" source="#uchannel_place-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#uchannel_place-mesh-normals" offset="1"/>
+          <p>8 0 9 0 10 0 1 0 8 0 10 0 6 7 1 7 10 7 11 7 6 7 10 7 9 8 11 8 10 8 12 4 6 4 11 4 9 8 12 8 11 8 12 4 14 4 6 4 14 10 12 10 9 10 8 10 14 10 9 10</p>
+        </triangles>
+        <triangles material="Material_002-material" count="26">
+          <input semantic="VERTEX" source="#uchannel_place-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#uchannel_place-mesh-normals" offset="1"/>
+          <p>0 0 1 0 2 0 3 1 4 1 2 1 4 2 0 2 2 2 1 3 3 3 2 3 5 4 4 4 3 4 6 4 5 4 3 4 1 3 6 3 3 3 7 0 1 0 0 0 4 5 5 5 0 5 5 6 7 6 0 6 13 0 8 0 1 0 7 0 13 0 1 0 14 4 5 4 6 4 5 9 15 9 7 9 15 9 13 9 7 9 14 4 15 4 5 4 13 0 16 0 8 0 16 11 14 11 8 11 17 4 18 4 14 4 18 4 15 4 14 4 16 11 17 11 14 11 19 0 16 0 13 0 15 12 18 12 13 12 18 13 19 13 13 13 18 14 17 14 19 14 17 15 16 15 19 15</p>
         </triangles>
       </mesh>
     </geometry>
@@ -147,9 +214,16 @@
         <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
         <instance_light url="#Lamp-light"/>
       </node>
-      <node id="Uchannel_1700" name="Uchannel_1700" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 -4.37114e-8 -1 0 0 1 -4.37114e-8 1.705 0 0 0 1</matrix>
-        <instance_geometry url="#Uchannel_1700-mesh" name="Uchannel_1700"/>
+      <node id="uchannel_place" name="uchannel_place" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#uchannel_place-mesh" name="uchannel_place">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material_001-material" target="#Material_001-material"/>
+              <instance_material symbol="Material_002-material" target="#Material_002-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
       </node>
     </visual_scene>
   </library_visual_scenes>
