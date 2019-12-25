@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <sdf version="1.4">
-  <model name='uchannel_1700'>
+  <model name='uchannel_place'>
     <static>1</static>
     <link name='link'>
       <pose>0 0 0 0 0 0</pose>
       <collision name='collision'>
         <geometry>
           <mesh>
-            <uri>model://uchannel_1700/mesh/uchannel_1700.dae</uri>
+            <uri>model://uchannel_place/mesh/uchannel_place.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -17,7 +17,7 @@
         <transparency>0</transparency>
         <geometry>
           <mesh>
-            <uri>model://uchannel_1700/mesh/uchannel_1700.dae</uri>
+            <uri>model://uchannel_place/mesh/uchannel_place.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
