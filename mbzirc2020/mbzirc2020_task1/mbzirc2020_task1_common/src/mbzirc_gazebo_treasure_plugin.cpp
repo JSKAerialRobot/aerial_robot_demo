@@ -36,6 +36,7 @@ namespace gazebo
   GazeboTreasure::GazeboTreasure()
   {
     magnet_on_.data = false;
+    pirate_linear_acc_.Set(0.0, 0.0, 9.8);
   }
 
   GazeboTreasure::~GazeboTreasure()
@@ -120,6 +121,12 @@ namespace gazebo
     else
       treasure_capture_flag_topic_name = "/treasure/capture_flag";
 
+    std::string pirate_imu_topic_name;
+    if (_sdf->HasElement("pirateImuTopicName") && _sdf->GetElement("pirateImuTopicName")->GetValue())
+      pirate_imu_topic_name = _sdf->GetElement("pirateImuTopicName")->Get<std::string>();
+    else
+      pirate_imu_topic_name = "/hawk/raw_imu";
+
     // Make sure the ROS node for Gazebo has already been initialized
     if (!ros::isInitialized())
       {
@@ -136,6 +143,7 @@ namespace gazebo
     gazebo_model_sub_ = node_handle_->subscribe("/gazebo/model_states",3,&GazeboTreasure::gazeboCallback,this);
     magnet_release_sub_ = node_handle_->subscribe("/mag_on",3,&GazeboTreasure::magnetCallback,this);
     treasure_force_state_sub_ = node_handle_->subscribe("/treasure_force_state_cmd",3,&GazeboTreasure::treasureForceStateCallback,this);
+    pirate_imu_sub_ = node_handle_->subscribe(pirate_imu_topic_name,3,&GazeboTreasure::pirateImuCallback,this);
 
     // publisher
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
@@ -224,15 +232,19 @@ namespace gazebo
 
   void GazeboTreasure::updateTreasureState(int owner_id, std::string robot_name){
     geometry_msgs::Pose treausre_pose = gazebo_models_.pose.at(owner_id);
-    double offset_z = 0.0;
-    if (robot_name == std::string("hawk"))
-      offset_z = guard_uav_treasure_offset_z_;
+    math::Vector3 offset;
+    if (robot_name == std::string("hawk")){
+      if (treausre_pose.position.z < guard_uav_treasure_offset_z_) // drone is in low height
+        offset.Set(0.0, 0.0, treausre_pose.position.z);
+      else
+        offset = pirate_linear_acc_ / 9.8 * guard_uav_treasure_offset_z_;
+    }
     else if (robot_name == std::string("hydrusx"))
-      offset_z = pirate_uav_treasure_offset_z_;
-    treausre_pose.position.z -= offset_z;
+      offset.Set(0.0, 0.0, pirate_uav_treasure_offset_z_);
     model_->SetWorldPose(math::Pose(math::Vector3(treausre_pose.position.x,
                                                   treausre_pose.position.y,
-                                                  treausre_pose.position.z),
+                                                  treausre_pose.position.z)
+                                    - offset,
                                     math::Quaternion(0, 0, 0, 1)));
     visualizeTreasure();
   }
