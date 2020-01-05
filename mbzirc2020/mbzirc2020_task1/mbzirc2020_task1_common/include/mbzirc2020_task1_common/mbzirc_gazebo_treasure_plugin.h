@@ -48,6 +48,7 @@
 #include <std_msgs/Empty.h>
 #include <std_msgs/UInt8.h>
 #include <visualization_msgs/Marker.h>
+#include <sensor_msgs/Imu.h>
 
 #include <stdio.h>
 #include <ros/callback_queue.h>
@@ -93,6 +94,7 @@ private:
   ros::Subscriber gazebo_model_sub_; //get the model states
   ros::Subscriber magnet_release_sub_; //release the object(disable attach)
   ros::Subscriber treasure_force_state_sub_; // treasure state is forced to change
+  ros::Subscriber pirate_imu_sub_;
 
   // treasure marker for visualization
   ros::Publisher treasure_marker_pub_;
@@ -111,6 +113,7 @@ private:
   double grab_thre_;
   double guard_uav_treasure_offset_z_;
   double pirate_uav_treasure_offset_z_;
+  math::Vector3 pirate_linear_acc_;
 
   //renew the data of the gazebo objects
   void gazeboCallback(const gazebo_msgs::ModelStates gazebo_model_states)
@@ -122,6 +125,11 @@ private:
         this->magnet_on_ = on;
   }
   void treasureForceStateCallback(std_msgs::UInt8 msg);
+  void pirateImuCallback(sensor_msgs::Imu msg){
+    this->pirate_linear_acc_.Set(msg.linear_acceleration.x,
+                                 msg.linear_acceleration.y,
+                                 msg.linear_acceleration.z);
+  }
 
   void updateTreasureState(int owner_id, std::string robot_name);
   void visualizeTreasure();
