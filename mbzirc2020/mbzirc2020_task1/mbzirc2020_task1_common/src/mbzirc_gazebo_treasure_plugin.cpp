@@ -255,7 +255,7 @@ namespace gazebo
     treasure_marker.scale.z = ball_radius;
     treasure_marker.color.a = 1.0; // Don't forget to set the alpha!
     treasure_marker.color.r = 1.0;
-    treasure_marker.color.g = 0.0;
+    treasure_marker.color.g = 1.0;
     treasure_marker.color.b = 0.0;
     treasure_marker.header.frame_id = "world";
     treasure_marker.header.stamp = ros::Time::now();
