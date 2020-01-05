@@ -14,5 +14,5 @@ navigator:
         nav_vel_limit : 0.3
 
         gain_tunning_mode: 0
-        max_target_tilt_angle: 0.5
+        max_target_tilt_angle: 0.2
         cmd_angle_lev2_gain : 1.5
