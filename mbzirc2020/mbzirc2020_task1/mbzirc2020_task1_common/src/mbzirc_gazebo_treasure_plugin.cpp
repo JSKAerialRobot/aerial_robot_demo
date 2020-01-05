@@ -109,6 +109,12 @@ namespace gazebo
     else
       grab_thre_ = 0.3;
 
+    std::string treasure_point_topic_name;
+    if (_sdf->HasElement("treasurePositionTopicName") && _sdf->GetElement("treasurePositionTopicName")->GetValue())
+      treasure_point_topic_name = _sdf->GetElement("treasurePositionTopicName")->Get<std::string>();
+    else
+      treasure_point_topic_name = "/treasure/point";
+
     std::string treasure_marker_topic_name;
     if (_sdf->HasElement("markerTopicName") && _sdf->GetElement("markerTopicName")->GetValue())
       treasure_marker_topic_name = _sdf->GetElement("markerTopicName")->Get<std::string>();
@@ -146,6 +152,7 @@ namespace gazebo
     pirate_imu_sub_ = node_handle_->subscribe(pirate_imu_topic_name,3,&GazeboTreasure::pirateImuCallback,this);
 
     // publisher
+    treasure_point_pub_ = node_handle_->advertise<geometry_msgs::PointStamped>(treasure_point_topic_name, 1, true);
     treasure_marker_pub_ = node_handle_->advertise<visualization_msgs::Marker>(treasure_marker_topic_name, 1, true);
     treasure_capture_flag_pub_ = node_handle_->advertise<std_msgs::Bool>(treasure_capture_flag_topic_name, 1, true);
 
@@ -273,6 +280,13 @@ namespace gazebo
     treasure_marker.header.stamp = ros::Time::now();
     treasure_marker.pose = treausre_pose;
     treasure_marker_pub_.publish(treasure_marker);
+
+    geometry_msgs::PointStamped treasure_point;
+    treasure_point.header = treasure_marker.header;
+    treasure_point.point.x = pose_object.pos.x;
+    treasure_point.point.y = pose_object.pos.y;
+    treasure_point.point.z = pose_object.pos.z;
+    treasure_point_pub_.publish(treasure_point);
   }
 
   // Register this plugin with the simulator

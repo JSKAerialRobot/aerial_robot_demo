@@ -49,6 +49,7 @@
 #include <std_msgs/UInt8.h>
 #include <visualization_msgs/Marker.h>
 #include <sensor_msgs/Imu.h>
+#include <geometry_msgs/PointStamped.h>
 
 #include <stdio.h>
 #include <ros/callback_queue.h>
@@ -97,6 +98,7 @@ private:
   ros::Subscriber pirate_imu_sub_;
 
   // treasure marker for visualization
+  ros::Publisher treasure_point_pub_;
   ros::Publisher treasure_marker_pub_;
   ros::Publisher treasure_capture_flag_pub_;
 
