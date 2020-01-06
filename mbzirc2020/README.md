@@ -4,8 +4,7 @@
 
 - aeiral_robot:
    - url: https://github.com/tongtybj/aerial_robot
-   - version: `mbzirc2020`
-     *note*: do not use `master` branch
+   - version: `master` or `tag >= 1.1.0`
 
 - aeiral_robot_recognition:
    - url: https://github.com/tongtybj/aerial_robot
