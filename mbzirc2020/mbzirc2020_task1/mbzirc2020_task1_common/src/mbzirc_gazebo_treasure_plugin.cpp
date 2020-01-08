@@ -113,7 +113,7 @@ namespace gazebo
     if (_sdf->HasElement("treasurePositionTopicName") && _sdf->GetElement("treasurePositionTopicName")->GetValue())
       treasure_point_topic_name = _sdf->GetElement("treasurePositionTopicName")->Get<std::string>();
     else
-      treasure_point_topic_name = "/treasure/point";
+      treasure_point_topic_name = "/treasure/point_from_gazebo";
 
     std::string treasure_marker_topic_name;
     if (_sdf->HasElement("markerTopicName") && _sdf->GetElement("markerTopicName")->GetValue())

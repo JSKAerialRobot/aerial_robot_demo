@@ -17,6 +17,8 @@
     <node pkg="mbzirc2020_task1_tasks" type="fake_visual_detector.py" name="fake_visual_detector" output="screen" respawn="false">
       <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
     </node>
+    <node pkg="mbzirc2020_task1_tasks" type="fake_treasure_detector_from_gazebo.py" name="fake_treasure_detector_from_gazebo" output="screen" respawn="false">
+    </node>
   </group>
 
   <node pkg="mbzirc2020_task1_tasks" type="hydrus_tracking_controller.py" name="hydrus_tracking_controller" output="screen" respawn="false">
