@@ -13,6 +13,7 @@
   <arg name= "expanding_bounding_box_aspect_ratio" default = "1.0" /> <!-- general SSD is 1:1 -->
   <arg name= "expanding_bounding_box_rate" default = "2.0" />
   <arg name= "larger_expanding_bounding_box_rate" default = "3.0" />
+  <arg name= "ball_radius_lpf_gain" default = "0.2" />
 
   <arg name= "detection_check_frame_num" default = "10" />
   <arg name= "lost_target_check_frame_num" default = "5" />
@@ -47,6 +48,7 @@
     <param name="detection_check_frame_num" value="$(arg detection_check_frame_num)"/>
     <param name="lost_target_check_frame_num" value="$(arg lost_target_check_frame_num)"/>
     <param name="redetection_after_lost_target_frame_num" value="$(arg redetection_after_lost_target_frame_num)"/>
+    <param name= "ball_radius_lpf_gain" value = "$(arg ball_radius_lpf_gain)" />
 
     <param name="subscribe_depth_image" value="$(arg subscribe_depth_image)"/>
     <param name="quick_detection" value="$(arg quick_detection)"/>
