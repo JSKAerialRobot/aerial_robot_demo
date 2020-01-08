@@ -4,7 +4,7 @@
 
   <!-- base kinematics model -->
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
-  <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "0"  />
+  <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "0" with_leg="0"  />
 
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
@@ -174,6 +174,61 @@
       </geometry>
     </collision>
   </link>
+
+
+  ##### leg #####
+
+  <xacro:standard_leg_end parent = "link1" self="1">
+    <origin xyz="${head_leg_offset} 0.0 0" rpy="0 0 0"/>
+  </xacro:standard_leg_end>
+  <xacro:standard_leg_joint parent = "link1" self="2">
+    <origin xyz="0.6 0.0 0" rpy="0 0 0"/>
+  </xacro:standard_leg_joint>
+  <xacro:standard_leg_joint parent = "link4" self="3">
+    <origin xyz="0.0 0.0 0" rpy="0 0 0"/>
+  </xacro:standard_leg_joint>
+  <xacro:standard_leg_end parent = "link4" self="4">
+    <origin xyz="${end_leg_offset} 0.0 0" rpy="0 0 0"/>
+  </xacro:standard_leg_end>
+
+  <xacro:macro name="leg_collision_model" params="name parent *origin">
+    <joint name="${parent}2${name}" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+      <xacro:insert_block name="origin" />
+    </joint>
+    <link name="${name}">
+      <inertial>
+        <mass value = "0.00001" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <inertia
+            ixx="0.000001" ixy="0.000000" ixz="0.0000000"
+            iyy="0.000001" iyz="0.000000" izz="0.000001"/>
+      </inertial>
+      <collision>
+        <geometry>
+          <box size="0.05 0.05 0.09"/>
+        </geometry>
+      </collision>
+    </link>
+  </xacro:macro>
+
+  <xacro:leg_collision_model name = "leg_collision_model1" parent = "leg1">
+    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+  </xacro:leg_collision_model>
+  <xacro:leg_collision_model name = "leg_collision_model2" parent = "leg2">
+    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+  </xacro:leg_collision_model>
+  <xacro:leg_collision_model name = "leg_collision_model3" parent = "leg3">
+    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+  </xacro:leg_collision_model>
+  <xacro:leg_collision_model name = "leg_collision_model4" parent = "leg4">
+    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+  </xacro:leg_collision_model>
+  <xacro:leg_collision_model name = "leg_collision_model5" parent = "link3">
+    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+  </xacro:leg_collision_model>
+
 
   <transmission name="rs_d435_servo_joint_tran">
     <type>transmission_interface/SimpleTransmission</type>
