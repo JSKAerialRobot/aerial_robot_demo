@@ -76,6 +76,7 @@ namespace edgetpu_roscpp
     bool subscribe_depth_image_;
     double ball_real_radius_;
     double ball_candidate_area_rate_;
+    double ball_radius_lpf_gain_;
     int h_min_;
     int h_max_;
     int s_min_;
