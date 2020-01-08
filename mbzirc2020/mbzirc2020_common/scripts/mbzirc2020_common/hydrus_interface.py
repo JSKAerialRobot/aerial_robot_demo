@@ -7,6 +7,7 @@ import ros_numpy as ros_np
 from tf.transformations import *
 from std_msgs.msg import Empty
 import math
+from aerial_robot_model.srv import AddExtraModule, AddExtraModuleRequest
 
 class HydrusInterface:
     def __init__(self):
@@ -19,6 +20,7 @@ class HydrusInterface:
         self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
+        self.add_extra_module_client_ = rospy.ServiceProxy('hydrusx/add_extra_module', AddExtraModule)
 
         self.joint_update_freq_ = rospy.get_param("~joint_update_freq", 20)
 
@@ -174,3 +176,19 @@ class HydrusInterface:
             rospy.sleep(0.1)
 
         return True
+
+    def addExtraModule(self, action, module_name, parent_link_name, transform, inertia):
+        try:
+            req = AddExtraModuleRequest()
+            if action == 'add':
+                req.action = AddExtraModuleRequest.ADD
+            elif action == 'remove':
+                req.action = AddExtraModuleRequest.REMOVE
+            req.module_name = module_name
+            req.parent_link_name = parent_link_name
+            req.transform = transform
+            req.inertia = inertia
+
+            self.add_extra_module_client_(req)
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
