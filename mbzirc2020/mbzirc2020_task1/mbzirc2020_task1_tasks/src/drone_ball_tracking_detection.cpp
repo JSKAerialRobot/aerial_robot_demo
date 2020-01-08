@@ -44,6 +44,7 @@ namespace edgetpu_roscpp
     pnh_->param("subscribe_depth_image", subscribe_depth_image_, false);
     pnh_->param("ball_candidate_area_rate", ball_candidate_area_rate_, 0.5); // rate of the lower part of the bounding box
     pnh_->param("ball_real_radius", ball_real_radius_, 0.075);
+    pnh_->param("ball_radius_lpf_gain", ball_radius_lpf_gain_, 0.2);
     pnh_->param("approx_contour_rate", approx_contour_rate_, 0.1);
 
     color_filter_reconfigure_server_ = boost::make_shared<dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig> >(*pnh_);
@@ -166,6 +167,7 @@ namespace edgetpu_roscpp
             target_contour = contour;
           }
       }
+    if(target_contour.size() == 0) return;
 
     /* estiamte the ball radius and center from contour */
 #if 0
@@ -186,7 +188,17 @@ namespace edgetpu_roscpp
     cv::drawContours(src_img, contours_for_drawing, 0, cv::Scalar(0, 255, 255), 2);
 #endif
 
-    cv::minEnclosingCircle(target_contour, ball_pixel_center_, ball_pixel_radius_);
+    float ball_pixel_radius;
+    cv::minEnclosingCircle(target_contour, ball_pixel_center_, ball_pixel_radius);
+    ball_pixel_center_.x += ball_search_area.xmin;
+    ball_pixel_center_.y += ball_search_area.ymin;
+    ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius);
+    cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius, cv::Scalar(255, 0, 0), 2);
+
+
+    /* low pass filter for radius */
+    if(ball_pixel_radius_ < 0) ball_pixel_radius_ = ball_pixel_radius;
+    else ball_pixel_radius_ = (1 - ball_radius_lpf_gain_) * ball_pixel_radius_ + ball_radius_lpf_gain_ * ball_pixel_radius;
 
 #if 0   // debug, check every pixel (HLS) of the ball
     cv::Mat temp_image;
@@ -230,11 +242,6 @@ namespace edgetpu_roscpp
 
     throw std::runtime_error("test");
 #endif
-
-    ball_pixel_center_.x += ball_search_area.xmin;
-    ball_pixel_center_.y += ball_search_area.ymin;
-    ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius_);
-    cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius_, cv::Scalar(255, 0, 0), 2);
 
     /* 3d position of ball */
     if(f_dash_ == 0) return;
