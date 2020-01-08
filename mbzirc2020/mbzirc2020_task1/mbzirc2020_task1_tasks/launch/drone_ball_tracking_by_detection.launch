@@ -1,0 +1,65 @@
+<launch>
+  <arg name= "need_nodelet_manager" default= "true"/>
+  <arg name= "image_view" default="false"/>
+  <arg name= "verbose" default="false"/>
+
+  <arg name= "camera_info_topic" default = "/camera/camera_info" />
+  <arg name= "color_image_topic" default = "/camera/image_raw" />
+  <arg name= "depth_image_topic" default = "/depth/image_raw" />
+  <arg name= "model_file"  default = "$(find edgetpu_roscpp)/test/data/drone_detection_edgetpu.tflite" />
+  <arg name= "coarse_detection_score_threshold" default = "0.3" />
+  <arg name= "refined_detection_score_threshold" default = "0.8" />
+  <arg name= "tracking_score_threshold" default = "0.7" />
+  <arg name= "expanding_bounding_box_aspect_ratio" default = "1.0" /> <!-- general SSD is 1:1 -->
+  <arg name= "expanding_bounding_box_rate" default = "2.0" />
+  <arg name= "larger_expanding_bounding_box_rate" default = "3.0" />
+
+  <arg name= "detection_check_frame_num" default = "10" />
+  <arg name= "lost_target_check_frame_num" default = "5" />
+  <arg name= "redetection_after_lost_target_frame_num" default = "30" /> <!-- this is associated with the frame rate (fps) -->
+
+  <arg name= "subscribe_depth_image" default ="false" />
+  <arg name= "quick_detection" default = "false" />
+  <arg name= "keep_aspect_ratio_in_inference" default = "false" />
+
+  <arg name="h_limit_max" default="80" doc="The maximum allowed field value Hue: yellow" />
+  <arg name="h_limit_min" default="40" doc="The minimum allowed field value Hue: yellow" />
+  <arg name="s_limit_max" default="255" doc="The maximum allowed field value Saturation" />
+  <arg name="s_limit_min" default="100" doc="The minimum allowed field value Saturation" />
+  <arg name="l_limit_max" default="255" doc="The maximum allowed field value Lightness" />
+  <arg name="l_limit_min" default="90" doc="The minimum allowed field value Lightness" />
+
+  <node pkg="nodelet" type="nodelet" name="detection_nodelet" args="manager" output="screen" if="$(arg need_nodelet_manager)"/>
+
+  <node pkg="nodelet" type="nodelet" name="drone_ball_detection_and_tracking"
+        args="load edgetpu_roscpp/DroneBallTrackingDetection detection_nodelet" output="screen">
+    <remap from="image" to="$(arg color_image_topic)" />
+    <remap from="color_image" to="$(arg color_image_topic)" />
+    <remap from="depth_image" to="$(arg depth_image_topic)" />
+    <remap from="color_camera_info" to="$(arg camera_info_topic)" />
+    <param name="model_file" value="$(arg model_file)"/>
+    <param name="coarse_detection_score_threshold" value="$(arg coarse_detection_score_threshold)"/>
+    <param name="refined_detection_score_threshold" value="$(arg refined_detection_score_threshold)"/>
+    <param name="tracking_score_threshold" value="$(arg tracking_score_threshold)"/>
+    <param name="expanding_bounding_box_aspect_ratio" value="$(arg expanding_bounding_box_aspect_ratio)"/>
+    <param name="expanding_bounding_box_rate" value="$(arg expanding_bounding_box_rate)"/>
+    <param name="larger_expanding_bounding_box_rate" value="$(arg larger_expanding_bounding_box_rate)"/>
+    <param name="detection_check_frame_num" value="$(arg detection_check_frame_num)"/>
+    <param name="lost_target_check_frame_num" value="$(arg lost_target_check_frame_num)"/>
+    <param name="redetection_after_lost_target_frame_num" value="$(arg redetection_after_lost_target_frame_num)"/>
+
+    <param name="subscribe_depth_image" value="$(arg subscribe_depth_image)"/>
+    <param name="quick_detection" value="$(arg quick_detection)"/>
+    <param name="keep_aspect_ratio_in_inference" value="$(arg keep_aspect_ratio_in_inference)"/>
+    <param name="image_view" value="$(arg image_view)"/>
+    <param name="verbose" value="$(arg verbose)"/>
+
+    <param name="h_limit_max" value="$(arg h_limit_max)" />
+    <param name="h_limit_min" value="$(arg h_limit_min)" />
+    <param name="s_limit_max" value="$(arg s_limit_max)" />
+    <param name="s_limit_min" value="$(arg s_limit_min)" />
+    <param name="l_limit_max" value="$(arg l_limit_max)" />
+    <param name="l_limit_min" value="$(arg l_limit_min)" />
+  </node>
+
+</launch>

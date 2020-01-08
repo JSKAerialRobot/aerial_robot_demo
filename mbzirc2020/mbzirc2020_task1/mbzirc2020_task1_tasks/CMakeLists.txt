@@ -1,37 +1,27 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(mbzirc2020_task1_tasks)
 
-## Add support for C++11, supported in ROS Kinetic and newer
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  nav_msgs
-  sensor_msgs
+  edgetpu_roscpp
+  message_filters
   message_generation
   message_runtime
+  nav_msgs
+  roscpp
+  sensor_msgs
+  std_msgs
   )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 find_package(Eigen3 REQUIRED)
-# Eigen requires optimization to get good performance
-# http://eigen.tuxfamily.org/index.php?title=FAQ#Optimization
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
-message(STATUS "CMAKE_BUILD_TYPE:               ${CMAKE_BUILD_TYPE}")
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE:        ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "CMAKE_CXX_FLAGS_RELWITHDEBINFO: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-message(STATUS "CMAKE_CXX_FLAGS_MINSIZEREL:     ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG:          ${CMAKE_CXX_FLAGS_DEBUG}")
 
-# Depend on system install of Gazebo and SDFormat
 find_package(gazebo REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
@@ -64,6 +54,10 @@ catkin_package(
   DEPENDS EIGEN3
   )
 
+# download detection models
+add_custom_target(install_detection_models ALL
+  COMMAND ${PROJECT_SOURCE_DIR}/script/install_detection_models.py)
+
 add_library(motion_single_primitive src/MotionSinglePrimitive.cpp)
 target_link_libraries(motion_single_primitive ${catkin_LIBRARIES})
 
@@ -81,3 +75,7 @@ target_link_libraries(trajectory_predictor_node trajectory_predictor ${catkin_LI
 
 add_executable(trajectory_tracker_node src/trajectory_tracker_node.cpp)
 target_link_libraries(trajectory_tracker_node trajectory_tracker ${catkin_LIBRARIES})
+
+# Detection
+add_library(drone_ball_tracking_detection SHARED src/drone_ball_tracking_detection.cpp)
+target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
