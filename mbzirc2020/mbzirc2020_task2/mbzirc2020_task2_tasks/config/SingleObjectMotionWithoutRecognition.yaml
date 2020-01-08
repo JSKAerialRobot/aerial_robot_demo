@@ -1,0 +1,6 @@
+grasp_pos: [-0.85, 0, 0.09, 0.785] #x,y,z,yaw
+grasp_z_offset: 0.5
+grasp_joint_angle: [1.4, 1.4]
+place_pos: [6.0, 0, 1.8, 3.96] #x,y,z,yaw
+place_z_offset: 0.5
+ungrasp_joint_angle: [0.9, 0.9]
