@@ -7,7 +7,7 @@
   <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "0" with_leg="0"  />
 
   <!-- special battery arrangement -->
-  <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
+  <xacro:extra_module name = "bat1" parent = "link2" visible = "1"
                       model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
@@ -19,7 +19,7 @@
     </inertial>
   </xacro:extra_module>
 
-  <xacro:extra_module name = "bat2" parent = "link4" visible = "1"
+  <xacro:extra_module name = "bat2" parent = "link3" visible = "1"
                       model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae" scale="0.001">
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
