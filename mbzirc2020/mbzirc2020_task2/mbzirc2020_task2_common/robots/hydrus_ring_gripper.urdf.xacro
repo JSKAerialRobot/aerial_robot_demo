@@ -127,11 +127,11 @@
 
   <link name="ring_gripper_left">
     <inertial>
-      <mass value = "0.0733147" />
-      <origin xyz="0.0000000 0.1954388 0.0039469" rpy="0 0 0"/>
+      <mass value = "0.086507" />
+      <origin xyz="0.0000000 0.196326 -0.020803" rpy="0 0 0"/>
       <inertia
-          ixx="0.0000290" ixy="0.0000000" ixz="0.0000000"
-          iyy="0.0002193" iyz="0.0000001" izz="0.0002130"/>
+          ixx="0.000072" ixy="0.0000000" ixz="0.0000000"
+          iyy="0.000274" iyz="-0.000013" izz="0.000226"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -155,11 +155,11 @@
 
   <link name="ring_gripper_right">
     <inertial>
-      <mass value = "0.0733147" />
-      <origin xyz="0.0000000 0.1954388 0.0039469" rpy="0 0 0"/>
+      <mass value = "0.086507" />
+      <origin xyz="0.0000000 0.196326 -0.020803" rpy="0 0 0"/>
       <inertia
-          ixx="0.0000290" ixy="0.0000000" ixz="0.0000000"
-          iyy="0.0002193" iyz="0.0000001" izz="0.0002130"/>
+          ixx="0.000072" ixy="0.0000000" ixz="0.0000000"
+          iyy="0.000274" iyz="-0.000013" izz="0.000226"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
