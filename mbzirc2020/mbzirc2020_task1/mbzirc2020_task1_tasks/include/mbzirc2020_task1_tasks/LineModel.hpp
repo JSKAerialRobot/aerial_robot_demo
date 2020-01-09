@@ -20,7 +20,37 @@ public:
 		m_Point2D[1] = y;
 	};
 
+  Point2D()
+  {
+    for (int i = 0; i < 2; ++i)
+      m_Point2D[i] = 0;
+  }
+
 	Vector2VP m_Point2D;
+
+  Point2D operator-(Point2D const &pt1)
+  {
+    Point2D pt;
+    for (int i = 0; i < 2; ++i)
+      pt.m_Point2D[i] = m_Point2D[i] - pt1.m_Point2D[i];
+    return pt;
+  }
+
+  Point2D operator+(Point2D const &pt1)
+  {
+    Point2D pt;
+    for (int i = 0; i < 2; ++i)
+      pt.m_Point2D[i] = m_Point2D[i] + pt1.m_Point2D[i];
+    return pt;
+  }
+
+  Point2D operator*(GRANSAC::VPFloat const &factor)
+  {
+    Point2D pt;
+    for (int i = 0; i < 2; ++i)
+      pt.m_Point2D[i] = m_Point2D[i] * factor;
+    return pt;
+  }
 };
 
 class Line2DModel

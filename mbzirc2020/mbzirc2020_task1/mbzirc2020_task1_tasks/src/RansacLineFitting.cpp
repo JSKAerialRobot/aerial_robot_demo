@@ -6,13 +6,16 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
 
   std::string target_pt_sub_topic_name;
   nhp_.param("target_point_sub_topic_name", target_pt_sub_topic_name, std::string("/treasure/point_detected"));
-  nhp_.param("cand_points_max_size", cand_points_max_size_, 50);
+  nhp_.param("cand_points2d_max_size", cand_points2d_max_size_, 50);
+  nhp_.param("cand_points3d_max_size", cand_points3d_max_size_, 50);
   nhp_.param("ransac_visualization_flag", ransac_vis_flag_, true);
+  nhp_.param("ransac_3d_mode", ransac_3d_mode_, true);
 
   lpf_z_ = -1;
   lpf_z_gain_ = 0.8;
 
-  estimator_2d_.Initialize(1.4, 100); // Threshold, iterations
+  estimator_2d_.Initialize(0.1, 100); // Threshold, iterations
+  estimator_3d_.Initialize(0.1, 100); // Threshold, iterations
 
   target_pt_sub_ = nh_.subscribe<geometry_msgs::PointStamped>(target_pt_sub_topic_name, 1, &RansacLineFitting::targetPointCallback, this, ros::TransportHints().tcpNoDelay());
 
@@ -21,22 +24,37 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
 }
 
 void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg){
-  std::shared_ptr<GRANSAC::AbstractParameter> CandPt = std::make_shared<Point2D>(msg->point.x, msg->point.y);
-  cand_points_.push_back(CandPt);
+  std::shared_ptr<GRANSAC::AbstractParameter> CandPt2d = std::make_shared<Point2D>(msg->point.x, msg->point.y);
+  cand_points2d_.push_back(CandPt2d);
+  std::shared_ptr<GRANSAC::AbstractParameter> CandPt3d = std::make_shared<Point3D>(msg->point.x, msg->point.y, msg->point.z);
+  cand_points3d_.push_back(CandPt3d);
   if (lpf_z_ < 0.0) // not initialize
     lpf_z_ = msg->point.z;
   else
     lpf_z_ = lpf_z_ * lpf_z_gain_ + (1 - lpf_z_gain_) * msg->point.z; // low-pass filter
-  if (cand_points_.size() > cand_points_max_size_){
-    cand_points_.erase(cand_points_.begin());
+
+  if (cand_points3d_.size() > cand_points3d_max_size_){
+    while (cand_points3d_.size() > cand_points3d_max_size_)
+      cand_points3d_.erase(cand_points3d_.begin());
     // todo: update trigger by time event or subscribe
-    update();
+    if (ransac_3d_mode_)
+      update();
+  }
+  if (cand_points2d_.size() > cand_points2d_max_size_){
+    while (cand_points2d_.size() > cand_points2d_max_size_)
+      cand_points2d_.erase(cand_points2d_.begin());
+    // todo: update trigger by time event or subscribe
+    if (!ransac_3d_mode_)
+      update();
   }
 }
 
 void RansacLineFitting::update(){
   ROS_INFO("Estimator.Initialize");
-  estimator_2d_.Estimate(cand_points_);
+  if (ransac_3d_mode_)
+    estimator_3d_.Estimate(cand_points3d_);
+  else
+    estimator_2d_.Estimate(cand_points2d_);
   ROS_INFO("Estimator.Estimate");
 
   visualizeRansacLine();
@@ -45,8 +63,6 @@ void RansacLineFitting::update(){
 }
 
 void RansacLineFitting::visualizeRansacLine(){
-  auto BestLine = estimator_2d_.GetBestModel();
-
   visualization_msgs::Marker line_strip;
   line_strip.header.frame_id = "world";
   line_strip.header.stamp = ros::Time::now();
@@ -64,30 +80,55 @@ void RansacLineFitting::visualizeRansacLine(){
   line_strip.color.a = 1.0;
 
   // Create the vertices for the points and lines
-  std::vector<geometry_msgs::Point> ransac_end_points;
-  for (uint32_t i = 0; i < 2; ++i)
-    {
-      auto BestLinePt = std::dynamic_pointer_cast<Point2D>(BestLine->GetModelParams()[i]);
-      geometry_msgs::Point p;
-      p.x = BestLinePt->m_Point2D[0];
-      p.y = BestLinePt->m_Point2D[1];
-      p.z = lpf_z_;
-      ransac_end_points.push_back(p);
+  double predict_factor = 1.5; // predict_horizon = history_horizon x predict_factor
+  if (ransac_3d_mode_){
+    auto ransac_start_pt = std::dynamic_pointer_cast<Point3D>(estimator_3d_.GetBestModel()->GetModelParams()[0]);
+    auto ransac_end_pt = std::dynamic_pointer_cast<Point3D>(estimator_3d_.GetBestModel()->GetModelParams()[1]);
+    Point3D slope = (*ransac_end_pt) - (*ransac_start_pt);
+    int rate_id = 0; // chosen the slope with large step to reduce errors
+    for (int i = 1; i < 3; ++i){
+      if (fabs(slope.m_Point3D[i]) > fabs(slope.m_Point3D[rate_id]))
+        rate_id = i;
     }
-  double slope_rate = (ransac_end_points[1].y - ransac_end_points[0].y) / (ransac_end_points[1].x - ransac_end_points[0].x);
-  auto start_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points_[0]);
-  auto end_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points_[cand_points_max_size_ - 1]);
-  for (int i = 0; i < 2; ++i){
+    Point3D line_start_pt = (*ransac_start_pt) +
+      slope * ((std::dynamic_pointer_cast<Point3D>(cand_points3d_[rate_id])->m_Point3D[rate_id] - ransac_start_pt->m_Point3D[rate_id]) / slope.m_Point3D[rate_id]);
+    Point3D line_end_pt = (*ransac_end_pt) +
+      slope * ((std::dynamic_pointer_cast<Point3D>(cand_points3d_[cand_points3d_max_size_ - 1])->m_Point3D[rate_id] - ransac_end_pt->m_Point3D[rate_id]
+                + predict_factor * (std::dynamic_pointer_cast<Point3D>(cand_points3d_[cand_points3d_max_size_ - 1])->m_Point3D[rate_id] - std::dynamic_pointer_cast<Point3D>(cand_points3d_[rate_id])->m_Point3D[rate_id])
+                ) / slope.m_Point3D[rate_id]);
     geometry_msgs::Point p;
-    if (i == 0)
-      p.x = start_cand_pt->m_Point2D[0];
-    else
-      p.x = (end_cand_pt->m_Point2D[0] - start_cand_pt->m_Point2D[0]) * 2.0 + end_cand_pt->m_Point2D[0];
-    p.y = ransac_end_points[i].y + slope_rate * (p.x - ransac_end_points[i].x);
+    p.x = line_start_pt.m_Point3D[0];
+    p.y = line_start_pt.m_Point3D[1];
+    p.z = line_start_pt.m_Point3D[2];
+    line_strip.points.push_back(p);
+    p.x = line_end_pt.m_Point3D[0];
+    p.y = line_end_pt.m_Point3D[1];
+    p.z = line_end_pt.m_Point3D[2];
+    line_strip.points.push_back(p);
+  }
+  else{
+    auto ransac_start_pt = std::dynamic_pointer_cast<Point2D>(estimator_2d_.GetBestModel()->GetModelParams()[0]);
+    auto ransac_end_pt = std::dynamic_pointer_cast<Point2D>(estimator_2d_.GetBestModel()->GetModelParams()[1]);
+    Point2D slope = (*ransac_end_pt) - (*ransac_start_pt);
+    int rate_id = 0; // chosen the slope with large step to reduce errors
+    if (fabs(slope.m_Point2D[1]) > fabs(slope.m_Point2D[rate_id]))
+      rate_id = 1;
+    Point2D line_start_pt = (*ransac_start_pt) +
+      slope * ((std::dynamic_pointer_cast<Point2D>(cand_points2d_[rate_id])->m_Point2D[rate_id] - ransac_start_pt->m_Point2D[rate_id]) / slope.m_Point2D[rate_id]);
+    Point2D line_end_pt = (*ransac_end_pt) +
+      slope * ((std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_max_size_ - 1])->m_Point2D[rate_id] - ransac_end_pt->m_Point2D[rate_id]
+                + predict_factor * (std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_max_size_ - 1])->m_Point2D[rate_id] - std::dynamic_pointer_cast<Point2D>(cand_points2d_[rate_id])->m_Point2D[rate_id])
+                ) / slope.m_Point2D[rate_id]);
+    geometry_msgs::Point p;
+    p.x = line_start_pt.m_Point2D[0];
+    p.y = line_start_pt.m_Point2D[1];
+    p.z = lpf_z_;
+    line_strip.points.push_back(p);
+    p.x = line_end_pt.m_Point2D[0];
+    p.y = line_end_pt.m_Point2D[1];
     p.z = lpf_z_;
     line_strip.points.push_back(p);
   }
-
   fitted_line_pub_.publish(line_strip);
 }
 
@@ -111,31 +152,63 @@ void RansacLineFitting::visualizeRansacInliers(){
   pt.color.r = 1.0;
   pt.color.a = 0.4;
 
-  auto start_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points_[0]);
-  auto end_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points_[cand_points_max_size_ - 1]);
-  for (int i = 0; i < cand_points_max_size_; ++i){
-    auto pt_2d = std::dynamic_pointer_cast<Point2D>(cand_points_[i]);
-    pt.pose.position.x = pt_2d->m_Point2D[0];
-    pt.pose.position.y = pt_2d->m_Point2D[1];
-    pt.pose.position.z = lpf_z_; // todo
-    ransac_points.markers.push_back(pt);
-    pt.id += 1;
+  if (ransac_3d_mode_){
+    auto start_cand_pt = std::dynamic_pointer_cast<Point3D>(cand_points3d_[0]);
+    auto end_cand_pt = std::dynamic_pointer_cast<Point3D>(cand_points3d_[cand_points3d_max_size_ - 1]);
+    for (int i = 0; i < cand_points3d_max_size_; ++i){
+      auto pt_3d = std::dynamic_pointer_cast<Point3D>(cand_points3d_[i]);
+      pt.pose.position.x = pt_3d->m_Point3D[0];
+      pt.pose.position.y = pt_3d->m_Point3D[1];
+      pt.pose.position.z = pt_3d->m_Point3D[2];
+      ransac_points.markers.push_back(pt);
+      pt.id += 1;
+    }
+  }
+  else{
+    auto start_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[0]);
+    auto end_cand_pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_max_size_ - 1]);
+    for (int i = 0; i < cand_points2d_max_size_; ++i){
+      auto pt_2d = std::dynamic_pointer_cast<Point2D>(cand_points2d_[i]);
+      pt.pose.position.x = pt_2d->m_Point2D[0];
+      pt.pose.position.y = pt_2d->m_Point2D[1];
+      pt.pose.position.z = lpf_z_; // todo
+      ransac_points.markers.push_back(pt);
+      pt.id += 1;
+    }
   }
 
   pt.color.r = 0.0;
   pt.color.b = 1.0;
-  auto BestInliers = estimator_2d_.GetBestInliers();
-  if (BestInliers.size() > 0)
-    {
-      for (auto& Inlier : BestInliers)
-        {
-          auto RPt = std::dynamic_pointer_cast<Point2D>(Inlier);
-          pt.pose.position.x = RPt->m_Point2D[0];
-          pt.pose.position.y = RPt->m_Point2D[1];
-          pt.pose.position.z = lpf_z_; // todo
-          ransac_points.markers.push_back(pt);
-          pt.id += 1;
-        }
-    }
+  pt.color.a = 1.0;
+  if (ransac_3d_mode_){
+    auto BestInliers = estimator_3d_.GetBestInliers();
+    if (BestInliers.size() > 0)
+      {
+        for (auto& Inlier : BestInliers)
+          {
+            auto RPt = std::dynamic_pointer_cast<Point3D>(Inlier);
+            pt.pose.position.x = RPt->m_Point3D[0];
+            pt.pose.position.y = RPt->m_Point3D[1];
+            pt.pose.position.z = RPt->m_Point3D[2];
+            ransac_points.markers.push_back(pt);
+            pt.id += 1;
+          }
+      }
+  }
+  else{
+    auto BestInliers = estimator_2d_.GetBestInliers();
+    if (BestInliers.size() > 0)
+      {
+        for (auto& Inlier : BestInliers)
+          {
+            auto RPt = std::dynamic_pointer_cast<Point2D>(Inlier);
+            pt.pose.position.x = RPt->m_Point2D[0];
+            pt.pose.position.y = RPt->m_Point2D[1];
+            pt.pose.position.z = lpf_z_; // todo
+            ransac_points.markers.push_back(pt);
+            pt.id += 1;
+          }
+      }
+  }
   fitted_points_pub_.publish(ransac_points);
 }
