@@ -1,5 +1,5 @@
 #include <mbzirc2020_task1_tasks/GRANSAC.hpp>
-#include <mbzirc2020_task1_tasks/LineModel.hpp>
+#include <mbzirc2020_task1_tasks/Line2DModel.hpp>
 #include <mbzirc2020_task1_tasks/Line3DModel.hpp>
 
 #include <cmath>
