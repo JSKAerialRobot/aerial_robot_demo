@@ -140,15 +140,9 @@
   </gazebo>
   
   
-  <!-- gazebo grasp plugin -->
+  #####gazebo grasp plugin#####
   <gazebo>
     <plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
-      <!--
-          NOTE: The finger tips are linked together with the links before, because they are connected with a
-          fixed joint. Gazebo makes one whole link out of this automatically. When listing the 9\
-          _*_tip links
-          here, they won't be found in the SDF.
-      -->
       <arm>
         <arm_name>hydrusx_arm</arm_name>
         <palm_link>link2</palm_link>

@@ -146,6 +146,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="ring_gripper_left">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
 
   <joint name="link12ring_gripper_right" type="fixed">
     <parent link="link4"/>
@@ -174,6 +178,10 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="ring_gripper_right">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
 
 
   ##### leg #####
@@ -207,26 +215,26 @@
       </inertial>
       <collision>
         <geometry>
-          <box size="0.05 0.05 0.09"/>
+          <box size="0.05 0.05 ${leg_collision_model_height}"/>
         </geometry>
       </collision>
     </link>
   </xacro:macro>
 
   <xacro:leg_collision_model name = "leg_collision_model1" parent = "leg1">
-    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+    <origin xyz="0 0 ${-leg_collision_model_height / 2}" rpy="0 0 0"/>
   </xacro:leg_collision_model>
   <xacro:leg_collision_model name = "leg_collision_model2" parent = "leg2">
-    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+    <origin xyz="0 0 ${-leg_collision_model_height / 2}" rpy="0 0 0"/>
   </xacro:leg_collision_model>
   <xacro:leg_collision_model name = "leg_collision_model3" parent = "leg3">
-    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+    <origin xyz="0 0 ${-leg_collision_model_height / 2}" rpy="0 0 0"/>
   </xacro:leg_collision_model>
   <xacro:leg_collision_model name = "leg_collision_model4" parent = "leg4">
-    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+    <origin xyz="0 0 ${-leg_collision_model_height / 2}" rpy="0 0 0"/>
   </xacro:leg_collision_model>
   <xacro:leg_collision_model name = "leg_collision_model5" parent = "link3">
-    <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+    <origin xyz="0 0 ${-leg_collision_model_height / 2}" rpy="0 0 0"/>
   </xacro:leg_collision_model>
 
 
