@@ -8,6 +8,7 @@ from tf.transformations import *
 from std_msgs.msg import Empty
 import math
 from aerial_robot_model.srv import AddExtraModule, AddExtraModuleRequest
+from std_msgs.msg import UInt8
 
 class HydrusInterface:
     def __init__(self):
@@ -21,12 +22,23 @@ class HydrusInterface:
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
         self.add_extra_module_client_ = rospy.ServiceProxy('hydrusx/add_extra_module', AddExtraModule)
+        self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
 
         self.joint_update_freq_ = rospy.get_param("~joint_update_freq", 20)
 
         self.joint_state_ = None
         self.cog_odom_ = None
         self.baselink_odom_ = None
+        self.flight_state_ = None
+
+        #flight state
+        self.ARM_OFF_STATE = 0
+        self.START_STATE = 1
+        self.ARM_ON_STATE = 2
+        self.TAKEOFF_STATE = 3
+        self.LAND_STATE = 4
+        self.HOVER_STATE = 5
+        self.STOP_STATE = 6
 
     def jointStateCallback(self, msg):
         self.joint_state_ = msg
@@ -36,6 +48,9 @@ class HydrusInterface:
 
     def baselinkOdomCallback(self, msg):
         self.baselink_odom_ = msg
+
+    def flightStateCallback(self, msg):
+        self.flight_state_ = msg.data
 
     #time [ms]
     def setJointAngle(self, target_joint_state, time = 1000):
@@ -108,6 +123,9 @@ class HydrusInterface:
 
     def getCogLinearVel(self):
         return ros_np.numpify(self.cog_odom_.twist.twist.linear)
+
+    def getFlightState(self):
+        return self.flight_state_
 
     #navigation
     def noNavigation(self):
