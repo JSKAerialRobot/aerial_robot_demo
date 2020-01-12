@@ -1,8 +1,0 @@
-<launch>
-  <node name="single_object_motion" type="task2_single_object_motion_without_recognition.py" pkg="mbzirc2020_task2_tasks"
-        output="screen">
-    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/SingleObjectMotionWithoutRecognition.yaml"/>
-  </node>
-
-  <node name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
-</launch>
