@@ -1,7 +1,7 @@
 <launch>
   <!-- default for upboard -->
   <arg name="spi_id" default="2.0" />
-  <arg name="i2c_id" default="1" />
+  <arg name="i2c_id" default="5" />
   <arg name="spi_speed" default="10000000" />
   <arg name="camera_name" default="lepton_camera"/>
   <arg name="output_screen" default="false"/>
@@ -45,5 +45,6 @@
     <param name="contour_area_margin" value="0.0"/>
     <param name="contour_area_min_thre" value="0.01"/>
     <param name="debug_view" value="false"/>
-  </node>
+    </node>
+
 </launch>
