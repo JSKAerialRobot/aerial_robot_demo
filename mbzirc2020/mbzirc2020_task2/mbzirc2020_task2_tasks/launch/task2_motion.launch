@@ -1,0 +1,8 @@
+<launch>
+  <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
+        output="screen">
+    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Task2Motion.yaml"/>
+  </node>
+
+  <node name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
+</launch>
