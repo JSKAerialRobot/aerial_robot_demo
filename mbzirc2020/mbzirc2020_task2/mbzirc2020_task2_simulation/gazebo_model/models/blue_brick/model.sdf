@@ -24,10 +24,10 @@
         </geometry>
         <max_contacts>10</max_contacts>
         <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <bounce/>
+          <ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
+          </ode>
         </surface>
       </collision>
       <visual name='visual'>
@@ -49,8 +49,4 @@
       <gravity>1</gravity>
     </link>
   </model>
-  <gazebo reference='object'>
-    <mu1>0.5</mu1>
-    <mu2>0.5</mu2>
-  </gazebo>
 </sdf>
