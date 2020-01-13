@@ -18,4 +18,19 @@
     <arg name="launch_gazebo" value="false" />
   </include>
 
+  ######### realsense d435 ###########
+  <arg name="resolution_width" default="1280" />
+  <arg name="resolution_height" default="720" />
+  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" if="$(arg real_machine)">
+    <arg name="camera" value="rs_d435" />
+    <arg name="color_width" value="$(arg resolution_width)" />
+    <arg name="color_height" value="$(arg resolution_height)" />
+    <arg name="infra_width" value="$(arg resolution_width)" />
+    <arg name="infra_height" value="$(arg resolution_height)" />
+    <arg name="depth_width" value="$(arg resolution_width)" />
+    <arg name="depth_height" value="$(arg resolution_height)" />
+  </include>
+  <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="10" />
+  <param name="/rs_d435/color/image_rect_color/compressed/jpeg_quality" value="10" />
+
 </launch>
