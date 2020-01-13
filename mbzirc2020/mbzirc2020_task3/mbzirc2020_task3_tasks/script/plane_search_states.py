@@ -43,10 +43,11 @@ class RectangularGridSearchState(smach.State):
         # retrieve parameters
         self.target_topic_name = rospy.get_param('~target_topic_name', '/target_object/pos')
         self.control_rate = rospy.get_param('~control_rate', 5.0)
-        self.area_corners = rospy.get_param('~area_corners', [[0,0],[2,2]])
+        self.area_corners = rospy.get_param('~area_corners', [[-5,5],[5,5]])
         self.search_grid_size = rospy.get_param('~search_grid_size', 1.0)
         self.reach_margin = rospy.get_param('~reach_margin', 0.2)
         self.search_height = rospy.get_param('~search_height', 3.0)
+        self.search_mode = rospy.get_param('~search_mode', 1)
 
         self.target_pos = None # set when target_pos topic recieved
 
@@ -58,15 +59,28 @@ class RectangularGridSearchState(smach.State):
         self.target_pos_sub_ = rospy.Subscriber(self.target_topic_name, Vector3Stamped, self.targetPositionCallback)
         self.target_pos_flag = False
 
-        self.searched_grid = np.zeros((int((self.area_corners[1][0]-self.area_corners[0][0])/self.search_grid_size), int((self.area_corners[1][1]-self.area_corners[0][1])/self.search_grid_size)), dtype=bool)
+        if self.search_mode == 0:
+            self.searched_grid = np.zeros((int((self.area_corners[1][0]-self.area_corners[0][0])/self.search_grid_size), int((self.area_corners[1][1]-self.area_corners[0][1])/self.search_grid_size)), dtype=bool)
+            self.start_idx = [0, 0]
+
+        elif self.search_mode == 1:
+            self.searched_grid = np.zeros((int(2*int(((self.area_corners[1][0]-self.area_corners[0][0])/(2*self.search_grid_size)))+1), int(2*int(((self.area_corners[1][1]-self.area_corners[0][1])/(2*self.search_grid_size)))+1)), dtype=bool)
+            self.start_idx = [int(((self.area_corners[1][0]-self.area_corners[0][0])/(2*self.search_grid_size))), int(((self.area_corners[1][1]-self.area_corners[0][1])/(2*self.search_grid_size)))]
+
         self.current_grid_idx = [0,0]
-        self.x_move_dir = 1
+        self.x_move_dir = 0
         self.y_move_dir = 0
+        self.thresh_num = 1
+        self.count = 0
 
     def grid_pos(self, grid_idx):
         """return position from grid index"""
         # TODO check valid range
-        start_pos = self.area_corners[0]
+        if self.search_mode == 0:
+            start_pos = self.area_corners[0]
+        elif self.search_mode == 1:
+            start_pos = [(self.area_corners[1][0]-self.area_corners[0][0])/2, (self.area_corners[1][1]-self.area_corners[0][1])/2]
+
         return (start_pos[0]+self.search_grid_size*grid_idx[0],
                 start_pos[1]+self.search_grid_size*grid_idx[1])
 
@@ -86,21 +100,43 @@ class RectangularGridSearchState(smach.State):
     def move_to_next_idx(self):
         self.current_grid_idx[0] = self.current_grid_idx[0] + self.x_move_dir
         self.current_grid_idx[1] = self.current_grid_idx[1] + self.y_move_dir
-        # TODO make it more efficient
-        if self.current_grid_idx[0] == self.searched_grid.shape[0]-1:
-            if self.y_move_dir == 0 and self.x_move_dir == 1:
-                self.x_move_dir = 0
-                self.y_move_dir = 1
-            else:
-                self.x_move_dir = -1
+
+
+        # conventional serch mode
+        if self.search_mode == 0:
+            # TODO make it more efficient
+            if self.current_grid_idx[0] == self.searched_grid.shape[0]-1:
+                if self.y_move_dir == 0 and self.x_move_dir == 1:
+                    self.x_move_dir = 0
+                    self.y_move_dir = 1
+                else:
+                    self.x_move_dir = -1
+                    self.y_move_dir = 0
+            elif self.current_grid_idx[0] == 0:
+                if self.y_move_dir == 0 and self.x_move_dir == -1:
+                    self.x_move_dir = 0
+                    self.y_move_dir = 1
+                else:
+                    self.x_move_dir = 1
+                    self.y_move_dir = 0
+
+
+        # vortex serch mode
+        if self.search_mode == 1:
+            if self.count < self.thresh_num:
+                self.x_move_dir = (-1)**(self.thresh_num+1)
                 self.y_move_dir = 0
-        elif self.current_grid_idx[0] == 0:
-            if self.y_move_dir == 0 and self.x_move_dir == -1:
+
+            elif self.count >= self.thresh_num and self.count < 2*self.thresh_num:
                 self.x_move_dir = 0
-                self.y_move_dir = 1
-            else:
-                self.x_move_dir = 1
-                self.y_move_dir = 0
+                self.y_move_dir = (-1)**(self.thresh_num+1)
+
+            self.count+=1
+
+            if self.count == 2*self.thresh_num:
+                self.count = 0
+                self.thresh_num += 1
+
         return
 
     def targetPositionCallback(self, msg):
@@ -125,7 +161,7 @@ class RectangularGridSearchState(smach.State):
             if self.is_grid_full():
                 return 'not_found'
             else:
-                self.searched_grid[self.current_grid_idx[0],self.current_grid_idx[1]] = True
+                self.searched_grid[self.start_idx[0]+self.current_grid_idx[0],self.start_idx[1]+self.current_grid_idx[1]] = True
                 self.move_to_next_idx()
 
         rospy.sleep(1/self.control_rate)

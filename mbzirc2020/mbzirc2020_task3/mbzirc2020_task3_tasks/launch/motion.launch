@@ -7,8 +7,9 @@
   <arg name="contour_area_min_thre"  default= "0.1" />
   <arg name="target_tf_name" default="target_object"/>
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
-  <arg name="horizontal_vio" default="False" />
+  <arg name="area_mode" default="indoor" />
   <arg name="headless" default="True" />
+  <arg name="horizontal_vio" value="False" />
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
@@ -48,7 +49,6 @@
   <!-- <node pkg="mbzirc2020_task3_tasks" type="motion.py" name="task3_motion_planner" output="screen"> -->
   <node pkg="mbzirc2020_task3_tasks" type="find_ground_fire.py" name="task3_motion_planner" output="screen">
     <param name="target_tf_name" value="$(arg target_tf_name)"/>
-    <rosparam file="$(find mbzirc2020_task3_tasks)/config/motion_indoor.yaml" command="load" if="$(arg horizontal_vio)"/>
-    <rosparam file="$(find mbzirc2020_task3_tasks)/config/motion_outdoor.yaml" command="load" unless="$(arg horizontal_vio)"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/motion_$(arg area_mode).yaml" command="load"/>
   </node>
 </launch>
