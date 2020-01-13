@@ -6,6 +6,10 @@
   <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
   <arg name="headless" default="True" />
+  <arg name="lanch_gazebo" default="False" />
+  <arg name="monocular_camera" default="True" />
+  <arg name="camera_height" default="0" />
+  <arg name="camera_name" default="elp_1080P_fov80" />
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
@@ -15,22 +19,46 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="task" value="1" />
-    <arg name="launch_gazebo" value="false" />
+    <arg name="launch_gazebo" value="${arg launch_gazebo}" />
   </include>
 
-  ######### realsense d435 ###########
-  <arg name="resolution_width" default="1280" />
-  <arg name="resolution_height" default="720" />
-  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" if="$(arg real_machine)">
-    <arg name="camera" value="rs_d435" />
-    <arg name="color_width" value="$(arg resolution_width)" />
-    <arg name="color_height" value="$(arg resolution_height)" />
-    <arg name="infra_width" value="$(arg resolution_width)" />
-    <arg name="infra_height" value="$(arg resolution_height)" />
-    <arg name="depth_width" value="$(arg resolution_width)" />
-    <arg name="depth_height" value="$(arg resolution_height)" />
-  </include>
-  <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="10" />
-  <param name="/rs_d435/color/image_rect_color/compressed/jpeg_quality" value="10" />
+  <group if="$(arg real_machine)">
+    ######### monocular camera (ELP-SUSB1080P) ######
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" if="$(arg monocular_camera)" >
+      <param name="video_device" value="/dev/video0" />
+      <param name="image_width" value="1920" />
+      <param name="image_height" value="1080" />
+      <param name="pixel_format" value="yuyv" />
+      <param name="camera_frame_id" value="color_camera_optical_frame" />
+      <param name="camera_info_url" value="file://$(find mbzirc2020_task1_common)/config/camera/$(arg camera_name).yaml" />
+      <param name="camera_name" value="$(arg camera_name)" />
+      <param name="io_method" value="mmap"/>
+      <param name="image_raw/compressed/jpeg_quality" value="10" />
+    </node>
+
+    ######### realsense d435 ###########
+    <arg name="resolution_width" default="1280" />
+    <arg name="resolution_height" default="720" />
+    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" unless="$(arg monocular_camera)">
+      <arg name="camera" value="rs_d435" />
+      <arg name="color_width" value="$(arg resolution_width)" />
+      <arg name="color_height" value="$(arg resolution_height)" />
+      <arg name="infra_width" value="$(arg resolution_width)" />
+      <arg name="infra_height" value="$(arg resolution_height)" />
+      <arg name="depth_width" value="$(arg resolution_width)" />
+      <arg name="depth_height" value="$(arg resolution_height)" />
+    </include>
+    <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="10" />
+    <param name="/rs_d435/color/image_rect_color/compressed/jpeg_quality" value="10" />
+  </group>
+
+  <!-- override robot model -->
+  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.urdf.xacro" unless="$(arg simulation)" />
+  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro" if="$(arg simulation)" />
+
+  <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
+  <group ns="hydrusx" >
+    <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
+  </group >
 
 </launch>
