@@ -66,7 +66,7 @@
       <xacro:extra_module name = "color_camera_frame" parent = "monocular_camera_unit" visible = "0" >
         <origin xyz="0.016 0.0 0.005 " rpy="0 0 0"/>
         <inertial>
-          <mass value = "0.0" />
+          <mass value = "0.00001" />
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia
               ixx="0.0" ixy="0.0" ixz="0.0"
