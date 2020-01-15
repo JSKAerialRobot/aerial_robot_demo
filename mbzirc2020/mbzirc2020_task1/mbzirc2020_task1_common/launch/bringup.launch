@@ -6,7 +6,7 @@
   <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
   <arg name="headless" default="True" />
-  <arg name="lanch_gazebo" default="False" />
+  <arg name="launch_gazebo" default="False" />
   <arg name="monocular_camera" default="True" />
   <arg name="camera_height" default="0" />
   <arg name="camera_name" default="elp_1080P_fov80" />
@@ -19,7 +19,7 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="task" value="1" />
-    <arg name="launch_gazebo" value="${arg launch_gazebo}" />
+    <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
   </include>
 
   <group if="$(arg real_machine)">
