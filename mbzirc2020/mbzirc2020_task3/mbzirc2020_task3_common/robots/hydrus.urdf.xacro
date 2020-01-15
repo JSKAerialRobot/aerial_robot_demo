@@ -88,7 +88,7 @@
   </xacro:extra_module>
 
   <!-- sheet -->
-  <xacro:property name="sheet_mass" value=".65" />
+  <xacro:property name="sheet_mass" value=".68" />
   <xacro:extra_module name = "sheet_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
     <inertial>
