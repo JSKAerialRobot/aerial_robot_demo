@@ -12,6 +12,8 @@
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
 
+  <param name="/simulation" value="$(arg simulation)"/>
+
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
     <arg name="real_machine" value="$(arg real_machine)" />

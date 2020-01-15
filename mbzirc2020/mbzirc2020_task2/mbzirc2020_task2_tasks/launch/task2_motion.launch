@@ -1,6 +1,15 @@
 <launch>
+  <arg name="pub_dummy_object_pos" default="true"/>
+
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
+    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Task2Motion.yaml"/>
+  </node>
+
+  <node if="$(arg pub_dummy_object_pos)"
+       name="dummy_object_tf_publisher"
+       type="dummy_object_tf_publisher.py"
+       pkg="mbzirc2020_task2_tasks">
     <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Task2Motion.yaml"/>
   </node>
 
