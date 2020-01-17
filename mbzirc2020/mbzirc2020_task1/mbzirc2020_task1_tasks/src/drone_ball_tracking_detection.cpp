@@ -192,7 +192,7 @@ namespace edgetpu_roscpp
     cv::minEnclosingCircle(target_contour, ball_pixel_center_, ball_pixel_radius);
     ball_pixel_center_.x += ball_search_area.xmin;
     ball_pixel_center_.y += ball_search_area.ymin;
-    ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius);
+    if(verbose_) ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius);
     cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius, cv::Scalar(255, 0, 0), 2);
 
 
@@ -248,7 +248,7 @@ namespace edgetpu_roscpp
     double ball_depth = f_dash_ * ball_real_radius_ / ball_pixel_radius_;
     ball_pos_ = camera_K_inv_ * tf2::Vector3(ball_pixel_center_.x, ball_pixel_center_.y, 1.0) * ball_depth;
 
-    ROS_INFO("ball position: [%f, %f, %f], depth: %f", ball_pos_.x(),
+    if(verbose_) ROS_INFO("ball position: [%f, %f, %f], depth: %f", ball_pos_.x(),
              ball_pos_.y(), ball_pos_.z(), ball_depth);
     //ROS_WARN("ball detection: %f", ros::Time::now().toSec() - start_t);
   }
