@@ -112,6 +112,7 @@ class RectangularGridSearchState(smach.State):
         # retrieve cog position from tf
         if self.target_pos_flag:
             userdata.target_pos = self.target_pos
+            self.target_pos_flag= False
             return 'found'
         try:
             self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
@@ -167,6 +168,7 @@ class AproachOnTargetState(smach.State):
             self.target_pos = userdata.target_pos
 
         if self.target_pos is None or rospy.Time.now() - self.target_pos.header.stamp > rospy.Duration(self.target_timeout) :
+            self.is_userdata_input_retrieved = False
             return 'target_lost'
 
         try:
