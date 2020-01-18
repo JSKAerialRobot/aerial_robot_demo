@@ -14,6 +14,7 @@ class HydrusInterface:
     def __init__(self):
         self.joint_state_sub_ = rospy.Subscriber('hydrusx/joint_states', JointState, self.jointStateCallback)
         self.joint_ctrl_pub_ = rospy.Publisher('hydrusx/joints_ctrl', JointState, queue_size = 1)
+        self.extra_joint_ctrl_pub_ = rospy.Publisher('hydrusx/extra_servos_ctrl', JointState, queue_size = 1)
         self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
         self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
         self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
@@ -72,6 +73,27 @@ class HydrusInterface:
             joint_msg.header.stamp = rospy.Time.now()
             joint_msg.position = joint_pos
             self.joint_ctrl_pub_.publish(joint_msg)
+            rospy.sleep(1.0 / self.joint_update_freq_)
+
+    def setExtraJointAngle(self, target_joint_state, time = 1000):
+        joint_seq_len = int(time * self.joint_update_freq_ / 1000.0)
+        joint_seq = []
+
+        if joint_seq_len > 1:
+            for position, name in zip(target_joint_state.position, target_joint_state.name):
+                current_position = self.joint_state_.position[self.joint_state_.name.index(name)]
+                joint_seq.append(np.linspace(current_position, position, num = joint_seq_len, endpoint = True))
+            joint_seq = np.stack(joint_seq).transpose()
+        else:
+            joint_seq = [target_joint_state.position]
+
+        joint_msg = JointState()
+        joint_msg.name = target_joint_state.name
+
+        for joint_pos in joint_seq:
+            joint_msg.header.stamp = rospy.Time.now()
+            joint_msg.position = joint_pos
+            self.extra_joint_ctrl_pub_.publish(joint_msg)
             rospy.sleep(1.0 / self.joint_update_freq_)
 
     def getJointState(self):
