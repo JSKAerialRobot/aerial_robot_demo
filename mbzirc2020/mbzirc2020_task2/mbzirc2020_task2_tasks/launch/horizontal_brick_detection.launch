@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <arg name="INPUT_CLOUD" default="/rs_d435/depth_registered/points" />
+
+  <!-- cloud point color filter -->
+  <arg name="h_limit_max"  default="50" /> <!-- red -->
+  <arg name="h_limit_min" default="-50" /> <!-- red -->
+  <arg name="s_limit_max" default="255" />
+  <arg name="s_limit_min" default="100" />
+  <arg name="i_limit_max" default="255" />
+  <arg name="i_limit_min" default="0" />
+
+  <!-- point cloud to laserscan -->
+  <arg name="min_height" default="0.0" />
+  <arg name="max_height" default="0.1" />
+  <arg name="angle_min" default="-0.5" /> <!-- less than the end link -->
+  <arg name="angle_max" default="0.5" /> <!-- less than the end link -->
+  <arg name="angle_increment" default="0.00436"/> <!-- 0.25 deg, same with hokuyo -->
+  <arg name="scan_time" default="10" />
+  <arg name="range_min" default="0.45" />
+  <arg name="range_max" default="4.0" />
+
+  <!-- line extraction from laserscan -->
+  <arg name="max_line_gap" default="0.1" />
+  <arg name="min_line_length" default="0.1" />  <!-- important -->
+  <arg name="min_split_dist" default="0.03" /> <!-- important, 0.03, 0.05, 0.1 -->
+  <arg name="min_line_points" default="5" />  <!-- important, e.g., 4, 5, 10 -->
+  <arg name="outlier_dist" default="0.1" />
+  <arg name="bearing_std_dev" default="0.01" />
+  <arg name="range_std_dev" default="0.012" />
+  <arg name="least_sq_angle_thresh" default="0.1" />
+  <arg name="least_sq_radius_thresh" default="0.1" />
+
+  <!-- brick fitting -->
+  <arg name="brick_width"  default="0.3" />
+  <arg name="brick_height" default="0.2" />
+  <arg name="line_estimate_error" default="0.02" />
+
+  <node name="horizontal_brick_detection_manager" pkg="nodelet" type="nodelet" args="manager" output="screen" />
+
+  <node pkg="nodelet" type="nodelet" name="hsi_filter_red" respawn="true"
+        args="load jsk_pcl/HSIColorFilter horizontal_brick_detection_manager" >
+    <remap from="~input" to="$(arg INPUT_CLOUD)" />
+    <param name="use_indices" value="false" />
+    <param name="keep_organized" value="true" />
+    <param name="h_limit_max"  value="$(arg h_limit_max)" />
+    <param name="h_limit_min" value="$(arg h_limit_min)" />
+    <param name="s_limit_max" value="$(arg s_limit_max)" />
+    <param name="s_limit_min" value="$(arg s_limit_min)" />
+    <param name="i_limit_max" value="$(arg i_limit_max)" />
+    <param name="i_limit_min" value="$(arg i_limit_min)" />
+  </node>
+
+  <node name="ground_plane_in_sensor_frame" pkg="mbzirc2020_common" type="ground_plane_in_sensor_frame.py" >
+    <param name="sensor_frame" value="rs_d435_color_frame" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet horizontal_brick_detection_manager">
+    <remap from="cloud_in" to="hsi_filter_red/output"/>
+
+    <param name="target_frame" value="ground_plane_in_sensor_frame" />
+    <param name="transform_tolerance" value="0.01" />
+    <param name="min_height" value="$(arg min_height)" />
+    <param name="max_height" value="$(arg max_height)" />
+    <param name="angle_min" value="$(arg angle_min)" />
+    <param name="angle_max" value="$(arg angle_max)" />
+    <param name="angle_increment" value="$(arg angle_increment)"/>
+    <param name="range_min" value="$(arg range_min)" />
+    <param name="range_max" value="$(arg range_max)" />
+    <param name="scan_time" value="10" />
+    <param name="use_inf" value="true" />
+    <param name="inf_epsilon" value="1.0" />
+    <param name="concurrency_level" value="0" />
+  </node>
+
+  <!-- shadow_laser_filter -->
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="shadow_laser_filter">
+    <remap from="scan" to="scan" />
+    <remap from="scan_filtered" to="scan_shadow_filtered" />
+    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/LaserShadowFilter.yaml" />
+  </node>
+
+  <!-- brick detection from laserscan -->
+  <include file="$(find aerial_robot_perception)/launch/horizontal_brick_detection.launch" >
+    <arg name="need_nodelet_manager" value="false" />
+    <arg name="nodelet_manager_name" value="horizontal_brick_detection_manager" />
+    <arg name="scan" value="scan_shadow_filtered"/>
+    <arg name="max_line_gap" value="$(arg max_line_gap)" />
+    <arg name="min_line_length" value="$(arg min_line_length)" />
+    <arg name="min_range" value="0.01" />
+    <arg name="min_split_dist" value="$(arg min_split_dist)" />
+    <arg name="min_line_points" value="$(arg min_line_points)" />
+    <arg name="outlier_dist" value="$(arg outlier_dist)" />
+    <arg name="bearing_std_dev" value="$(arg bearing_std_dev)" />
+    <arg name="range_std_dev" value="$(arg range_std_dev)" />
+    <arg name="least_sq_angle_thresh" value="$(arg least_sq_angle_thresh)" />
+    <arg name="least_sq_radius_thresh" value="$(arg least_sq_radius_thresh)" />
+
+    <arg name="brick_width"  value="$(arg brick_width)" />
+    <arg name="brick_height" value="$(arg brick_height)" />
+    <arg name="line_estimate_error" value="$(arg line_estimate_error)" />
+  </include>
+
+</launch>
