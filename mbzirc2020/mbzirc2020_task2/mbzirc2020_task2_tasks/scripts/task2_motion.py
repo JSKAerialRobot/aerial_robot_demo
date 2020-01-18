@@ -100,6 +100,7 @@ class AdjustGraspPosition(smach.State):
     def __init__(self, robot):
         smach.State.__init__(self, outcomes=['succeeded', 'failed'])
         self.robot = robot
+        self.object_approach_height = rospy.get_param('~object_approach_height')
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -110,15 +111,21 @@ class AdjustGraspPosition(smach.State):
 
     def execute(self, userdata):
         try:
-            trans = self.tf_buffer.lookup_transform('world', 'target_object', rospy.Time(), rospy.Duration(1.0))
+            trans = self.tf_buffer.lookup_transform('world', 'target_object00', rospy.Time(), rospy.Duration(1.0))
+            rospy.logwarn("found object! %f %f %f", trans.transform.translation.x, trans.transform.translation.y, trans.transform.translation.z)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             return 'failed'
 
         object_global_coords = ros_numpy.numpify(trans.transform)
-        uav_target_coords = tft.concatenate_matrices(object_global_coords, tft.inverse_matrix(self.grasping_point_coords))
+        object_global_x_axis = object_global_coords[0:3, 0]
+        object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
+        object_global_coords_modified = tft.compose_matrix(translate=tft.translation_from_matrix(object_global_coords), angles=[0, 0, object_global_yaw])
+
+        uav_target_coords = tft.concatenate_matrices(object_global_coords_modified, tft.inverse_matrix(self.grasping_point_coords))
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
         uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], uav_target_pos[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'
