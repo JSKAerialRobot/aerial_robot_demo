@@ -47,6 +47,11 @@ class Start(smach.State):
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
         self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_approach_height, self.robot.getBaselinkRPY()[2])
+
+        joint_state = JointState()
+        joint_state.name = ['rs_d435_servo_joint']
+        joint_state.position = [np.pi / 2] #look down
+        self.robot.setExtraJointAngle(joint_state, time = 1000)
         return 'succeeded'
 
 class Finish(smach.State):
