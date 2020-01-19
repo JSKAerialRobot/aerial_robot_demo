@@ -39,8 +39,16 @@ class Start(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'])
         self.robot = robot
         self.object_approach_height = rospy.get_param('~object_approach_height')
+        self.start_sub = rospy.Subscriber('/task_start', UInt8, self.taskStartCallback)
+        self.task_start = False
+
+    def taskStartCallback(self, msg):
+        self.task_start = True
 
     def execute(self, userdata):
+        while not self.task_start:
+            pass
+
         rospy.loginfo('Takeoff')
         rospy.sleep(0.5)
         self.robot.startAndTakeoff()
