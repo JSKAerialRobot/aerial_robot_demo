@@ -10,7 +10,7 @@ from geometry_msgs.msg import Transform, Inertia
 import tf.transformations as tft
 import tf2_ros
 import ros_numpy
-from std_msgs.msg import UInt8
+from std_msgs.msg import UInt8, Empty
 from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
 
 def addObjectToModel(robot, action, translation, yaw, mass):
@@ -39,7 +39,7 @@ class Start(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'])
         self.robot = robot
         self.object_approach_height = rospy.get_param('~object_approach_height')
-        self.start_sub = rospy.Subscriber('/task_start', UInt8, self.taskStartCallback)
+        self.start_sub = rospy.Subscriber('/task_start', Empty, self.taskStartCallback)
         self.task_start = False
 
     def taskStartCallback(self, msg):
