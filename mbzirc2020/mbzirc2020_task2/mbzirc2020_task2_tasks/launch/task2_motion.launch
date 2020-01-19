@@ -21,6 +21,8 @@
       <param name="debug_view" value="$(arg object_recognition_debug_view)"/>
       <param name="frame_id" value="target_object"/>
     </node>
+
+    <include file="$(find mbzirc2020_task2_tasks)/launch/hls_color_filter_object_detection.launch"/>
   </group>
 
   <group unless="$(arg object_pos_recognition)">
