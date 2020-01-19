@@ -1,0 +1,21 @@
+<launch>
+  <node name="image_republish1" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/rs_d435/color/image_rect_color" />
+    <remap from="out" to="/rs_d435/color/image_rect_color" />
+  </node>
+
+  <node name="image_republish2" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/rectangle_detection_depth/debug_image" />
+    <remap from="out" to="/rectangle_detection_depth/debug_image" />
+  </node>
+
+  <node name="image_republish3" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/hls_color_filter/image" />
+    <remap from="out" to="/hls_color_filter/image" />
+  </node>
+
+  <node name="image_republish4" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/ground_object_detection_with_size_filter/debug_image" />
+    <remap from="out" to="/ground_object_detection_with_size_filter/debug_image" />
+  </node>
+</launch>
