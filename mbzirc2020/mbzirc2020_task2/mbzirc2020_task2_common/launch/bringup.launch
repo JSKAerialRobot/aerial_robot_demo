@@ -46,4 +46,6 @@
     <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load"/>
   </group>
 
+  <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle"/>
+
 </launch>
