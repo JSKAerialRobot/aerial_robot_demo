@@ -37,7 +37,7 @@
   <group unless="$(arg ground_mode)">
     <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
     <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435" name="timed_roslaunch" output="screen" />
+          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435" name="timed_roslaunch" output="screen" if="$(arg real_machine)"/>
     <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="20" />
     <param name="/rs_d435/color/image_rect_color/compressed/jpeg_quality" value="20" />
   </group>
