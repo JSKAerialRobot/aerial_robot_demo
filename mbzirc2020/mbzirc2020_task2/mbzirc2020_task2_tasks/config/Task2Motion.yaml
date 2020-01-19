@@ -8,7 +8,7 @@ object_mass: 1.0
 object_num: 4
 global_object_pos: [[-1.5, 0, 3.141], [-2.1, 0, 3.141], [-2.7, 0, 3.141], [-3.3, 0, 3.141]] #in world frame, [x, y, yaw]
 #global_object_pos: [[-3.9, 0, 3.141], [-4.5, 0, 3.141], [-5.1, 0, 3.141], [-5.7, 0, 3.141]] #in world frame, [x, y, yaw]
-object_approach_height: 1.0
+object_approach_height: 2.0
 global_object_z: 0.16
 
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame

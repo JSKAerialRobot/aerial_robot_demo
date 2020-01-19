@@ -8,12 +8,12 @@
   <arg name="contour_area_size" default="0.06"/>
   <arg name="contour_area_margin" default="0.02"/>
   <arg name="contour_area_min_thre" default="0.01"/>
-  <arg name="frame_id" default="target_object"/>
+  <arg name="frame_id" default="target_object_color"/>
   <arg name="h_limit_max" default="0" doc="The maximum allowed field value Hue" />
   <arg name="h_limit_min" default="316" doc="The minimum allowed field value Hue" />
   <arg name="l_limit_max" default="255" doc="The maximum allowed field value Saturation" />
   <arg name="l_limit_min" default="50" doc="The minimum allowed field value Saturation" />
-  <arg name="s_limit_max" default="164" doc="The maximum allowed field value Value" />
+  <arg name="s_limit_max" default="255" doc="The maximum allowed field value Value" />
   <arg name="s_limit_min" default="76" doc="The minimum allowed field value Value" />
 
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen" if="$(arg output_screen)"/>

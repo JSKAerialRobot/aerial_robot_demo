@@ -102,6 +102,8 @@ class MoveToGraspPosition(smach.State):
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], uav_target_pos[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
+        while True:
+            pass
         return 'succeeded'
 
 class AdjustGraspPosition(smach.State):
@@ -119,7 +121,7 @@ class AdjustGraspPosition(smach.State):
 
     def execute(self, userdata):
         try:
-            trans = self.tf_buffer.lookup_transform('world', 'target_object00', rospy.Time(), rospy.Duration(1.0))
+            trans = self.tf_buffer.lookup_transform('world', 'target_object_color', rospy.Time(), rospy.Duration(1.0))
             rospy.logwarn("found object! %f %f %f", trans.transform.translation.x, trans.transform.translation.y, trans.transform.translation.z)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             return 'failed'

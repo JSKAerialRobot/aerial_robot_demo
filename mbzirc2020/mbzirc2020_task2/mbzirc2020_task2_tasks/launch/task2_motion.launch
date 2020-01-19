@@ -1,5 +1,5 @@
 <launch>
-  <arg name="object_pos_recognition" default="true"/>
+  <arg name="object_pos_recognition" default="false"/>
   <arg name="object_recognition_debug_view" default="true"/>
 
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
@@ -8,30 +8,30 @@
   </node>
 
 
-  <group if="$(arg object_pos_recognition)">
-    <node pkg="nodelet" type="nodelet" name="rectangle_detection_depth_nodelet" args="manager" output="screen"/>
+  <!-- <group if="$(arg object_pos_recognition)"> -->
+  <!--   <node pkg="nodelet" type="nodelet" name="rectangle_detection_depth_nodelet" args="manager" output="screen"/> -->
 
-    <node pkg="nodelet" type="nodelet" name="rectangle_detection_depth"
-          args="load aerial_robot_perception/RectangleDetectionDepth rectangle_detection_depth_nodelet" output="screen">
+  <!--   <node pkg="nodelet" type="nodelet" name="rectangle_detection_depth" -->
+  <!--         args="load aerial_robot_perception/RectangleDetectionDepth rectangle_detection_depth_nodelet" output="screen"> -->
 
-      <remap from="rgb_img" to="/rs_d435/color/image_rect_color" />
-      <remap from="depth_image" to="/rs_d435/aligned_depth_to_color/image_raw" />
-      <remap from="cam_info" to="/rs_d435/aligned_depth_to_color/camera_info" />
+  <!--     <remap from="rgb_img" to="/rs_d435/color/image_rect_color" /> -->
+  <!--     <remap from="depth_image" to="/rs_d435/aligned_depth_to_color/image_raw" /> -->
+  <!--     <remap from="cam_info" to="/rs_d435/aligned_depth_to_color/camera_info" /> -->
 
-      <param name="debug_view" value="$(arg object_recognition_debug_view)"/>
-      <param name="frame_id" value="target_object"/>
-    </node>
+  <!--     <param name="debug_view" value="$(arg object_recognition_debug_view)"/> -->
+  <!--     <param name="frame_id" value="target_object_depth"/> -->
+  <!--   </node> -->
 
-    <include file="$(find mbzirc2020_task2_tasks)/launch/hls_color_filter_object_detection.launch"/>
-  </group>
+  <!--   <include file="$(find mbzirc2020_task2_tasks)/launch/hls_color_filter_object_detection.launch"/> -->
+  <!-- </group> -->
 
-  <group unless="$(arg object_pos_recognition)">
-    <node name="dummy_object_tf_publisher"
-          type="dummy_object_tf_publisher.py"
-       pkg="mbzirc2020_task2_tasks">
-    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Task2Motion.yaml"/>
-    </node>
-  </group>
+  <!-- <group unless="$(arg object_pos_recognition)"> -->
+  <!--   <node name="dummy_object_tf_publisher" -->
+  <!--         type="dummy_object_tf_publisher.py" -->
+  <!--      pkg="mbzirc2020_task2_tasks"> -->
+  <!--   <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Task2Motion.yaml"/> -->
+  <!--   </node> -->
+  <!-- </group> -->
 
 
   <node name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
