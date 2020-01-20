@@ -16,6 +16,7 @@
   <arg name="spawn_z" default="0.0"/>
   <arg name="spawn_yaw" default="0.0"/>
   <arg name="config_path" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/config/$(arg model_suffix)"/>
+  <arg name="rviz_config_path" default="$(find aerial_robot_model)/launch/rviz_config"/>
 
   ###########  UAV Config  ###########
   # HYDRUS = 16 # 0x10, hydrus type with  4dof underactuated property
@@ -79,6 +80,7 @@
     <arg name="description_mode" value="gazebo" if="$(arg simulation)"/>
     <arg name="horizontal_vio" value="1" if="$(arg horizontal_vio)" />
     <arg name="horizontal_vio" value="0" unless="$(arg horizontal_vio)" />
+    <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
   </include >
 
   ###########  Servo Bridge  ###########
