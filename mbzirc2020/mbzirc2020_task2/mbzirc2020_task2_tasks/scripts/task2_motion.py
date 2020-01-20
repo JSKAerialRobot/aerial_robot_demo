@@ -6,7 +6,7 @@ import smach_ros
 from mbzirc2020_common.hydrus_interface import *
 from sensor_msgs.msg import JointState
 import numpy as np
-from geometry_msgs.msg import Transform, Inertia
+from geometry_msgs.msg import Transform, Inertia, PoseArray
 import tf.transformations as tft
 import tf2_ros
 import ros_numpy
@@ -38,7 +38,7 @@ class Start(smach.State):
     def __init__(self, robot):
         smach.State.__init__(self, outcomes=['succeeded'])
         self.robot = robot
-        self.object_approach_height = rospy.get_param('~object_approach_height')
+        self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.start_sub = rospy.Subscriber('/task_start', Empty, self.taskStartCallback)
         self.task_start = False
 
@@ -54,7 +54,7 @@ class Start(smach.State):
         self.robot.startAndTakeoff()
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
-        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_approach_height, self.robot.getBaselinkRPY()[2])
+        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2])
 
         joint_state = JointState()
         joint_state.name = ['rs_d435_servo_joint']
@@ -68,7 +68,7 @@ class Finish(smach.State):
         self.robot = robot
 
     def execute(self, userdata):
-        self.robot.goPosWaitConvergence('global', [0, 0], self.robot.getBaselinkPos()[2], 0.0)
+        self.robot.goPosWaitConvergence('global', [0, 0], self.robot.getBaselinkPos()[2], self.robot.getBaselinkRPY()[2])
         rospy.loginfo('Landing')
         self.robot.land()
         return 'succeeded'
@@ -78,12 +78,9 @@ class MoveToGraspPosition(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'], input_keys=['object_count'], output_keys=['object_count'])
         self.robot = robot
         self.global_object_pos = rospy.get_param('~global_object_pos')
-        self.object_approach_height = rospy.get_param('~object_approach_height')
+        self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.preshape_joint_angle = rospy.get_param('~preshape_joint_angle')
-
-        grasping_point = rospy.get_param('~grasping_point')
-        grasping_yaw = rospy.get_param('~grasping_yaw')
-        self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
+        self.grasping_yaw = rospy.get_param('~grasping_yaw')
 
     def execute(self, userdata):
         #preshape
@@ -94,16 +91,10 @@ class MoveToGraspPosition(smach.State):
 
         #calc uav target coords
         target_object_pos = self.global_object_pos[userdata.object_count]
-        object_global_coords = tft.compose_matrix(translate=[target_object_pos[0], target_object_pos[1], self.object_approach_height], angles=[0, 0, target_object_pos[2]])
-        uav_target_coords = tft.concatenate_matrices(object_global_coords, tft.inverse_matrix(self.grasping_point_coords))
-        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-        uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+        target_object_pos[2] -= self.grasping_yaw
+        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_object_pos[2], pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_object_pos[2], pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], uav_target_pos[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-
-        while True:
-            pass
         return 'succeeded'
 
 class AdjustGraspPosition(smach.State):
@@ -121,7 +112,7 @@ class AdjustGraspPosition(smach.State):
 
     def execute(self, userdata):
         try:
-            trans = self.tf_buffer.lookup_transform('world', 'target_object_color', rospy.Time(), rospy.Duration(1.0))
+            trans = self.tf_buffer.lookup_transform('world', 'target_object_color00', rospy.Time(), rospy.Duration(1.0))
             rospy.logwarn("found object! %f %f %f", trans.transform.translation.x, trans.transform.translation.y, trans.transform.translation.z)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             return 'failed'
@@ -255,7 +246,7 @@ def main():
 
             smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
                                    transitions={'succeeded':'Grasp',
-                                                'failed':'Grasp'})
+                                                'failed':'AdjustGraspPosition'})
 
             smach.StateMachine.add('Grasp', Grasp(robot, add_object_model_func),
                                    transitions={'succeeded':'pick_succeeded'})
