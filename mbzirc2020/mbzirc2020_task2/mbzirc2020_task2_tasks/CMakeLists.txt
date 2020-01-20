@@ -6,6 +6,7 @@ add_compile_options(-std=c++14)
 find_package(catkin REQUIRED COMPONENTS
   smach
   smach_ros
+  smach_viewer
   mbzirc2020_common
   mbzirc2020_task2_common
   ros_numpy
