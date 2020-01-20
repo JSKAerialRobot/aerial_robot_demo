@@ -31,6 +31,7 @@ class HydrusInterface:
         self.cog_odom_ = None
         self.baselink_odom_ = None
         self.flight_state_ = None
+        self.target_pos_yaw_ = None
 
         #flight state
         self.ARM_OFF_STATE = 0
@@ -149,6 +150,9 @@ class HydrusInterface:
     def getFlightState(self):
         return self.flight_state_
 
+    def getTargetPosYaw(self):
+        return self.target_pos_yaw_
+
     #navigation
     def noNavigation(self):
         nav_msg = FlightNav()
@@ -179,6 +183,8 @@ class HydrusInterface:
         nav_msg.target_pos_z = target_z
 
         self.nav_pub_.publish(nav_msg)
+
+        self.target_pos_yaw_ = [target_xy, target_z, target_yaw]
 
     def isConvergent(self, frame, target_xy, target_z, target_yaw, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh):
         current_xy = self.getBaselinkPos()[0:2]
