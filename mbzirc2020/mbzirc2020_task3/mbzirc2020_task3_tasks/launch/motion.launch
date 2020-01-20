@@ -10,6 +10,10 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="headless" default="True" />
   <arg name="config_filename" default="motion_outdoor.yaml"/>
+  <arg name="dummy_target" default="False"/>
+  <arg name="dummy_x" default="0"/>
+  <arg name="dummy_y" default="0"/>
+  <arg name="dummy_z" default="0"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
@@ -23,11 +27,11 @@
 
   ########## recognition ###############
   ########### real machine #############
-  <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(arg real_machine)">
+  <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(eval real_machine and not dummy_target)">
   </include>
 
   ########### simulation ###############
-  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(arg simulation)">
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(eval simulation and not dummy_target)">
     <arg name="image_topic" value="/flir/image_raw"/>
     <arg name="camera_info_topic" value="/flir/camera_info"/>
     <arg name="output_screen" value="true"/>
@@ -44,6 +48,13 @@
     <arg name="v_limit_max" value="255" />
     <arg name="v_limit_min" value="60" />
   </include>
+
+  ########### dummy target #############
+  <node pkg="mbzirc2020_task3_tasks" type="dummy_target_publisher.py" name="dummy_target_publisher" output="screen" if="$(arg dummy_target)">
+    <param name="dummy_x" value="$(arg dummy_x)"/>
+    <param name="dummy_y" value="$(arg dummy_y)"/>
+    <param name="dummy_z" value="$(arg dummy_z)"/>
+  </node>
 
   ########## motion planner ###############
   <!-- <node pkg="mbzirc2020_task3_tasks" type="motion.py" name="task3_motion_planner" output="screen"> -->
