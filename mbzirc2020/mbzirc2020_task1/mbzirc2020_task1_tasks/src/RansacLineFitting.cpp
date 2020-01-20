@@ -9,10 +9,13 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("cand_points2d_max_size", cand_points2d_max_size_, 50);
   nhp_.param("cand_points3d_max_size", cand_points3d_max_size_, 50);
   nhp_.param("ransac_visualization_flag", ransac_vis_flag_, true);
-  nhp_.param("ransac_3d_mode", ransac_3d_mode_, true);
+  nhp_.param("ransac_3d_mode", ransac_3d_mode_, false);
+  nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
 
   lpf_z_ = -1;
   lpf_z_gain_ = 0.8;
+
+  target_pt_update_time_ = -1.0;
 
   estimator_2d_.Initialize(0.1, 100); // Threshold, iterations
   estimator_3d_.Initialize(0.1, 100); // Threshold, iterations
@@ -24,6 +27,19 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
 }
 
 void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg){
+  double cur_time = msg->header.stamp.toSec();
+  if (target_pt_update_time_ < 0.0) // when in initial case
+    target_pt_update_time_ = cur_time;
+  else if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_){
+    target_pt_update_time_ = cur_time;
+    // initalize ransac related variables to re-start estimation
+    lpf_z_ = -1;
+    cand_points3d_.clear();
+    cand_points2d_.clear();
+  }
+  else
+    target_pt_update_time_ = cur_time;
+
   std::shared_ptr<GRANSAC::AbstractParameter> CandPt2d = std::make_shared<Point2D>(msg->point.x, msg->point.y);
   cand_points2d_.push_back(CandPt2d);
   std::shared_ptr<GRANSAC::AbstractParameter> CandPt3d = std::make_shared<Point3D>(msg->point.x, msg->point.y, msg->point.z);

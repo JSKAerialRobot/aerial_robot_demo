@@ -36,6 +36,8 @@ private:
   double lpf_z_gain_;
   bool ransac_vis_flag_;
   bool ransac_3d_mode_;
+  double target_pt_update_time_;
+  double target_pt_dispear_time_thre_;
 
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void visualizeRansacLine();
