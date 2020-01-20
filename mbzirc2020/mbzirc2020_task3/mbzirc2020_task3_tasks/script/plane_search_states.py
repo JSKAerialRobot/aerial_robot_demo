@@ -13,40 +13,40 @@ from geometry_msgs.msg import Vector3Stamped
 from hydrus_commander import HydrusCommander
 
 class PlaneFireFightStateMachineCreator():
-    def create(self, search_method):
+    def create(self, search_method, params):
         ''' search_method: {'rectangular_grid'}
             params: dictionary'''
         if search_method=='rectangular_grid':
             sm = smach.StateMachine(outcomes={'success', 'failure'})
             with sm:
-                smach.StateMachine.add('searching', RectangularGridSearchState(),
+                smach.StateMachine.add('searching', RectangularGridSearchState(params),
                                         transitions={'found':'approach_on_top',
                                                      'not_found':'failure',
                                                      'still_searching':'searching'},
                                         remapping={'target_pos':'target_pos'})
-                smach.StateMachine.add('approach_on_top', AproachOnTargetState(),
+                smach.StateMachine.add('approach_on_top', AproachOnTargetState(params),
                                        transitions={'success':'covering',
                                                     'target_lost':'searching',
                                                     'ongoing':'approach_on_top'},
                                         remapping={'target_pos':'target_pos'})
-                smach.StateMachine.add('covering', CoveringState(),
+                smach.StateMachine.add('covering', CoveringState(params),
                                        transitions={'done':'success'})
             return sm
 
 
 class RectangularGridSearchState(smach.State):
-    def __init__(self):
+    def __init__(self, params):
         smach.State.__init__(self, outcomes=['found', 'not_found', 'still_searching'],
                                    output_keys=['target_pos'])
         self.commander = HydrusCommander()
 
         # retrieve parameters
-        self.target_topic_name = rospy.get_param('~target_topic_name', '/target_object/pos')
-        self.control_rate = rospy.get_param('~control_rate', 5.0)
-        self.area_corners = rospy.get_param('~area_corners', [[0,0],[2,2]])
-        self.search_grid_size = rospy.get_param('~search_grid_size', 1.0)
-        self.reach_margin = rospy.get_param('~reach_margin', 0.2)
-        self.search_height = rospy.get_param('~search_height', 3.0)
+        self.target_topic_name = params['target_topic_name']
+        self.control_rate = params['control_rate']
+        self.area_corners = params['area_corners']
+        self.search_grid_size = params['search_grid_size']
+        self.reach_margin = params['reach_margin']
+        self.search_height = params['search_height']
 
         self.target_pos = None # set when target_pos topic recieved
 
@@ -134,19 +134,19 @@ class RectangularGridSearchState(smach.State):
 
 
 class AproachOnTargetState(smach.State):
-    def __init__(self):
+    def __init__(self, params):
         smach.State.__init__(self, outcomes=['success', 'target_lost', 'ongoing'],
                                    input_keys = ['target_pos'] )
         self.commander = HydrusCommander()
 
         # retrieve parameters
-        self.target_topic_name = rospy.get_param('~target_topic_name', '/target_object/pos')
-        self.control_rate = rospy.get_param('~control_rate', 5.0)
-        self.target_timeout = rospy.get_param('~target_timeout', 1.0)
-        self.approach_height = rospy.get_param('~approach_height', 3.0)
-        self.descending_height = rospy.get_param('~descending_height', 2.0)
-        self.approach_margin = rospy.get_param('~approach_margin', 0.05)
-        self.height_margin = rospy.get_param('~height_margin', 0.05)
+        self.target_topic_name = params['target_topic_name']
+        self.control_rate = params['control_rate']
+        self.target_timeout = params['target_timeout']
+        self.approach_height = params['approach_height']
+        self.descending_height = params['descending_height']
+        self.approach_margin = params['approach_margin']
+        self.height_margin = params['height_margin']
 
         # tf Buffer
         self.tfBuffer = tf2_ros.Buffer()
@@ -185,14 +185,14 @@ class AproachOnTargetState(smach.State):
 
 
 class CoveringState(smach.State):
-    def __init__(self):
+    def __init__(self, params):
         smach.State.__init__(self, outcomes=['done'])
         self.commander = HydrusCommander()
 
         # retrieve parameters
-        self.covering_pre_height = rospy.get_param('~covering_pre_height', 1.0)
-        self.covering_post_height = rospy.get_param('~covering_post_height', 0.2)
-        self.covering_move_dist = rospy.get_param('~covering_move_dist', 1.0)
+        self.covering_pre_height = params['covering_pre_height']
+        self.covering_post_height = params['covering_post_height']
+        self.covering_move_dist = params['covering_move_dist']
 
         # tf Buffer
         self.tfBuffer = tf2_ros.Buffer()
