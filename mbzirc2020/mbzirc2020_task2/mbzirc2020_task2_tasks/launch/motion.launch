@@ -2,6 +2,7 @@
   <arg name="object_pos_recognition" default="true"/>
   <arg name="skip_takeoff" default="false"/>
   <arg name="smach_viewer" default="true"/>
+  <arg name="outdoor" default="true"/>
 
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
@@ -10,7 +11,10 @@
   </node>
 
   <group if="$(arg object_pos_recognition)">
-    <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch"/>
+    <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+      <arg if="$(arg outdoor)" name="external_manager" value="true" />
+      <arg if="$(arg outdoor)" name="manager" value="/rs_d435/realsense2_camera_manager" />
+    </include>
   </group>
 
   <group unless="$(arg object_pos_recognition)">
@@ -22,6 +26,8 @@
   </group>
 
 
-  <node if="$(arg smach_viewer)"
-        name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
+  <group unless="$(arg outdoor)">
+    <node if="$(arg smach_viewer)"
+          name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
+  </group>
 </launch>
