@@ -12,7 +12,7 @@ class InitCameraJointAngle:
 
         while self.init_angle is None:
             try:
-                self.init_angle = rospy.get_param('/hydrusx/servo_controller/extra_servos/controller1/simulation/init_value')
+                self.init_angle = rospy.get_param('/hydrusx/servo_controller/extra_servos/simulation/init_value')
             except:
                 pass
 
