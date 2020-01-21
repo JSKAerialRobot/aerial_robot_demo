@@ -1,8 +1,8 @@
 <launch>
   <arg name="object_pos_recognition" default="true"/>
   <arg name="skip_takeoff" default="false"/>
-  <arg name="smach_viewer" default="true"/>
-  <arg name="outdoor" default="true"/>
+  <arg name="smach_viewer" default="false"/>
+  <arg name="outdoor" default="false"/>
 
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
