@@ -4,9 +4,9 @@
     <remap from="out" to="/rs_d435/color/image_rect_color" />
   </node>
 
-  <node name="image_republish2" pkg="image_transport" type="republish" args="compressed raw">
-    <remap from="in" to="/rectangle_detection_depth/debug_image" />
-    <remap from="out" to="/rectangle_detection_depth/debug_image" />
+  <node name="image_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
+    <remap from="in" to="/rs_d435/aligned_depth_to_color/image_raw" />
+    <remap from="out" to="/rs_d435/aligned_depth_to_color/image_raw" />
   </node>
 
   <node name="image_republish3" pkg="image_transport" type="republish" args="compressed raw">
@@ -15,7 +15,14 @@
   </node>
 
   <node name="image_republish4" pkg="image_transport" type="republish" args="compressed raw">
-    <remap from="in" to="/ground_object_detection_with_size_filter/debug_image" />
-    <remap from="out" to="/ground_object_detection_with_size_filter/debug_image" />
+    <remap from="in" to="/rectangle_detection_color/debug_image" />
+    <remap from="out" to="/rectangle_detection_color/debug_image" />
   </node>
+
+  <node name="image_republish5" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/rectangle_detection_depth/debug_image" />
+    <remap from="out" to="/rectangle_detection_depth/debug_image" />
+  </node>
+
+
 </launch>
