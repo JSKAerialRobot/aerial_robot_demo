@@ -8,7 +8,7 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="ground_mode" default="False" />
   <arg name="passive_gripper" default="False"/>
-  <arg name="ring_gripper" default="False"/>
+  <arg name="ring_gripper" default="True"/>
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
 
