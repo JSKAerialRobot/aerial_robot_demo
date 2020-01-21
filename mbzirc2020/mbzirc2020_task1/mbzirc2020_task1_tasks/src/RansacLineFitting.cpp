@@ -11,6 +11,7 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("ransac_visualization_flag", ransac_vis_flag_, true);
   nhp_.param("ransac_3d_mode", ransac_3d_mode_, false);
   nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
+  nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 1.0);
 
   lpf_z_ = -1;
   lpf_z_gain_ = 0.8;
@@ -19,6 +20,8 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
 
   estimator_2d_.Initialize(0.1, 100); // Threshold, iterations
   estimator_3d_.Initialize(0.1, 100); // Threshold, iterations
+
+  estimator_state_ = STOP_ESTIMATION;
 
   target_pt_sub_ = nh_.subscribe<geometry_msgs::PointStamped>(target_pt_sub_topic_name, 1, &RansacLineFitting::targetPointCallback, this, ros::TransportHints().tcpNoDelay());
 
@@ -36,6 +39,7 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
     lpf_z_ = -1;
     cand_points3d_.clear();
     cand_points2d_.clear();
+    estimator_state_ = STOP_ESTIMATION;
   }
   else
     target_pt_update_time_ = cur_time;
@@ -65,17 +69,60 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
   }
 }
 
+bool RansacLineFitting::isEstimated(){
+  if (estimator_state_ == STOP_ESTIMATION)
+    return false;
+  else if (estimator_state_ == IN_ESTIMATION)
+    return true;
+}
+
 void RansacLineFitting::update(){
-  ROS_INFO("Estimator.Initialize");
+  estimator_state_ = IN_ESTIMATION;
+  // ROS_INFO("Estimator.Initialize");
   if (ransac_3d_mode_)
     estimator_3d_.Estimate(cand_points3d_);
   else
     estimator_2d_.Estimate(cand_points2d_);
-  ROS_INFO("Estimator.Estimate");
+  // ROS_INFO("Estimator.Estimate");
 
   visualizeRansacLine();
   if (ransac_vis_flag_)
     visualizeRansacInliers();
+}
+
+bool RansacLineFitting::getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt){
+  if (ransac_3d_mode_){
+    // to develop
+    return false;
+  }
+  else{
+    std::shared_ptr<GRANSAC::AbstractParameter> pos2d = std::make_shared<Point2D>(pos[0], pos[1]);
+    auto waypt2d = std::dynamic_pointer_cast<Point2D>(estimator_2d_.GetBestModel()->ComputeNearestPoint(pos2d));
+    waypt = Eigen::Vector3d(waypt2d->m_Point2D[0], waypt2d->m_Point2D[1], lpf_z_);
+    return true;
+  }
+}
+
+bool RansacLineFitting::isNearTarget(Eigen::Vector3d pos){
+  int checked_point_cnt = 5;
+  if (checked_point_cnt > cand_points3d_max_size_) checked_point_cnt = cand_points3d_max_size_;
+  if (ransac_3d_mode_){
+    // to develop
+    return false;
+  }
+  else{
+    int near_point_cnt = 0;
+    for (int i = 0; i < checked_point_cnt; ++i){
+      auto pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_max_size_ - 1 - i]);
+      double dist = sqrt(pow(pos[0] - pt->m_Point2D[0], 2.0) + pow(pos[1] - pt->m_Point2D[1], 2.0));
+      if (dist < 0.7 + target_close_dist_thre_)
+        ++near_point_cnt;
+    }
+    if (near_point_cnt >= checked_point_cnt / 2 + 1)
+      return true;
+    else
+      return false;
+  }
 }
 
 void RansacLineFitting::visualizeRansacLine(){

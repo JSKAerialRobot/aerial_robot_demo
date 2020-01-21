@@ -141,5 +141,14 @@ public:
 
 		return std::make_pair(InlierFraction, Inliers);
 	};
+
+	virtual std::shared_ptr<GRANSAC::AbstractParameter> ComputeNearestPoint(std::shared_ptr<GRANSAC::AbstractParameter> Param) override
+  {
+    // todo
+    std::shared_ptr<Point3D> pt(new Point3D(0, 0, 0));
+
+    return std::dynamic_pointer_cast<GRANSAC::AbstractParameter>(pt);
+
+  };
 };
 

@@ -11,11 +11,23 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+/* linear algebra */
+#include <math.h>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/LU>
+#include <eigen3/Eigen/Geometry>
+#include <eigen3/Eigen/Eigenvalues>
+
 class RansacLineFitting{
+#define STOP_ESTIMATION 0
+#define IN_ESTIMATION 1
 public:
   RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp);
   void update();
-  void update_ori();
+  bool isEstimated();
+  bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
+  bool isNearTarget(Eigen::Vector3d pos);
 
 private:
   /* basic */
@@ -26,6 +38,7 @@ private:
   ros::Publisher fitted_line_pub_;
   ros::Publisher fitted_points_pub_;
 
+  int estimator_state_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points2d_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points3d_;
   int cand_points2d_max_size_;
@@ -38,6 +51,7 @@ private:
   bool ransac_3d_mode_;
   double target_pt_update_time_;
   double target_pt_dispear_time_thre_;
+  double target_close_dist_thre_;
 
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void visualizeRansacLine();

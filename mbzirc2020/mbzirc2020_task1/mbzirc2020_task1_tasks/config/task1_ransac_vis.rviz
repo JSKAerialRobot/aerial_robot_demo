@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /PointStamped1
       Splitter Ratio: 0.669126689
     Tree Height: 1341
   - Class: rviz/Selection
@@ -96,6 +97,16 @@ Visualization Manager:
       Namespaces:
         treasure_marker: true
       Queue Size: 100
+      Value: true
+    - Alpha: 1
+      Class: rviz/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 1
+      Name: PointStamped
+      Radius: 0.8
+      Topic: /reactive_motion/target
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
