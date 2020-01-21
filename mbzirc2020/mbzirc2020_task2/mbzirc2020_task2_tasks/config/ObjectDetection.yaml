@@ -31,7 +31,7 @@ depth_distance_filter:
 
 opening_depth_distance_filter:
   size: 2
-  iterations: 2
+  iterations: 4
 
 rectangle_detection_depth:
   debug_view: true
@@ -39,4 +39,4 @@ rectangle_detection_depth:
   target_object_area: 0.06 #0.2 * 0.6
   target_object_area_margin: 0.02
   object_height: 0.2
-  lowest_margin: 10
+  lowest_margin: 20
