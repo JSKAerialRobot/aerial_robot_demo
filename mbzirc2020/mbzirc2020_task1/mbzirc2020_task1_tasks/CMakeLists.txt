@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  aerial_robot_msgs
   )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -81,6 +82,9 @@ target_link_libraries(trajectory_tracker ${catkin_LIBRARIES} trajectory_predicto
 add_library(ransac_line_fitting src/RansacLineFitting.cpp)
 target_link_libraries(ransac_line_fitting ${catkin_LIBRARIES})
 
+add_library(reactive_motion src/ReactiveMotion.cpp)
+target_link_libraries(reactive_motion ransac_line_fitting ${catkin_LIBRARIES})
+
 add_executable(trajectory_predictor_node src/trajectory_predictor_node.cpp)
 target_link_libraries(trajectory_predictor_node trajectory_predictor ${catkin_LIBRARIES})
 
@@ -92,4 +96,4 @@ add_library(drone_ball_tracking_detection SHARED src/drone_ball_tracking_detecti
 target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
 
 add_executable(ransac_line_fitting_node src/ransac_line_fitting_node.cpp)
-target_link_libraries(ransac_line_fitting_node ransac_line_fitting ${catkin_LIBRARIES})
+target_link_libraries(ransac_line_fitting_node reactive_motion ransac_line_fitting ${catkin_LIBRARIES})

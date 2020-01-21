@@ -135,5 +135,27 @@ public:
 
 		return std::make_pair(InlierFraction, Inliers);
 	};
+
+	virtual std::shared_ptr<GRANSAC::AbstractParameter> ComputeNearestPoint(std::shared_ptr<GRANSAC::AbstractParameter> Param) override
+	{
+		auto ExtPoint2D = std::dynamic_pointer_cast<Point2D>(Param);
+		if (ExtPoint2D == nullptr)
+			throw std::runtime_error("Line2DModel::ComputeDistanceMeasure() - Passed parameter are not of type Point2D.");
+
+		// Return distance between passed "point" and this line
+                // ax + by + c = 0
+                // bx - ay + c2 = 0, c2 = ay - bx
+                GRANSAC::VPFloat c2 = m_a * ExtPoint2D->m_Point2D[1] - m_b * ExtPoint2D->m_Point2D[0];
+                // aax + aby + ac = 0
+                // bbx - bay + bc2 = 0
+                GRANSAC::VPFloat x= (-m_a * m_c - m_b * c2) / (m_a * m_a + m_b * m_b);
+                // bax + bby + bc = 0
+                // abx - aay + ac2 = 0
+                GRANSAC::VPFloat y = (-m_b * m_c + m_a * c2) / (m_a * m_a + m_b * m_b);
+
+                std::shared_ptr<Point2D> pt(new Point2D(x, y));
+
+		return std::dynamic_pointer_cast<GRANSAC::AbstractParameter>(pt);
+	};
 };
 
