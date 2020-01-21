@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="headless" default="true" />
+  <arg name="vision" default="true" />
   <node pkg="mbzirc2020_task1_tasks" type="ransac_line_fitting_node" name="ransac_line_fitting_node" output="screen" >
     <param name="target_point_sub_topic_name" value="/treasure/point_detected"/>
     <param name="cand_points2d_max_size" value="30"/>
@@ -9,6 +10,15 @@
     <param name="target_point_maximum_disappear_time" value="0.8"/>
     <param name="target_close_distance_threshold" value="1.0"/>
   </node>
+
+  <group if="$(arg vision)">
+    <node pkg="mbzirc2020_task1_tasks" type="target_world_pose_node" name="target_world_pose_node"  output="screen">
+      <remap from ="target_local_pos"  to="ball_pos" />
+      <remap from ="uav_odom"  to="/uav/baselink/odom" />
+      <remap from ="target_pos_world"  to="/treasure/point_detected" />
+      <param name = "baselink_frame" value = "fc" />
+    </node>
+  </group>
 
   <group unless="$(arg headless)">
     <include file="$(find mbzirc2020_task1_tasks)/launch/ransac_visualization.launch" >

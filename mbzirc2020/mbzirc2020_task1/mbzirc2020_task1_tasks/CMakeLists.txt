@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   aerial_robot_msgs
+  tf2_geometry_msgs
+  tf2_ros
   )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -97,3 +99,6 @@ target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_
 
 add_executable(ransac_line_fitting_node src/ransac_line_fitting_node.cpp)
 target_link_libraries(ransac_line_fitting_node reactive_motion ransac_line_fitting ${catkin_LIBRARIES})
+
+add_executable(target_world_pose_node src/target_world_pose.cpp)
+target_link_libraries(target_world_pose_node ${catkin_LIBRARIES})
