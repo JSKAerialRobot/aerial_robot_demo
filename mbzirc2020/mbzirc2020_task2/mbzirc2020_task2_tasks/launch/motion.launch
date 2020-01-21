@@ -1,9 +1,11 @@
 <launch>
   <arg name="object_pos_recognition" default="true"/>
+  <arg name="skip_takeoff" default="false"/>
   <arg name="smach_viewer" default="true"/>
 
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
+    <param name="skip_takeoff" value="$(arg skip_takeoff)"/>
     <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Motion.yaml"/>
   </node>
 

@@ -39,6 +39,7 @@ class Start(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'])
         self.robot = robot
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
+        self.skip_takeoff = rospy.get_param('~skip_takeoff')
         self.start_sub = rospy.Subscriber('/task_start', Empty, self.taskStartCallback)
         self.task_start = False
 
@@ -46,6 +47,9 @@ class Start(smach.State):
         self.task_start = True
 
     def execute(self, userdata):
+        if self.skip_takeoff:
+            return 'succeeded'
+
         while not self.task_start:
             pass
 
@@ -97,11 +101,66 @@ class MoveToGraspPosition(smach.State):
 
         return 'succeeded'
 
-class AdjustGraspPosition(smach.State):
+class LookDown(smach.State):
     def __init__(self, robot):
         smach.State.__init__(self, outcomes=['succeeded', 'failed'])
         self.robot = robot
         self.object_approach_height = rospy.get_param('~object_approach_height')
+        self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
+        self.grasping_yaw = rospy.get_param('~grasping_yaw')
+
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
+
+        self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
+        self.object_pose = None
+
+    def objectPoseCallback(self, msg):
+        self.object_pose = msg
+
+    def execute(self, userdata):
+        if (self.object_pose is not None) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
+            try:
+                cam_trans = self.tf_buffer.lookup_transform('world', self.object_pose.header.frame_id, rospy.Time(), rospy.Duration(0.5))
+                cam_trans = ros_numpy.numpify(cam_trans.transform)
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                return 'failed'
+        else:
+            return 'failed'
+
+        #determine valid target object
+        #detect most foreground object
+        object_poses = self.object_pose.poses
+        object_poses = sorted(object_poses, key=lambda x: x.position.y)
+        target_object_pose = object_poses[-1]
+
+        #check the validity in terms of yaw angle (yaw angle should be around -pi/2 in camera frame)
+        object_yaw = tft.euler_from_quaternion(ros_numpy.numpify(target_object_pose.orientation))[2]
+        if abs(object_yaw - (-np.pi / 2)) > self.object_yaw_thresh:
+            rospy.logerror("invalide yaw")
+            return 'failed'
+
+        #succeeded to find object, then move
+
+        object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
+        object_global_x_axis = object_global_coords[0:3, 0]
+        object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
+        object_global_pos = tft.translation_from_matrix(object_global_coords)
+        uav_target_yaw = object_global_yaw - self.grasping_yaw
+
+        rospy.logwarn("succeed to find valid object: %f, %f", object_global_pos[0], object_global_pos[1])
+
+        self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+
+        return 'succeeded'
+
+class AdjustGraspPosition(smach.State):
+    def __init__(self, robot):
+        smach.State.__init__(self, outcomes=['succeeded', 'failed'])
+        self.robot = robot
+        self.object_grasping_height = rospy.get_param('~object_grasping_height')
+        self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -110,33 +169,59 @@ class AdjustGraspPosition(smach.State):
         grasping_yaw = rospy.get_param('~grasping_yaw')
         self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
 
+        self.object_pose_sub = rospy.Subscriber('rectangle_detection_depth/target_object_depth', PoseArray, self.objectPoseCallback)
+        self.object_pose = None
+
+    def objectPoseCallback(self, msg):
+        self.object_pose = msg
+
     def execute(self, userdata):
-        try:
-            trans = self.tf_buffer.lookup_transform('world', 'target_object_color00', rospy.Time(), rospy.Duration(1.0))
-            rospy.logwarn("found object! %f %f %f", trans.transform.translation.x, trans.transform.translation.y, trans.transform.translation.z)
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        if (self.object_pose is not None) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5:
+            try:
+                cam_trans = self.tf_buffer.lookup_transform('world', self.object_pose.header.frame_id, rospy.Time(), rospy.Duration(0.5))
+                cam_trans = ros_numpy.numpify(cam_trans.transform)
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                return 'failed'
+        else:
             return 'failed'
 
-        object_global_coords = ros_numpy.numpify(trans.transform)
+        #determine valid target object
+        #detect most center object
+        object_poses = self.object_pose.poses
+        object_poses = sorted(object_poses, key=lambda x: x.position.x ** 2 + x.position.y ** 2)
+        target_object_pose = object_poses[0]
+
+        #check the validity in terms of yaw angle (yaw angle should be around -pi/2 in camera frame)
+        object_yaw = tft.euler_from_quaternion(ros_numpy.numpify(target_object_pose.orientation))[2]
+        if abs(object_yaw - (-np.pi / 2)) > self.object_yaw_thresh:
+            rospy.logerr("invalide yaw")
+            return 'failed'
+
+        object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
+        object_global_pos = tft.translation_from_matrix(object_global_coords)
         object_global_x_axis = object_global_coords[0:3, 0]
         object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
+        rospy.logwarn("succeed to find valid object: %f, %f", object_global_pos[0], object_global_pos[1])
+
         object_global_coords_modified = tft.compose_matrix(translate=tft.translation_from_matrix(object_global_coords), angles=[0, 0, object_global_yaw])
 
         uav_target_coords = tft.concatenate_matrices(object_global_coords_modified, tft.inverse_matrix(self.grasping_point_coords))
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
         uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], uav_target_pos[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.object_grasping_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'
 
 class Grasp(smach.State):
     def __init__(self, robot, add_object_model_func):
-        smach.State.__init__(self, outcomes=['succeeded'])
+        smach.State.__init__(self, outcomes=['succeeded', 'failed'])
         self.robot = robot
         self.add_object_model_func = add_object_model_func
         self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle')
+        self.joint_torque_thresh = rospy.get_param('~joint_torque_thresh')
 
     def execute(self, userdata):
         joint_state = JointState()
@@ -144,8 +229,16 @@ class Grasp(smach.State):
         joint_state.position = self.grasp_joint_angle
         self.robot.setJointAngle(joint_state, time = 3000)
         rospy.sleep(1);
-        self.add_object_model_func(self.robot)
-        return 'succeeded'
+        joint_state = self.robot.getJointState()
+        joint_torque = []
+        joint_torque.append(joint_state.effort[joint_state.name.index('joint1')])
+        joint_torque.append(joint_state.effort[joint_state.name.index('joint3')])
+
+        if all(np.array(joint_torque) > self.joint_torque_thresh):
+            self.add_object_model_func(self.robot)
+            return 'succeeded'
+        else:
+            return 'failed'
 
 class MoveToPlacePosition(smach.State):
     def __init__(self, robot):
@@ -242,15 +335,27 @@ def main():
 
         with sm_pick:
             smach.StateMachine.add('MoveToGraspPosition', MoveToGraspPosition(robot),
-                                   transitions={'succeeded':'AdjustGraspPosition'})
+                                   transitions={'succeeded':'PickRecognition'})
 
-            smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
+
+            sm_pick_recognition = smach.StateMachine(outcomes=['succeeded', 'failed'])
+
+            with sm_pick_recognition:
+                smach.StateMachine.add('LookDown', LookDown(robot),
+                                       transitions={'succeeded':'AdjustGraspPosition',
+                                                    'failed':'failed'})
+
+                smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
+                                       transitions={'succeeded':'succeeded',
+                                                    'failed':'failed'})
+
+            smach.StateMachine.add('PickRecognition', sm_pick_recognition,
                                    transitions={'succeeded':'Grasp',
-                                                'failed':'AdjustGraspPosition'})
+                                                'failed':'MoveToGraspPosition'})
 
             smach.StateMachine.add('Grasp', Grasp(robot, add_object_model_func),
-                                   transitions={'succeeded':'pick_succeeded'})
-
+                                   transitions={'succeeded':'pick_succeeded',
+                                                'failed':'MoveToGraspPosition'})
 
         smach.StateMachine.add('Pick', sm_pick,
                                transitions={'pick_succeeded':'Place'})
