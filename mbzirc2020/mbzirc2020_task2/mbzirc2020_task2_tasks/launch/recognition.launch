@@ -10,15 +10,21 @@
 
   <rosparam command="load" file="$(arg config_dir)/ObjectDetection.yaml"/>
   <node unless="$(arg external_manager)"
-        pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="log"/>
+        pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen">
+    <remap from="~input" to="$(arg rgb_image_topic)"/>
+  </node>
 
   <node pkg="nodelet" type="nodelet" name="hls_color_filter" args="load opencv_apps/hls_color_filter $(arg manager)">
     <remap from="image" to="$(arg rgb_image_topic)"/>
     <param name="debug_view" value="false"/>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="opening_hls_color_filter" args="load jsk_perception/Opening $(arg manager)" output="screen">
+  <node pkg="nodelet" type="nodelet" name="dilate_hls_color_filter" args="load jsk_perception/DilateMaskImage $(arg manager)" output="screen">
     <remap from="~input" to="/hls_color_filter/image"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="opening_hls_color_filter" args="load jsk_perception/Opening $(arg manager)" output="screen">
+    <remap from="~input" to="/dilate_hls_color_filter/output"/>
   </node>
 
   <node pkg="nodelet" type="nodelet" name="rectangle_detection_color" args="load aerial_robot_perception/RectangleDetection $(arg manager)" output="screen">

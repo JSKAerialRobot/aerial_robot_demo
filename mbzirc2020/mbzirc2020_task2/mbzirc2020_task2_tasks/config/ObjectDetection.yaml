@@ -6,6 +6,10 @@ hls_color_filter:
   s_limit_max: 255
   s_limit_min: 76
 
+dilate_hls_color_filter:
+  size: 2
+  iterations: 2
+
 opening_hls_color_filter:
   size: 1
   iterations: 2
@@ -14,7 +18,7 @@ rectangle_detection_color:
   debug_view: true
   frame_id: target_object_color
   target_object_area: 0.06 #0.2 * 0.6
-  target_object_area_magin: 0.1
+  target_object_area_margin: 0.1
   object_height: 0.2
   lowest_margin: 10
 
@@ -31,6 +35,6 @@ rectangle_detection_depth:
   debug_view: true
   frame_id: target_object_depth
   target_object_area: 0.06 #0.2 * 0.6
-  target_object_area_magin: 0.02
+  target_object_area_margin: 0.02
   object_height: 0.2
   lowest_margin: 10
