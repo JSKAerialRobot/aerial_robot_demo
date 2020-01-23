@@ -122,6 +122,11 @@ class RectangularGridSearchState(smach.State):
         search_pos = self.grid_pos(self.current_grid_idx)
         self.commander.change_height(self.search_height)
         self.commander.move_to(search_pos[0], search_pos[1])
+
+        rospy.loginfo("Searching grid "+
+                str(np.count_nonzero(self.searched_grid)+1)+"/"+str(self.searched_grid.size)
+                + ", navigating to "+str([search_pos[0],search_pos[1],self.search_height]))
+
         if abs(self.cog_pos.transform.translation.x - search_pos[0]) < self.reach_margin and abs(self.cog_pos.transform.translation.y - search_pos[1]) < self.reach_margin:
             if self.is_grid_full():
                 return 'not_found'
@@ -177,6 +182,8 @@ class AproachOnTargetState(smach.State):
             rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
         self.commander.change_height(self.approach_height)
         self.commander.move_to(self.target_pos.vector.x, self.target_pos.vector.y)
+        rospy.loginfo("Navigating to target position "
+                +str([self.target_pos.vector.x, self.target_pos.vector.y, 0]))
         if abs(self.target_pos.vector.x - self.cog_pos.transform.translation.x) < self.approach_margin and abs(self.target_pos.vector.y - self.cog_pos.transform.translation.y) < self.approach_margin:
             return 'success'
 
