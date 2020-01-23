@@ -4,6 +4,7 @@ import rospy
 import smach
 import smach_ros
 from mbzirc2020_common.hydrus_interface import *
+from task2_hydrus_interface import Task2HydrusInterface
 from sensor_msgs.msg import JointState
 import numpy as np
 from geometry_msgs.msg import Transform, Inertia, PoseArray
@@ -12,6 +13,7 @@ import tf2_ros
 import ros_numpy
 from std_msgs.msg import UInt8, Empty
 from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
+import copy
 
 def addObjectToModel(robot, action, translation, yaw, mass):
     transform = Transform()
@@ -47,6 +49,7 @@ class Start(smach.State):
         self.task_start = True
 
     def execute(self, userdata):
+        self.robot.setXYPosOffset(self.robot.getBaselinkPos()[0:2])
         if self.skip_takeoff:
             return 'succeeded'
 
@@ -60,21 +63,7 @@ class Start(smach.State):
             pass
         self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2])
 
-        joint_state = JointState()
-        joint_state.name = ['rs_d435_servo_joint']
-        joint_state.position = [np.pi / 2] #look down
-        self.robot.setExtraJointAngle(joint_state, time = 1000)
-        return 'succeeded'
-
-class Finish(smach.State):
-    def __init__(self, robot):
-        smach.State.__init__(self, outcomes=['succeeded'])
-        self.robot = robot
-
-    def execute(self, userdata):
-        self.robot.goPosWaitConvergence('global', [0, 0], self.robot.getBaselinkPos()[2], self.robot.getBaselinkRPY()[2])
-        rospy.loginfo('Landing')
-        self.robot.land()
+        self.robot.setCameraJointAngle(np.pi / 2)
         return 'succeeded'
 
 class MoveToGraspPosition(smach.State):
@@ -83,19 +72,14 @@ class MoveToGraspPosition(smach.State):
         self.robot = robot
         self.global_object_pos = rospy.get_param('~global_object_pos')
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
-        self.preshape_joint_angle = rospy.get_param('~preshape_joint_angle')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
 
     def execute(self, userdata):
-        #preshape
-        joint_state = JointState()
-        joint_state.name = ['joint1', 'joint3']
-        joint_state.position = self.preshape_joint_angle
-        self.robot.setJointAngle(joint_state, time = 3000)
-
+        self.robot.preshape()
         #calc uav target coords
-        target_object_pos = self.global_object_pos[userdata.object_count]
+        target_object_pos = copy.copy(self.global_object_pos[userdata.object_count])
         target_object_pos[2] -= self.grasping_yaw
+
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_object_pos[2], pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_object_pos[2], pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
@@ -109,9 +93,6 @@ class LookDown(smach.State):
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
 
-        self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
         self.object_pose = None
 
@@ -121,7 +102,7 @@ class LookDown(smach.State):
     def execute(self, userdata):
         if (self.object_pose is not None) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
             try:
-                cam_trans = self.tf_buffer.lookup_transform('world', self.object_pose.header.frame_id, rospy.Time(), rospy.Duration(0.5))
+                cam_trans = self.robot.getCameraTransform(self.object_pose.header.frame_id)
                 cam_trans = ros_numpy.numpify(cam_trans.transform)
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 return 'failed'
@@ -162,9 +143,6 @@ class AdjustGraspPosition(smach.State):
         self.object_grasping_height = rospy.get_param('~object_grasping_height')
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
 
-        self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
         self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
@@ -178,7 +156,7 @@ class AdjustGraspPosition(smach.State):
     def execute(self, userdata):
         if (self.object_pose is not None) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5:
             try:
-                cam_trans = self.tf_buffer.lookup_transform('world', self.object_pose.header.frame_id, rospy.Time(), rospy.Duration(0.5))
+                cam_trans = self.robot.getCameraTransform(self.object_pose.header.frame_id)
                 cam_trans = ros_numpy.numpify(cam_trans.transform)
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 return 'failed'
@@ -220,14 +198,10 @@ class Grasp(smach.State):
         smach.State.__init__(self, outcomes=['succeeded', 'failed'])
         self.robot = robot
         self.add_object_model_func = add_object_model_func
-        self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle')
         self.joint_torque_thresh = rospy.get_param('~joint_torque_thresh')
 
     def execute(self, userdata):
-        joint_state = JointState()
-        joint_state.name = ['joint1', 'joint3']
-        joint_state.position = self.grasp_joint_angle
-        self.robot.setJointAngle(joint_state, time = 3000)
+        self.robot.grasp()
         rospy.sleep(1);
         joint_state = self.robot.getJointState()
         joint_torque = []
@@ -292,7 +266,6 @@ class Ungrasp(smach.State):
                              output_keys=['object_count'])
         self.robot = robot
         self.remove_object_model_func = remove_object_model_func
-        self.ungrasp_joint_angle = rospy.get_param('~ungrasp_joint_angle')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.place_z_offset = rospy.get_param('~place_z_offset')
         self.object_num = rospy.get_param('~object_num')
@@ -300,10 +273,7 @@ class Ungrasp(smach.State):
         self.object_count_pub = rospy.Publisher('/object_count', UInt8, queue_size = 1) #for dummy object pos publisher
 
     def execute(self, userdata):
-        joint_state = JointState()
-        joint_state.name = ['joint1', 'joint3']
-        joint_state.position = self.ungrasp_joint_angle
-        self.robot.setJointAngle(joint_state, time = 3000)
+        self.robot.ungrasp()
         self.remove_object_model_func(self.robot)
         userdata.object_count += 1
         self.object_count_pub.publish(userdata.object_count)
@@ -314,12 +284,23 @@ class Ungrasp(smach.State):
         else:
             return 'continue'
 
+class Finish(smach.State):
+    def __init__(self, robot):
+        smach.State.__init__(self, outcomes=['succeeded'])
+        self.robot = robot
+
+    def execute(self, userdata):
+        self.robot.goPosWaitConvergence('global', [0, 0], self.robot.getBaselinkPos()[2], self.robot.getBaselinkRPY()[2])
+        rospy.loginfo('Landing')
+        self.robot.land()
+        return 'succeeded'
+
 def main():
     rospy.init_node('mbzirc2020_task2_motion')
     sm_top = smach.StateMachine(outcomes=['succeeded'])
     sm_top.userdata.object_count = 0
 
-    robot = HydrusInterface()
+    robot = Task2HydrusInterface()
 
     object_translation = rospy.get_param('~object_translation')
     object_yaw = rospy.get_param('~object_yaw')

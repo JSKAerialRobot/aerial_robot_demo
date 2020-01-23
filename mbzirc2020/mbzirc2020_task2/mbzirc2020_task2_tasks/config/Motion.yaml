@@ -6,7 +6,7 @@ object_yaw: -0.785
 object_mass: 1.0
 
 object_num: 4
-global_object_pos: [[-1.5, 0.0, 3.141], [-2.1, 0, 3.141], [-2.7, 0, 3.141], [-3.3, 0, 3.141]] #in world frame, [x, y, yaw]
+global_object_pos: [[-2.5, -1.0, 3.141], [-2.1, 0, 3.141], [-2.7, 0, 3.141], [-3.3, 0, 3.141]] #in world frame, [x, y, yaw]
 object_lookdown_height: 3.0
 object_approach_height: 1.2
 object_grasping_height: 0.2

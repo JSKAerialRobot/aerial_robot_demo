@@ -9,9 +9,28 @@ from std_msgs.msg import Empty
 import math
 from aerial_robot_model.srv import AddExtraModule, AddExtraModuleRequest
 from std_msgs.msg import UInt8
+from jsk_rviz_plugins.msg import OverlayText
 
 class HydrusInterface:
-    def __init__(self):
+    def __init__(self, debug_view = False):
+        self.debug_view_ = debug_view
+        self.joint_state_ = None
+        self.cog_odom_ = None
+        self.baselink_odom_ = None
+        self.flight_state_ = None
+        self.target_pos_yaw_ = None
+
+        self.xy_pos_offset_ = [0, 0]
+
+        #flight state
+        self.ARM_OFF_STATE = 0
+        self.START_STATE = 1
+        self.ARM_ON_STATE = 2
+        self.TAKEOFF_STATE = 3
+        self.LAND_STATE = 4
+        self.HOVER_STATE = 5
+        self.STOP_STATE = 6
+
         self.joint_state_sub_ = rospy.Subscriber('hydrusx/joint_states', JointState, self.jointStateCallback)
         self.joint_ctrl_pub_ = rospy.Publisher('hydrusx/joints_ctrl', JointState, queue_size = 1)
         self.extra_joint_ctrl_pub_ = rospy.Publisher('hydrusx/extra_servos_ctrl', JointState, queue_size = 1)
@@ -25,30 +44,23 @@ class HydrusInterface:
         self.add_extra_module_client_ = rospy.ServiceProxy('hydrusx/add_extra_module', AddExtraModule)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
 
+        if self.debug_view_:
+            self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
+
         self.joint_update_freq_ = rospy.get_param("~joint_update_freq", 20)
 
-        self.joint_state_ = None
-        self.cog_odom_ = None
-        self.baselink_odom_ = None
-        self.flight_state_ = None
-        self.target_pos_yaw_ = None
-
-        #flight state
-        self.ARM_OFF_STATE = 0
-        self.START_STATE = 1
-        self.ARM_ON_STATE = 2
-        self.TAKEOFF_STATE = 3
-        self.LAND_STATE = 4
-        self.HOVER_STATE = 5
-        self.STOP_STATE = 6
 
     def jointStateCallback(self, msg):
         self.joint_state_ = msg
 
     def cogOdomCallback(self, msg):
+        msg.pose.pose.position.x -= self.xy_pos_offset_[0]
+        msg.pose.pose.position.y -= self.xy_pos_offset_[1]
         self.cog_odom_ = msg
 
     def baselinkOdomCallback(self, msg):
+        msg.pose.pose.position.x -= self.xy_pos_offset_[0]
+        msg.pose.pose.position.y -= self.xy_pos_offset_[1]
         self.baselink_odom_ = msg
 
     def flightStateCallback(self, msg):
@@ -96,6 +108,10 @@ class HydrusInterface:
             joint_msg.position = joint_pos
             self.extra_joint_ctrl_pub_.publish(joint_msg)
             rospy.sleep(1.0 / self.joint_update_freq_)
+
+
+    def setXYPosOffset(self, xy_pos_offset_):
+        self.xy_pos_offset_ = xy_pos_offset_
 
     def getJointState(self):
         return self.joint_state_
@@ -172,13 +188,15 @@ class HydrusInterface:
             rospy.logerr('invalid frame %s' % (frame))
             return
 
+        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
+
         nav_msg.header.stamp = rospy.Time.now()
         nav_msg.target = FlightNav.BASELINK
         nav_msg.pos_xy_nav_mode = FlightNav.POS_MODE
         nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
         nav_msg.psi_nav_mode = FlightNav.POS_MODE
-        nav_msg.target_pos_x = target_xy[0]
-        nav_msg.target_pos_y = target_xy[1]
+        nav_msg.target_pos_x = target_xy[0] + self.xy_pos_offset_[0]
+        nav_msg.target_pos_y = target_xy[1] + self.xy_pos_offset_[1]
         nav_msg.target_psi = target_yaw
         nav_msg.target_pos_z = target_z
 
@@ -205,6 +223,19 @@ class HydrusInterface:
             delta_yaw -= np.pi * 2
         elif delta_yaw < -np.pi:
             delta_yaw += np.pi * 2
+
+        if self.debug_view_:
+            text = OverlayText()
+            text.width = 400
+            text.height = 200
+            text.left = 10
+            text.top = 10
+            text.text_size = 12
+            text.line_width = 2
+            text.font = "DejaVu Sans Mono"
+            text.text = """%f %f %f """ % (np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel))
+
+            self.nav_debug_pub_.publish(text)
 
         if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh and np.linalg.norm(current_vel) < vel_conv_thresh:
             return True
