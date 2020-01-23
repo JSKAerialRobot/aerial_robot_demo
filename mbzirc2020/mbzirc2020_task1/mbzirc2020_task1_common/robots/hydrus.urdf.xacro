@@ -5,7 +5,7 @@
   <!-- base kinematics model -->
   <xacro:arg name="horizontal_vio" default="false" />
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
-  <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"/>
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0" with_gps = "false"/>
 
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
@@ -47,7 +47,31 @@
   <!-- end: intel upboard -->
 
   <!-- sensor -->
-  <!-- 1. RGB camera -->
+  <!-- 1. GPS -->
+  <xacro:extra_module name = "gps" parent = "link2" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/sensor/gps_ublox_m8n.dae">
+    <origin xyz="${link_length/2 + 0.1925} 0.0 0.152" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0.000000 0.000000 -0.013" rpy="0 0 0"/>
+      <mass value="0.042"/>
+      <inertia
+          ixx="0.00006" iyy="0.00006" izz="0.000007"
+          ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "magnet" parent = "gps">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <inertial>
+      <mass value = "0.00001" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.000001" ixy="0.0" ixz="0.0"
+          iyy="0.000001" iyz="0.0"
+          izz="0.000002"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- 2. RGB camera -->
   <!-- TODO: accurate intertia parameters and position -->
   <xacro:extra_module name = "rgb_camera_frame" parent = "link2" visible = "0"  >
     <origin xyz="${link_length / 2 + 0.140} 0.162 0.063" rpy="0 0 ${3 * pi/4}"/>

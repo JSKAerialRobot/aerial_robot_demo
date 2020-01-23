@@ -7,7 +7,7 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1">
+  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1 with_gps:=1">
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
       <xacro:hydrusx_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
@@ -70,28 +70,30 @@
     <!-- end: leddar one -->
 
     <!-- 2.2 gps -->
-    <xacro:extra_module name = "gps" parent = "link2" visible = "1"
-                        model_url = "package://hydrus/urdf/mesh/sensor/gps_ublox_m8n.dae">
-      <origin xyz="${link_length/2 + 0.1925} 0.0 0.152" rpy="0 0 0"/>
-      <inertial>
-        <origin xyz="0.000000 0.000000 -0.013" rpy="0 0 0"/>
-        <mass value="0.042"/>
-        <inertia
-            ixx="0.00006" iyy="0.00006" izz="0.000007"
-            ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
-      </inertial>
-    </xacro:extra_module>
-    <xacro:extra_module name = "magnet" parent = "gps">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertial>
-        <mass value = "0.00001" />
+    <xacro:if value="${with_gps == 1}">
+      <xacro:extra_module name = "gps" parent = "link2" visible = "1"
+                          model_url = "package://hydrus/urdf/mesh/sensor/gps_ublox_m8n.dae">
+        <origin xyz="${link_length/2 + 0.2446} 0.0554 0.121" rpy="0 0 0"/>
+        <inertial>
+          <origin xyz="0.000000 0.000000 -0.008" rpy="0 0 0"/>
+          <mass value="0.059"/>
+          <inertia
+              ixx="0.00006" iyy="0.00006" izz="0.000007"
+              ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+        </inertial>
+      </xacro:extra_module>
+      <xacro:extra_module name = "magnet" parent = "gps">
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia
-            ixx="0.000001" ixy="0.0" ixz="0.0"
-            iyy="0.000001" iyz="0.0"
-            izz="0.000002"/>
-      </inertial>
-    </xacro:extra_module>
+        <inertial>
+          <mass value = "0.00001" />
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <inertia
+              ixx="0.000001" ixy="0.0" ixz="0.0"
+              iyy="0.000001" iyz="0.0"
+              izz="0.000002"/>
+        </inertial>
+      </xacro:extra_module>
+    </xacro:if>
     <!-- end: gps -->
 
     <!-- 2.3 downwards rs-t265 (VIO) -->
