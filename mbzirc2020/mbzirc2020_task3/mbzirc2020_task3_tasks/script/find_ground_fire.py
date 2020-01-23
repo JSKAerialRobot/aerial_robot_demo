@@ -22,6 +22,9 @@ def main():
 
     sm = smach.StateMachine(outcomes=['DONE', 'FAIL'])
     with sm:
+        nav_control_rate = rospy.get_param('~control_rate', 5.0)
+        nav_approach_margin = rospy.get_param('~navigation_approach_margin', [0.1, 0.1, 0.1])
+
         search_params = {}
         search_params['target_topic_name'] = rospy.get_param('~target_topic_name', '/target_object/pos')
         search_params['control_rate'] = rospy.get_param('~control_rate', 5.0)
@@ -46,7 +49,7 @@ def main():
         for i in range(search_area_number):
             waypoint_nav_creator = WaypointNavigationStateMachineCreator()
             waypoints = waypoints_list[i]
-            sm_sub_nav = waypoint_nav_creator.create(waypoints)
+            sm_sub_nav = waypoint_nav_creator.create(waypoints, nav_approach_margin, nav_control_rate)
             smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'SEARCHING'+str(i), 'failure':'FAIL'})
 
             search_params['area_corners'] = area_corners_list[i]

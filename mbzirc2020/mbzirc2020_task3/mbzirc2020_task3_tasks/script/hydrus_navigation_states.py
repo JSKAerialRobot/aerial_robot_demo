@@ -23,11 +23,11 @@ class TakeoffState(smach.State):
         return 'success'
 
 class GoPositionState(smach.State):
-    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05]):
+    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0):
         smach.State.__init__(self, outcomes=['success', 'ongoing'])
         self.commander = HydrusCommander()
 
-        self.control_rate = rospy.get_param('~control_rate', 5.0)
+        self.control_rate = control_rate
         self.approach_margin = approach_margin
         # tf Buffer
         self.tfBuffer = tf2_ros.Buffer()
@@ -43,6 +43,8 @@ class GoPositionState(smach.State):
         self.commander.change_height(self.target_pos[2])
         self.commander.move_to(self.target_pos[0], self.target_pos[1])
 
+        rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
+
         if abs(self.target_pos[0] - self.cog_pos.transform.translation.x) < self.approach_margin[0] and abs(self.target_pos[1] - self.cog_pos.transform.translation.y) < self.approach_margin[1] and abs(self.target_pos[2] - self.cog_pos.transform.translation.z) < self.approach_margin[2]:
             return 'success'
 
@@ -50,7 +52,7 @@ class GoPositionState(smach.State):
         return 'ongoing'
 
 class WaypointNavigationStateMachineCreator():
-    def create(self, waypoints):
+    def create(self, waypoints, approach_margin, control_rate):
         ''' waypoints: nx3 array of 3d poionts
         '''
         sm = smach.StateMachine(outcomes={'success', 'failure'})
@@ -60,7 +62,7 @@ class WaypointNavigationStateMachineCreator():
                     next_state = 'success'
                 else:
                     next_state = 'waypoint'+str(i+1)
-                smach.StateMachine.add('waypoint'+str(i), GoPositionState(waypoint),
+                smach.StateMachine.add('waypoint'+str(i), GoPositionState(waypoint, approach_margin, control_rate),
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
         return sm

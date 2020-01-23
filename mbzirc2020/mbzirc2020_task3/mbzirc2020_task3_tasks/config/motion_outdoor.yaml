@@ -2,9 +2,11 @@
 
 control_rate : 1.0
 
+navigation_approach_margin : [0.5, 0.5, 0.5]
+
 search_height : 2.0
 search_grid_size : 1.0
-reach_margin : 0.15
+reach_margin : 0.5
 target_timeout : 3.0
 approach_height : 1.8
 descending_height : 1.2
