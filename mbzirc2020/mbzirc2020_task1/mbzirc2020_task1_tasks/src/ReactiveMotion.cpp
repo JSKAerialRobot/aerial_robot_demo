@@ -18,6 +18,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   flight_nav_pub_ = nh_.advertise<aerial_robot_msgs::FlightNav>("/uav/nav", 1);
   // nearest_waypoint_pub_ = nh_.advertise<visualization_msgs::Marker>("/reactive_motion/target", 1);
   nearest_waypoint_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/target", 1);
+  uav_cog_point_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/cog_point", 1);
 
   sleep(0.1);
 }
@@ -105,6 +106,11 @@ void ReactiveMotion::cogOdomCallback(const nav_msgs::OdometryConstPtr & msg){
   cur_pos_ << cog_odom_.pose.pose.position.x,
     cog_odom_.pose.pose.position.y,
     cog_odom_.pose.pose.position.z;
+  geometry_msgs::PointStamped cog_pt_msg;
+  cog_pt_msg.header = cog_odom_.header;
+  cog_pt_msg.header.frame_id = "world";
+  cog_pt_msg.point = cog_odom_.pose.pose.position;
+  uav_cog_point_pub_.publish(cog_pt_msg);
 }
 
 void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & msg){
