@@ -31,6 +31,7 @@ private:
   ros::Subscriber motion_state_sub_;
   ros::Publisher flight_nav_pub_;
   ros::Publisher nearest_waypoint_pub_;
+  ros::Publisher uav_cog_point_pub_;
 
   void sendControlCmd(Eigen::Vector3d target_pos);
 
