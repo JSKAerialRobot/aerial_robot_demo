@@ -1,0 +1,28 @@
+<launch>
+  <arg name="play" default="false"/>
+  <arg name="path" default=""/>
+  <arg name="model_suffix" default="_ring_gripper"/>
+
+  <param name="/use_sim_time" value="true"/>
+
+  <node if="$(arg play)" pkg="rosbag" name="rosbag" type="play" args="$(arg path) --clock"/>
+
+  <include file="$(find mbzirc2020_common)/launch/robot_model.launch">
+    <arg name="description_mode" default="gazebo"/>
+    <arg name="task" value="2"/>
+    <arg name="need_joint_state" value="false"/>
+    <arg name="model_suffix" value="$(arg model_suffix)"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rosbag_replay_rviz_config"/>
+  </include>
+
+  <include file="$(find mbzirc2020_task2_common)/launch/image_republish.launch"/>
+
+  <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
+        args="standalone depth_image_proc/point_cloud_xyzrgb" >
+    <remap from="rgb/camera_info" to="/rs_d435/color/camera_info"/>
+    <remap from="rgb/image_rect_color" to="/rs_d435/color/image_rect_color"/>
+    <remap from="depth_registered/image_rect" to="/rs_d435/aligned_depth_to_color/image_raw"/>
+    <remap from="depth_registered/points" to="/rs_d435/points"/>
+  </node>
+
+</launch>
