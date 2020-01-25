@@ -1,17 +1,32 @@
 <launch>
+  <arg name="world" default="simulation_default"/>
   <arg name="object_pos_recognition" default="true"/>
-  <arg name="skip_takeoff" default="false"/>
   <arg name="smach_viewer" default="false"/>
   <arg name="outdoor" default="false"/>
+  <arg name="debug_adjust" default="false"/>
+
+  <group ns="task2_motion">
+    <group if="$(arg debug_adjust)">
+      <rosparam>
+        skip_takeoff: true
+        skip_move_to_grasp_position: true
+        skip_look_down: true
+        skip_adjust_grasp_position: false
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+  </group>
 
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
-    <param name="skip_takeoff" value="$(arg skip_takeoff)"/>
-    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/Motion.yaml"/>
+    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/$(arg world)/Motion.yaml"/>
   </node>
 
   <group if="$(arg object_pos_recognition)">
     <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+      <arg name="world" value="$(arg world)"/>
       <arg if="$(arg outdoor)" name="external_manager" value="true" />
       <arg if="$(arg outdoor)" name="manager" value="/rs_d435/realsense2_camera_manager" />
     </include>

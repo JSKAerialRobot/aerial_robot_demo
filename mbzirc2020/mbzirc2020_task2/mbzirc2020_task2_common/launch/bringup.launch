@@ -28,8 +28,8 @@
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
     <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rviz_config"/>
-    <arg name="spawn_x" value="1.0"/>
-    <arg name="spawn_y" value="1.0"/>
+    <arg name="spawn_x" value="0.0"/>
+    <arg name="spawn_y" value="0.0"/>
   </include>
 
   ######### config for actuated legs #########

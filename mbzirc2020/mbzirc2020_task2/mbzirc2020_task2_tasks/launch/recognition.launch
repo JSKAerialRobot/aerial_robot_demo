@@ -1,4 +1,5 @@
 <launch>
+  <arg name="world" default="simulation_default"/>
   <arg name="rgb_image_topic" default="/rs_d435/color/image_rect_color" />
   <arg name="rgb_camera_info_topic" default="/rs_d435/color/camera_info" />
   <arg name="depth_image_topic" default="/rs_d435/aligned_depth_to_color/image_raw" />
@@ -6,7 +7,7 @@
 
   <arg name="external_manager" default="false"/>
   <arg name="manager" default="object_detection_manager"/>
-  <arg name="config_dir" default="$(find mbzirc2020_task2_tasks)/config"/>
+  <arg name="config_dir" default="$(find mbzirc2020_task2_tasks)/config/$(arg world)"/>
 
   <rosparam command="load" file="$(arg config_dir)/ObjectDetection.yaml"/>
   <node unless="$(arg external_manager)"
