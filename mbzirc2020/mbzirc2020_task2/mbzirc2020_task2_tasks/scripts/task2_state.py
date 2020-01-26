@@ -85,7 +85,7 @@ class LookDown(Task2State):
         self.skip_look_down = rospy.get_param('~skip_look_down', False)
 
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
-        self.object_pose = None
+        self.object_pose = PoseArray()
 
     def objectPoseCallback(self, msg):
         self.object_pose = msg
@@ -96,7 +96,7 @@ class LookDown(Task2State):
         if self.skip_look_down:
             return 'succeeded'
 
-        if (self.object_pose is not None) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
+        if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
             try:
                 cam_trans = self.robot.getCameraTransform(self.object_pose.header.frame_id)
                 cam_trans = ros_numpy.numpify(cam_trans.transform)
