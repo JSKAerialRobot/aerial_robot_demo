@@ -56,4 +56,5 @@ private:
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void visualizeRansacLine();
   void visualizeRansacInliers();
+  void initializeEstimatorParam();
 };

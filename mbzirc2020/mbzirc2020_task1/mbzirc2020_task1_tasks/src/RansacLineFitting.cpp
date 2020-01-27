@@ -12,16 +12,12 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("ransac_3d_mode", ransac_3d_mode_, false);
   nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
   nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 1.0);
+  nhp_.param("lpf_z_gain", lpf_z_gain_, 0.8);
 
-  lpf_z_ = -1;
-  lpf_z_gain_ = 0.8;
-
-  target_pt_update_time_ = -1.0;
+  initializeEstimatorParam();
 
   estimator_2d_.Initialize(0.1, 100); // Threshold, iterations
   estimator_3d_.Initialize(0.1, 100); // Threshold, iterations
-
-  estimator_state_ = STOP_ESTIMATION;
 
   target_pt_sub_ = nh_.subscribe<geometry_msgs::PointStamped>(target_pt_sub_topic_name, 1, &RansacLineFitting::targetPointCallback, this, ros::TransportHints().tcpNoDelay());
 
@@ -33,14 +29,8 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
   double cur_time = msg->header.stamp.toSec();
   if (target_pt_update_time_ < 0.0) // when in initial case
     target_pt_update_time_ = cur_time;
-  else if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_){
-    target_pt_update_time_ = cur_time;
-    // initalize ransac related variables to re-start estimation
-    lpf_z_ = -1;
-    cand_points3d_.clear();
-    cand_points2d_.clear();
-    estimator_state_ = STOP_ESTIMATION;
-  }
+  else if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_)
+    initializeEstimatorParam();
   else
     target_pt_update_time_ = cur_time;
 
@@ -69,11 +59,27 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
   }
 }
 
+void RansacLineFitting::initializeEstimatorParam(){
+    target_pt_update_time_ = -1.0;
+    // initalize ransac related variables to re-start estimation
+    lpf_z_ = -1;
+    cand_points3d_.clear();
+    cand_points2d_.clear();
+    estimator_state_ = STOP_ESTIMATION;
+}
+
 bool RansacLineFitting::isEstimated(){
   if (estimator_state_ == STOP_ESTIMATION)
     return false;
-  else if (estimator_state_ == IN_ESTIMATION)
-    return true;
+  else if (estimator_state_ == IN_ESTIMATION){
+    double cur_time = ros::Time::now().toSec();
+    if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_){
+      initializeEstimatorParam();
+      return false;
+    }
+    else
+      return true;
+  }
 }
 
 void RansacLineFitting::update(){
