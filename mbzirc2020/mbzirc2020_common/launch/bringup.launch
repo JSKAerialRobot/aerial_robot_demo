@@ -49,7 +49,8 @@
 
     <param name="simulation" value="$(arg simulation)" />  <!--for sensor plugin-->
     <param name="param_verbose" value="false"/>
-    <param name="main_rate" type="double" value="100"/>
+    <param name="main_rate" type="double" value="100" if="$(arg mpc)"/>
+    <param name="main_rate" type="double" value="40" unless="$(arg mpc)"/>
 
     ###########  PID Control  ###########
     <param name="control_plugin_name" value="control_plugin/agile_flatness_pid" />
