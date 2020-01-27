@@ -20,6 +20,7 @@
     <arg name="headless" value="$(arg headless)" />
     <arg name="task" value="1" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
+    <arg name="worldtype" value="$(find mbzirc2020_task1_common)/gazebo_model/world/mbzirc_arena_task_1.world" />
   </include>
 
   <group if="$(arg real_machine)">
@@ -38,7 +39,7 @@
 
     ######### realsense d435 ###########
     <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 color_width:=1920 color_height:=1080"
+          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 color_width:=1280 color_height:=720"
           name="timed_roslaunch" output="screen" unless="$(arg monocular_camera)" />
 
     <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="20" />
