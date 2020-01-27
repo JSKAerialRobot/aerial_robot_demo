@@ -186,8 +186,9 @@
       </inertial>
     </xacro:extra_module>
   </xacro:unless>
+
   <!-- net -->
-  <xacro:property name="net_mass" value=".035" />
+  <xacro:property name="net_mass" value=".03" />
   <xacro:extra_module name = "net_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
     <inertial>
