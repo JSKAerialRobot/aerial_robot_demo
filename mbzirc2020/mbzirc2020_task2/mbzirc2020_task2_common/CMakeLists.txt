@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   hydrus
   mbzirc2020_task2_simulation
   gazebo_ros
+  timed_roslaunch
   )
 
 catkin_package(

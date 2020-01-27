@@ -1,0 +1,11 @@
+<launch>
+
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+
+  <node name="hydrus_position_reset" type="hydrus_position_reset.py" pkg="mbzirc2020_task2_simulation" output="screen">
+    <param name="respawn_pos_x" value="$(arg x)"/>
+    <param name="respawn_pos_y" value="$(arg y)"/>
+  </node>
+
+</launch>

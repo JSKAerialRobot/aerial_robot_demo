@@ -83,6 +83,7 @@ class LookDown(Task2State):
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.skip_look_down = rospy.get_param('~skip_look_down', False)
+        self.do_object_recognition = rospy.get_param('~do_object_recognition')
 
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
         self.object_pose = PoseArray()
@@ -94,6 +95,10 @@ class LookDown(Task2State):
         self.waitUntilTaskStart()
 
         if self.skip_look_down:
+            return 'succeeded'
+
+        if not self.do_object_recognition:
+            rospy.logwarn('no recognition: skip LookDown')
             return 'succeeded'
 
         if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
@@ -126,7 +131,6 @@ class LookDown(Task2State):
         uav_target_yaw = object_global_yaw - self.grasping_yaw
 
         rospy.logwarn("succeed to find valid object: %f, %f", object_global_pos[0], object_global_pos[1])
-
         self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
@@ -134,11 +138,13 @@ class LookDown(Task2State):
 
 class AdjustGraspPosition(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'])
+        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'], input_keys=['object_count'], output_keys=['object_count'])
         self.robot = robot
         self.object_grasping_height = rospy.get_param('~object_grasping_height')
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.skip_adjust_grasp_position = rospy.get_param('~skip_adjust_grasp_position', False)
+        self.do_object_recognition = rospy.get_param('~do_object_recognition')
+        self.global_object_pos = rospy.get_param('~global_object_pos')
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -156,38 +162,49 @@ class AdjustGraspPosition(Task2State):
         if self.skip_adjust_grasp_position:
             return 'succeeded'
 
-        if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5:
-            try:
-                cam_trans = self.robot.getCameraTransform(self.object_pose.header.frame_id)
-                cam_trans = ros_numpy.numpify(cam_trans.transform)
-            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        if self.do_object_recognition:
+            if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5:
+                try:
+                    cam_trans = self.robot.getCameraTransform(self.object_pose.header.frame_id)
+                    cam_trans = ros_numpy.numpify(cam_trans.transform)
+                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                    return 'failed'
+            else:
                 return 'failed'
-        else:
-            return 'failed'
 
-        #determine valid target object
-        #detect most center object
-        object_poses = self.object_pose.poses
-        object_poses = sorted(object_poses, key=lambda x: x.position.x ** 2 + x.position.y ** 2)
-        target_object_pose = object_poses[0]
+            #determine valid target object
+            #detect most center object
+            object_poses = self.object_pose.poses
+            object_poses = sorted(object_poses, key=lambda x: x.position.x ** 2 + x.position.y ** 2)
+            target_object_pose = object_poses[0]
 
-        #check the validity in terms of yaw angle (yaw angle should be around -pi/2 in camera frame)
-        object_yaw = tft.euler_from_quaternion(ros_numpy.numpify(target_object_pose.orientation))[2]
-        if abs(object_yaw - (-np.pi / 2)) > self.object_yaw_thresh:
-            rospy.logerr("invalide yaw")
-            return 'failed'
+            #check the validity in terms of yaw angle (yaw angle should be around -pi/2 in camera frame)
+            object_yaw = tft.euler_from_quaternion(ros_numpy.numpify(target_object_pose.orientation))[2]
+            if abs(object_yaw - (-np.pi / 2)) > self.object_yaw_thresh:
+                rospy.logerr("invalide yaw")
+                return 'failed'
 
-        object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
-        object_global_pos = tft.translation_from_matrix(object_global_coords)
-        object_global_x_axis = object_global_coords[0:3, 0]
-        object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
-        rospy.logwarn("succeed to find valid object: %f, %f", object_global_pos[0], object_global_pos[1])
+            object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
+            object_global_pos = tft.translation_from_matrix(object_global_coords)
+            object_global_x_axis = object_global_coords[0:3, 0]
+            object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
+            rospy.logwarn("succeed to find valid object x: %f, y: %f, yaw: %f", object_global_pos[0], object_global_pos[1], object_global_yaw)
 
-        object_global_coords_modified = tft.compose_matrix(translate=tft.translation_from_matrix(object_global_coords), angles=[0, 0, object_global_yaw])
+            object_global_coords_modified = tft.compose_matrix(translate=tft.translation_from_matrix(object_global_coords), angles=[0, 0, object_global_yaw])
 
-        uav_target_coords = tft.concatenate_matrices(object_global_coords_modified, tft.inverse_matrix(self.grasping_point_coords))
-        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-        uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+            uav_target_coords = tft.concatenate_matrices(object_global_coords_modified, tft.inverse_matrix(self.grasping_point_coords))
+            uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+            uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+
+        else: #no recognition
+            rospy.logwarn('no recognition: skip AdjustGraspPosition')
+            target_object_pos = copy.copy(self.global_object_pos[userdata.object_count])
+            object_global_coords = tft.compose_matrix(translate=[target_object_pos[0], target_object_pos[1], 0], angles=[0, 0, target_object_pos[2]])
+            uav_target_coords = tft.concatenate_matrices(object_global_coords, tft.inverse_matrix(self.grasping_point_coords))
+            uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+            uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+
+            rospy.logwarn("go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], uav_target_yaw)
 
         self.robot.preshape()
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)

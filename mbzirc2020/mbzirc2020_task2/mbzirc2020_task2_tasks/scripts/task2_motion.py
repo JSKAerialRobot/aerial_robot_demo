@@ -61,7 +61,7 @@ def main():
                                    transitions={'succeeded':'PickRecognition'})
 
 
-            sm_pick_recognition = smach.StateMachine(outcomes=['succeeded', 'failed'])
+            sm_pick_recognition = smach.StateMachine(outcomes=['succeeded', 'failed'], input_keys=['object_count'], output_keys=['object_count'])
 
             with sm_pick_recognition:
                 smach.StateMachine.add('LookDown', LookDown(robot),
@@ -70,11 +70,13 @@ def main():
 
                 smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
                                        transitions={'succeeded':'succeeded',
-                                                    'failed':'failed'})
+                                                    'failed':'failed'},
+                                       remapping={'object_count':'object_count'})
 
             smach.StateMachine.add('PickRecognition', sm_pick_recognition,
                                    transitions={'succeeded':'Grasp',
-                                                'failed':'MoveToGraspPosition'})
+                                                'failed':'MoveToGraspPosition'},
+                                   remapping={'object_count':'object_count'})
 
             smach.StateMachine.add('Grasp', Grasp(robot, add_object_model_func),
                                    transitions={'succeeded':'pick_succeeded',

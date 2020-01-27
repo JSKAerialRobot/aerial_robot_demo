@@ -11,6 +11,8 @@
   <arg name="ring_gripper" default="True"/>
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
+  <arg name="spawn_x" default="0.0"/>
+  <arg name="spawn_y" default="0.0"/>
 
   <param name="/simulation" value="$(arg simulation)"/>
 
@@ -28,8 +30,6 @@
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
     <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rviz_config"/>
-    <arg name="spawn_x" value="0.0"/>
-    <arg name="spawn_y" value="0.0"/>
   </include>
 
   ######### config for actuated legs #########
@@ -48,5 +48,9 @@
   </group>
 
   <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle"/>
+
+  <node if="$(arg simulation)"
+        pkg="timed_roslaunch" type="timed_roslaunch.sh"
+        args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y)" name="timed_roslaunch" output="screen"/>
 
 </launch>
