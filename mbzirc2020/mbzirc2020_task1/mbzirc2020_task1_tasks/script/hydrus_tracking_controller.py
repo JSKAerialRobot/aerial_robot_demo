@@ -102,6 +102,7 @@ class hydrusTrackingController:
 
         ## hydrusx start and takeoff
         if self.__hydrus_init_process:
+            rospy.sleep(1.0)
             self.__hydrusx_start_pub.publish(Empty())
             rospy.sleep(1.0)
             self.__hydrusx_takeoff_pub.publish(Empty())

@@ -1,17 +1,20 @@
 <launch>
   <arg name="fake_vision" default="true" />
+  <arg name="ransac" default="true" />
   <arg name="mpc" default="false" />
 
-  <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
-    <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
-    <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
-    <param name="replan_timer_period" value="0.2" />
-    <param name="predict_horizon" value="3.0" />
-    <param name="kf_method" value="2" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
-    <param name="primitive_visualize_flag" value="true" />
-    <param name="primitive_candidates_num" value="6" />
-    <param name="noise_flag" value="true" />
-  </node>
+  <group unless="$(arg ransac)">
+    <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
+      <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+      <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
+      <param name="replan_timer_period" value="0.2" />
+      <param name="predict_horizon" value="3.0" />
+      <param name="kf_method" value="2" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
+      <param name="primitive_visualize_flag" value="true" />
+      <param name="primitive_candidates_num" value="6" />
+      <param name="noise_flag" value="true" />
+    </node>
+  </group>
 
   <group if="$(arg fake_vision)">
     <node pkg="mbzirc2020_task1_tasks" type="fake_visual_detector.py" name="fake_visual_detector" output="screen" respawn="false">
