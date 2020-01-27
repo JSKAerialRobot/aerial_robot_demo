@@ -7,6 +7,7 @@
   <arg name="estimate_mode"  default= "0" />
   <arg name="headless" default="True" />
   <arg name="start" default="true" />
+  <arg name="ransac" default="true" />
   <arg name="mpc" default="false" />
 
   ##########  basic bringup file ########
@@ -21,6 +22,7 @@
 
   ####### tracking ##########
   <include file="$(find mbzirc2020_task1_tasks)/launch/tracking.launch" >
+    <arg name="ransac" value="$(arg ransac)" />
     <arg name="mpc" value="$(arg mpc)" />
   </include>
 
