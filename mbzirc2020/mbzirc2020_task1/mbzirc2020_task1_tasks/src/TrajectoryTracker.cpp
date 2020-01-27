@@ -43,7 +43,7 @@ namespace trajectory_tracker{
     nhp_.param("predict_horizon", kf_predict_horizon_, 4.0);
     nhp_.param("tracking_offset_z", tracking_offset_z_, 1.0);
     nhp_.param("primitive_candidates_num", primitive_candidates_num_, 6);
-    nhp_.param("primitive_period_step", primitive_period_step_, 0.3);
+    nhp_.param("primitive_period_step", primitive_period_step_, 0.2);
     nhp_.param("primitive_period_base", primitive_period_base_, 0.3);
     nhp_.param("primitive_visualize_flag", primitive_visualize_flag_, false);
     nhp_.param("treasure_box_x", treasure_box_pos_(0), 0.0);
@@ -108,8 +108,8 @@ namespace trajectory_tracker{
       /* find the primitive with minimum snap energy */
       double min_energy = -1;
       double primitive_period_base_local = period - primitive_period_step_ * primitive_candidates_num_ / 2;
-      while (primitive_period_base_local < 0.1)
-        primitive_period_base_local += primitive_period_step_;
+      if (primitive_period_base_local < 0.1)
+        primitive_period_base_local = 0.1;
       for (int i = 0; i < primitive_candidates_num_; ++i){
         double period_candidate = primitive_period_base_local + primitive_period_step_ * i;
         if (period_candidate > kf_predict_horizon_)
@@ -167,7 +167,6 @@ namespace trajectory_tracker{
       primitive_period_ = dist_treasure_box / 2.0;
 
     }
-    replan_timer_period_ = primitive_period_ - 0.2;
     if (replan_timer_period_ < 0.0){
       ROS_ERROR("[TrajectoryTracker] replan_timer_period is less than 0");
       replan_timer_period_ = 0.1;

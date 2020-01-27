@@ -7,6 +7,8 @@
   <arg name="estimate_mode"  default= "0" />
   <arg name="headless" default="True" />
   <arg name="start" default="true" />
+  <arg name="ransac" default="true" />
+  <arg name="mpc" default="false" />
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
@@ -14,10 +16,15 @@
     <arg name="simulation" value="$(arg simulation)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
+    <arg name="mpc" value="$(arg mpc)" />
+    <arg name="launch_gazebo" value="$(arg simulation)" />
   </include>
 
   ####### tracking ##########
-  <include file="$(find mbzirc2020_task1_tasks)/launch/tracking.launch" />
+  <include file="$(find mbzirc2020_task1_tasks)/launch/tracking.launch" >
+    <arg name="ransac" value="$(arg ransac)" />
+    <arg name="mpc" value="$(arg mpc)" />
+  </include>
 
   ####### simulation #########
   <group if="$(arg simulation)">
@@ -28,12 +35,6 @@
 
     <arg name="use_ground_truth" default="true" />
     <arg name="uav_name" default="hawk" />
-
-    ####### virtual arena #########
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name" value="$(find mbzirc2020_task1_common)/gazebo_model/world/mbzirc_arena.world"/>
-      <arg name="gui" default="false" if="$(arg headless)" />
-    </include>
 
     ####### moving target uav ######
     <group ns="$(arg uav_name)">
