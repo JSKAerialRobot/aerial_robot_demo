@@ -23,6 +23,7 @@
   <run_depend>visualization_msgs</run_depend>
   <run_depend>gazebo_ros</run_depend>
   <run_depend>usb_cam</run_depend>
+  <run_depend>timed_roslaunch</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
