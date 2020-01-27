@@ -25,6 +25,7 @@ private:
   Eigen::Vector3d cur_pos_;
   Eigen::Vector3d target_pos_;
   int stop_tracking_cnt_;
+  double cog_net_offset_;
 
   ros::Timer control_timer_;
   ros::Subscriber cog_odom_sub_;
