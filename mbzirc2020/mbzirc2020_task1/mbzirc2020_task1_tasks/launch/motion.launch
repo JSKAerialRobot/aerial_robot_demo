@@ -16,6 +16,7 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="mpc" value="$(arg mpc)" />
+    <arg name="launch_gazebo" value="$(arg simulation)" />
   </include>
 
   ####### tracking ##########
