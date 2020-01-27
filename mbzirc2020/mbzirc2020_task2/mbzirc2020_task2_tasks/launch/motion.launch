@@ -3,15 +3,41 @@
   <arg name="object_pos_recognition" default="true"/>
   <arg name="smach_viewer" default="false"/>
   <arg name="outdoor" default="false"/>
+  <arg name="debug_look_down" default="false"/>
   <arg name="debug_adjust" default="false"/>
+  <arg name="debug_grasp" default="false"/>
 
   <group ns="task2_motion">
+    <group if="$(arg debug_look_down)">
+      <rosparam>
+        skip_takeoff: true
+        skip_move_to_grasp_position: true
+        skip_look_down: false
+        skip_adjust_grasp_position: false
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
     <group if="$(arg debug_adjust)">
       <rosparam>
         skip_takeoff: true
         skip_move_to_grasp_position: true
         skip_look_down: true
         skip_adjust_grasp_position: false
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
+    <group if="$(arg debug_grasp)">
+      <rosparam>
+        skip_takeoff: true
+        skip_move_to_grasp_position: true
+        skip_look_down: true
+        skip_adjust_grasp_position: true
         skip_grasp: false
         skip_move_to_place_position: false
         skip_ungrasp: false
