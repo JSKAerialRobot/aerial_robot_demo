@@ -10,6 +10,8 @@
   <arg name="config_dir" default="$(find mbzirc2020_task2_tasks)/config/$(arg world)"/>
 
   <rosparam command="load" file="$(arg config_dir)/ObjectDetection.yaml"/>
+  <rosparam command="load" file="$(arg config_dir)/ChannelDetection.yaml"/>
+
   <node unless="$(arg external_manager)"
         pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen">
     <remap from="~input" to="$(arg rgb_image_topic)"/>
@@ -46,6 +48,25 @@
     <remap from="~input" to="/opening_depth_distance_filter/output" />
     <remap from="~rgb_img" to="$(arg rgb_image_topic)" />
     <remap from="~cam_info" to="$(arg depth_camera_info_topic)" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="hls_color_filter_channel" args="load opencv_apps/hls_color_filter $(arg manager)">
+    <remap from="image" to="$(arg rgb_image_topic)"/>
+    <param name="debug_view" value="false"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="closing_hls_color_filter_channel" args="load jsk_perception/Closing $(arg manager)" output="screen">
+    <remap from="~input" to="/hls_color_filter_channel/image"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="opening_hls_color_filter_channel" args="load jsk_perception/Opening $(arg manager)" output="screen">
+    <remap from="~input" to="/closing_hls_color_filter_channel/output"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="channel_detection"
+        args="load aerial_robot_perception/GroundObjectDetection $(arg manager)" output="screen">
+    <remap from="image" to="/opening_hls_color_filter_channel/output" />
+    <remap from="camera_info" to="$(arg rgb_camera_info_topic)"/>
   </node>
 
 </launch>

@@ -9,8 +9,8 @@ hls_color_filter:
   queue_size: 10
 
 dilate_hls_color_filter:
-  size: 2
-  iterations: 2
+  size: 1
+  iterations: 1
 
 opening_hls_color_filter:
   size: 1
