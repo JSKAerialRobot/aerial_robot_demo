@@ -9,6 +9,7 @@ class Task2HydrusInterface(HydrusInterface):
         self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle')
         self.ungrasp_joint_angle = rospy.get_param('~ungrasp_joint_angle')
         self.preshape_joint_angle = rospy.get_param('~preshape_joint_angle')
+        self.reset_joint_angle = rospy.get_param('~reset_joint_angle')
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
 
@@ -28,6 +29,12 @@ class Task2HydrusInterface(HydrusInterface):
         joint_state = JointState()
         joint_state.name = ['joint1', 'joint3']
         joint_state.position = self.preshape_joint_angle
+        self.setJointAngle(joint_state, time = time)
+
+    def resetPose(self, time = 3000):
+        joint_state = JointState()
+        joint_state.name = ['joint1', 'joint3']
+        joint_state.position = self.reset_joint_angle
         self.setJointAngle(joint_state, time = time)
 
     def setCameraJointAngle(self, angle, time = 1000):

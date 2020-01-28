@@ -314,6 +314,7 @@ class Ungrasp(Task2State):
         userdata.object_count += 1
         self.object_count_pub.publish(userdata.object_count)
         self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.global_place_channel_z + self.place_z_offset, self.robot.getBaselinkRPY()[2], pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
+        self.robot.resetPose()
 
         if userdata.object_count == self.object_num:
             return 'finish'
