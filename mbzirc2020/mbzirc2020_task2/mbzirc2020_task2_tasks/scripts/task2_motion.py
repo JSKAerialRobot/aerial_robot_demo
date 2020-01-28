@@ -47,6 +47,13 @@ def main():
     object_translation = rospy.get_param('~object_translation')
     object_yaw = rospy.get_param('~object_yaw')
     object_mass = rospy.get_param('~object_mass')
+    do_object_recognition = rospy.get_param('~do_object_recognition')
+    do_channel_recognition = rospy.get_param('~do_channel_recognition')
+    if not do_object_recognition:
+        rospy.logerr('WARNING!! NO OBJECT RECOGNITION')
+    if not do_channel_recognition:
+        rospy.logerr('WARNING!! NO CHANNEL RECOGNITION')
+
     add_object_model_func = lambda robot: addObjectToModel(robot, 'add', object_translation, object_yaw, object_mass)
     remove_object_model_func = lambda robot: addObjectToModel(robot, 'remove', object_translation, object_yaw, object_mass)
 
