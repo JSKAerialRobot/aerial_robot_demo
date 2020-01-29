@@ -38,7 +38,7 @@ class RectangularGridSearchState(smach.State):
     def __init__(self, params):
         smach.State.__init__(self, outcomes=['found', 'not_found', 'still_searching'],
                                    output_keys=['target_pos'])
-        self.commander = HydrusCommander()
+        self.commander = HydrusCommander(nav_mode=params['nav_mode'])
 
         # retrieve parameters
         self.target_topic_name = params['target_topic_name']
@@ -142,7 +142,7 @@ class AproachOnTargetState(smach.State):
     def __init__(self, params):
         smach.State.__init__(self, outcomes=['success', 'target_lost', 'ongoing'],
                                    input_keys = ['target_pos'] )
-        self.commander = HydrusCommander()
+        self.commander = HydrusCommander(nav_mode=params['nav_mode'])
 
         # retrieve parameters
         self.target_topic_name = params['target_topic_name']
@@ -194,7 +194,7 @@ class AproachOnTargetState(smach.State):
 class CoveringState(smach.State):
     def __init__(self, params):
         smach.State.__init__(self, outcomes=['done'])
-        self.commander = HydrusCommander()
+        self.commander = HydrusCommander(nav_mode=params['nav_mode'])
 
         # retrieve parameters
         self.covering_pre_height = params['covering_pre_height']

@@ -13,7 +13,7 @@ from aerial_robot_msgs.msg import FlightNav
 from std_srvs.srv import Trigger
 
 class HydrusCommander():
-    def __init__(self, name="hydrus_commander"):
+    def __init__(self, nav_mode=2, name="hydrus_commander"):
         # init node
         # rospy.init_node(name)
 
@@ -27,6 +27,7 @@ class HydrusCommander():
 
         self.cover_pose = rospy.get_param('~cover_pose')
         self.close_pose = rospy.get_param('~close_pose')
+        self.nav_mode = nav_mode
 
         # constants
         self.WAIT_TIME = 0.5
@@ -44,13 +45,18 @@ class HydrusCommander():
         self.land_pub.publish(Empty())
         time.sleep(self.WAIT_TIME)
 
-    def move_to(self, pos_x, pos_y):
+    def move_to(self, pos_x, pos_y, override_nav_mode=None):
         """move to target x, y position"""
         # send desired position
         nav_msg = FlightNav()
 
+        if override_nav_mode is None:
+            nav_mode = self.nav_mode
+        else:
+            nav_mode = override_nav_mode
+
         nav_msg.target = nav_msg.COG
-        nav_msg.pos_xy_nav_mode = nav_msg.POS_MODE
+        nav_msg.pos_xy_nav_mode = nav_mode
         nav_msg.target_pos_x = pos_x
         nav_msg.target_pos_y = pos_y
         time.sleep(self.WAIT_TIME)
@@ -111,7 +117,7 @@ class HydrusCommander():
         time.sleep(1)
 
         back = 1.2
-        self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1])
+        self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1], override_nav_mode=2)
         self.change_height(covering_post_height)
         self.land()
 

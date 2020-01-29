@@ -23,9 +23,9 @@ class TakeoffState(smach.State):
         return 'success'
 
 class GoPositionState(smach.State):
-    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0):
+    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0, nav_mode=2):
         smach.State.__init__(self, outcomes=['success', 'ongoing'])
-        self.commander = HydrusCommander()
+        self.commander = HydrusCommander(nav_mode=nav_mode)
 
         self.control_rate = control_rate
         self.approach_margin = approach_margin
@@ -52,7 +52,7 @@ class GoPositionState(smach.State):
         return 'ongoing'
 
 class WaypointNavigationStateMachineCreator():
-    def create(self, waypoints, approach_margin, control_rate):
+    def create(self, waypoints, approach_margin, control_rate, nav_mode=2):
         ''' waypoints: nx3 array of 3d poionts
         '''
         sm = smach.StateMachine(outcomes={'success', 'failure'})
@@ -62,7 +62,7 @@ class WaypointNavigationStateMachineCreator():
                     next_state = 'success'
                 else:
                     next_state = 'waypoint'+str(i+1)
-                smach.StateMachine.add('waypoint'+str(i), GoPositionState(waypoint, approach_margin, control_rate),
+                smach.StateMachine.add('waypoint'+str(i), GoPositionState(waypoint, approach_margin, control_rate, nav_mode),
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
         return sm
