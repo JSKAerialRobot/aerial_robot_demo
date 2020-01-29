@@ -9,7 +9,7 @@ import math
 
 from std_msgs.msg import Empty
 from sensor_msgs.msg import JointState
-from aerial_robot_msgs.msg import FlightNav
+from aerial_robot_msgs.msg import FlightNav, FlatnessPid
 from std_srvs.srv import Trigger
 
 class HydrusCommander():
@@ -63,6 +63,13 @@ class HydrusCommander():
         self.nav_control_pub.publish(nav_msg)
         time.sleep(self.WAIT_TIME)
 
+    def target_pos_error(self):
+        '''return target pos error [x,y,z]'''
+        controller_debug_msg = rospy.wait_for_message("/controller/debug", FlatnessPid)
+        return [controller_debug_msg.pitch.pos_err,
+                controller_debug_msg.roll.pos_err,
+                controller_debug_msg.throttle.pos_err]
+
     def change_height(self, pos_z):
         """ change height """
         nav_msg = FlightNav()
@@ -109,7 +116,7 @@ class HydrusCommander():
     def covering_motion(self,pos_x, pos_y, cog_yaw, covering_pre_height, covering_post_height, covering_move_dist):
         dest_yaw = cog_yaw + 0.785 # correct forward angle of open form
         forward_dir = [-covering_move_dist*math.sin(dest_yaw), covering_move_dist*math.cos(dest_yaw)]
-        self.move_to(pos_x-forward_dir[0], pos_y-forward_dir[1])
+        self.move_to(pos_x-forward_dir[0], pos_y-forward_dir[1], override_nav_mode=2)
         time.sleep(5)
         self.open_joints()
         time.sleep(1)

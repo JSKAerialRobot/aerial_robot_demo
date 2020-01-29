@@ -45,7 +45,7 @@ class RectangularGridSearchState(smach.State):
         self.control_rate = params['control_rate']
         self.area_corners = params['area_corners']
         self.area_orientation = self.area_corners[2]
-        self.search_grid_size = params['search_grid_size']
+        self.search_grid_size = [params['search_grid_size'], params['search_grid_size']]
         self.reach_margin = params['reach_margin']
         self.search_height = params['search_height']
 
@@ -62,10 +62,12 @@ class RectangularGridSearchState(smach.State):
         # rotated grid edge length
         x = self.area_corners[1][0]-self.area_corners[0][0]
         y = self.area_corners[1][1]-self.area_corners[0][1]
+        self.search_grid_size[0] = self.search_grid_size[0] * np.sign(x)
+        self.search_grid_size[1] = self.search_grid_size[1] * np.sign(y)
         theta = np.deg2rad(self.area_orientation)
         self.x_dash = x*np.cos(theta) + y*np.sin(theta)
         self.y_dash = -x*np.sin(theta)+ y*np.cos(theta)
-        self.searched_grid = np.zeros((int((self.x_dash)/self.search_grid_size), int((self.y_dash)/self.search_grid_size)), dtype=bool)
+        self.searched_grid = np.zeros((abs(int(self.x_dash/self.search_grid_size[0])), abs(int(self.y_dash/self.search_grid_size[1]))), dtype=bool)
         self.current_grid_idx = [0,0]
         self.x_move_dir = 1
         self.y_move_dir = 0
@@ -74,8 +76,8 @@ class RectangularGridSearchState(smach.State):
         """return position from grid index"""
         # TODO check valid range
         start_pos = self.area_corners[0]
-        a = self.search_grid_size*grid_idx[0]
-        b = self.search_grid_size*grid_idx[1]
+        a = self.search_grid_size[0]*grid_idx[0]
+        b = self.search_grid_size[1]*grid_idx[1]
         theta = np.deg2rad(self.area_orientation)
         sin_t = np.sin(theta)
         cos_t = np.cos(theta)
@@ -127,10 +129,10 @@ class RectangularGridSearchState(smach.State):
             userdata.target_pos = self.target_pos
             self.target_pos_flag= False
             return 'found'
-        try:
-            self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
-        except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
-            rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
+        # try:
+        #     self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
+        # except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
+        #     rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
 
         search_pos = self.grid_pos(self.current_grid_idx)
         self.commander.change_height(self.search_height)
@@ -140,7 +142,9 @@ class RectangularGridSearchState(smach.State):
                 str(np.count_nonzero(self.searched_grid)+1)+"/"+str(self.searched_grid.size)
                 + ", navigating to "+str([search_pos[0],search_pos[1],self.search_height]))
 
-        if abs(self.cog_pos.transform.translation.x - search_pos[0]) < self.reach_margin and abs(self.cog_pos.transform.translation.y - search_pos[1]) < self.reach_margin:
+        #if abs(self.cog_pos.transform.translation.x - search_pos[0]) < self.reach_margin and abs(self.cog_pos.transform.translation.y - search_pos[1]) < self.reach_margin:
+        target_pos_err = self.commander.target_pos_error()
+        if abs(target_pos_err[0]) < self.reach_margin and abs(target_pos_err[1]) < self.reach_margin and abs(target_pos_err[2]) < self.reach_margin:
             if self.is_grid_full():
                 return 'not_found'
             else:
@@ -189,15 +193,17 @@ class AproachOnTargetState(smach.State):
             self.is_userdata_input_retrieved = False
             return 'target_lost'
 
-        try:
-            self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
-        except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
-            rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
+        # try:
+        #     self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
+        # except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
+        #     rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
         self.commander.change_height(self.approach_height)
-        self.commander.move_to(self.target_pos.vector.x, self.target_pos.vector.y)
+        self.commander.move_to(self.target_pos.vector.x, self.target_pos.vector.y, 2)
         rospy.loginfo("Navigating to target position "
                 +str([self.target_pos.vector.x, self.target_pos.vector.y, 0]))
-        if abs(self.target_pos.vector.x - self.cog_pos.transform.translation.x) < self.approach_margin and abs(self.target_pos.vector.y - self.cog_pos.transform.translation.y) < self.approach_margin:
+        # if abs(self.target_pos.vector.x - self.cog_pos.transform.translation.x) < self.approach_margin and abs(self.target_pos.vector.y - self.cog_pos.transform.translation.y) < self.approach_margin:
+        target_pos_err = self.commander.target_pos_error()
+        if abs(target_pos_err[0]) < self.approach_margin and abs(target_pos_err[1]) < self.approach_margin and abs(target_pos_err[2]) < self.approach_margin:
             return 'success'
 
         rospy.sleep(1/self.control_rate)
