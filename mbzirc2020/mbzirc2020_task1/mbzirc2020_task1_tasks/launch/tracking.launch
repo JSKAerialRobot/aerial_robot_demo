@@ -1,7 +1,6 @@
 <launch>
   <arg name="fake_vision" default="true" />
-  <arg name="ransac" default="true" />
-  <arg name="mpc" default="false" />
+  <arg name="ransac" default="false" />
 
   <group unless="$(arg ransac)">
     <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
@@ -27,8 +26,6 @@
   <node pkg="mbzirc2020_task1_tasks" type="hydrus_tracking_controller.py" name="hydrus_tracking_controller" output="screen" respawn="false">
     <param name="hydrus_controller_freq" value="100.0" />
     <param name="control_model" value="0" /> <!-- 0, POS_VEL; 1, POS; 2, POS_VEL_PSI -->
-    <param name="mpc" value="$(arg mpc)" />
-    <param name="mpc_horizon" value="1.0" />
   </node>
 
 </launch>
