@@ -44,6 +44,7 @@ class RectangularGridSearchState(smach.State):
         self.target_topic_name = params['target_topic_name']
         self.control_rate = params['control_rate']
         self.area_corners = params['area_corners']
+        self.area_orientation = self.area_corners[2]
         self.search_grid_size = params['search_grid_size']
         self.reach_margin = params['reach_margin']
         self.search_height = params['search_height']
@@ -58,7 +59,13 @@ class RectangularGridSearchState(smach.State):
         self.target_pos_sub_ = rospy.Subscriber(self.target_topic_name, Vector3Stamped, self.targetPositionCallback)
         self.target_pos_flag = False
 
-        self.searched_grid = np.zeros((int((self.area_corners[1][0]-self.area_corners[0][0])/self.search_grid_size), int((self.area_corners[1][1]-self.area_corners[0][1])/self.search_grid_size)), dtype=bool)
+        # rotated grid edge length
+        x = self.area_corners[1][0]-self.area_corners[0][0]
+        y = self.area_corners[1][1]-self.area_corners[0][1]
+        theta = np.deg2rad(self.area_orientation)
+        self.x_dash = x*np.cos(theta) + y*np.sin(theta)
+        self.y_dash = -x*np.sin(theta)+ y*np.cos(theta)
+        self.searched_grid = np.zeros((int((self.x_dash)/self.search_grid_size), int((self.y_dash)/self.search_grid_size)), dtype=bool)
         self.current_grid_idx = [0,0]
         self.x_move_dir = 1
         self.y_move_dir = 0
@@ -67,8 +74,14 @@ class RectangularGridSearchState(smach.State):
         """return position from grid index"""
         # TODO check valid range
         start_pos = self.area_corners[0]
-        return (start_pos[0]+self.search_grid_size*grid_idx[0],
-                start_pos[1]+self.search_grid_size*grid_idx[1])
+        a = self.search_grid_size*grid_idx[0]
+        b = self.search_grid_size*grid_idx[1]
+        theta = np.deg2rad(self.area_orientation)
+        sin_t = np.sin(theta)
+        cos_t = np.cos(theta)
+        x = a*cos_t - b*sin_t
+        y = a*sin_t + b*cos_t
+        return (start_pos[0]+x, start_pos[1]+y)
 
     def is_grid_full(self):
         return np.all(self.searched_grid)

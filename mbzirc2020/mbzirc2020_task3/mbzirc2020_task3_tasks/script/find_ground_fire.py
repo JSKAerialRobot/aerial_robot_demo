@@ -48,7 +48,7 @@ def main():
 
         search_area_number = rospy.get_param('~search_area_number', 1)
         waypoints_list = rospy.get_param('~initial_waypoints', [[[0,0,1]]])
-        area_corners_list = rospy.get_param('~area_corners', [[[0,0],[2,2]]])
+        area_corners_list = rospy.get_param('~area_corners', [[[0,0],[2,2],0]])
         for i in range(search_area_number):
             waypoint_nav_creator = WaypointNavigationStateMachineCreator()
             waypoints = waypoints_list[i]

@@ -21,4 +21,4 @@ close_pose: [1.56, 1.56] # the joint angles  for closing
 
 search_area_number: 2
 initial_waypoints: [[[0,0,0.5], [0, 0, 1]], [[0.4,0,4]]]
-area_corners : [[[0, 0], [0.5, 0.5]], [[0.5,0.5],[1,1]]]
+area_corners : [[[0, 0], [0.5, 0.5],0], [[0.5,0.5],[1,1],0]]
