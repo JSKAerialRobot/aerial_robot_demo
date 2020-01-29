@@ -29,23 +29,17 @@ class GoPositionState(smach.State):
 
         self.control_rate = control_rate
         self.approach_margin = approach_margin
-        # tf Buffer
-        self.tfBuffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
 
         self.target_pos = target_pos
 
     def execute(self, userdata):
-        try:
-            self.cog_pos = self.tfBuffer.lookup_transform('world', 'cog', rospy.Time(), rospy.Duration(0.5))
-        except (tf2_ros.LookupException, tf2_ros.ConvertRegistration, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException):
-            rospy.logwarn("tf lookup exception catched: could not find tf from world to cog")
         self.commander.change_height(self.target_pos[2])
         self.commander.move_to(self.target_pos[0], self.target_pos[1])
 
         rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
 
-        if abs(self.target_pos[0] - self.cog_pos.transform.translation.x) < self.approach_margin[0] and abs(self.target_pos[1] - self.cog_pos.transform.translation.y) < self.approach_margin[1] and abs(self.target_pos[2] - self.cog_pos.transform.translation.z) < self.approach_margin[2]:
+        target_pos_err = self.commander.target_pos_error()
+        if abs(target_pos_err[0]) < self.approach_margin[0] and abs(target_pos_err[1]) < self.approach_margin[1] and abs(target_pos_err[2]) < self.approach_margin[2]:
             return 'success'
 
         rospy.sleep(1/self.control_rate)
@@ -66,5 +60,4 @@ class WaypointNavigationStateMachineCreator():
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
         return sm
-
 

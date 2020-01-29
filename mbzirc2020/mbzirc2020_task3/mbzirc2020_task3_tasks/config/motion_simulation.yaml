@@ -2,10 +2,12 @@
 
 control_rate : 1.0
 
-nav_mode: 2
+navigation_approach_margin: [0.3, 0.3, 0.3]
+
+nav_mode: 5
 search_height : 2.0
-search_grid_size : 1.0
-reach_margin : 0.3
+search_grid_size : 0.00001
+reach_margin : 0.5
 target_timeout : 10.0
 approach_height : 1.5
 descending_height : 1.2
@@ -18,6 +20,6 @@ covering_move_dist : 0.6
 
 close_pose: [1.56, 1.56] # the joint angles  for closing
 
-search_area_number: 2
-initial_waypoints: [[[0,0,0.5], [0, 0, 1]], [[2,3,2]]]
-area_corners : [[[0, 0], [2, 2], 0], [[4,4],[6,6], 0]]
+search_area_number: 1
+initial_waypoints: [[[49.9, 8.9, 2]]]
+area_corners : [[[49.9, 8.9], [49.90005, 8.89995], 20]]
