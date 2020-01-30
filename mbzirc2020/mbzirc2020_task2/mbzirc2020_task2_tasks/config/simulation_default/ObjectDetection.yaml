@@ -1,6 +1,6 @@
 hls_color_filter:
-  h_limit_max: 12
-  h_limit_min: 354
+  h_limit_max: 37
+  h_limit_min: 325
   l_limit_max: 251
   l_limit_min: 1
   s_limit_max: 255
