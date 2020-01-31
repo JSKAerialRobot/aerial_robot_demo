@@ -1,0 +1,35 @@
+<launch>
+
+  <arg name="world" default="simulation_default"/>
+
+  ### bringup
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="false"/>
+    <arg name="simulation" value="true"/>
+    <arg name="ring_gripper" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
+  </include>
+
+
+  ### motion
+  <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
+    <arg name="config_dir" value="$(find mbzirc2020_task2_simulation)/config/$(arg world)"/>
+    <arg name="do_object_recognition" value="true"/>
+    <arg name="do_channel_recognition" value="true"/>
+    <arg name="debug_look_down" value="false"/>
+    <arg name="debug_adjust_grasp" value="false"/>
+    <arg name="debug_grasp" value="false"/>
+    <arg name="debug_adjust_place" value="false"/>
+  </include>
+
+  ### recognition
+  <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+    <arg name="config_dir" value="$(find mbzirc2020_task2_simulation)/config/$(arg world)"/>
+    <arg name="external_manager" value="false"/>
+  </include>
+
+  ### smach viewer
+  <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer"/>
+
+</launch>
