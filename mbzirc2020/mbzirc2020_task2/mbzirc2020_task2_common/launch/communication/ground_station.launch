@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="GROUND_STATION_IP" default="localhost" />
-  <arg name="UAV_IP" default="localhost" />
+  <arg name="GROUND_STATION_IP" default="$(env ROS_IP)" />
+  <arg name="UAV_IP" default="192.168.1.120" />
   <arg name="HIGH_PORT" default="16484" />
 
   <!-- Ground Station (from UAV) -->

@@ -28,4 +28,6 @@
     <arg name="external_manager" value="false"/>
   </include>
 
+  ### communication to ground station
+  <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch"/>
 </launch>
