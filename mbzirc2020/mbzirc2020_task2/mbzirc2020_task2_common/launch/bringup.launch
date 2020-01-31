@@ -11,6 +11,7 @@
   <arg name="ring_gripper" default="True"/>
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
+  <arg name="rviz_config_path" default=""/>
   <arg name="spawn_x" default="0.0"/>
   <arg name="spawn_y" default="0.0"/>
 
@@ -29,7 +30,7 @@
     <arg name="model_suffix" value="_ground_mode" if="$(arg ground_mode)"/>
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
-    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rviz_config"/>
+    <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
   </include>
 
   ######### config for actuated legs #########

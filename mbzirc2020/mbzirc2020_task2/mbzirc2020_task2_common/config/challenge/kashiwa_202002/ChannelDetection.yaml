@@ -1,0 +1,22 @@
+hls_color_filter_channel:
+  h_limit_max: 75
+  h_limit_min: 38
+  l_limit_max: 37
+  l_limit_min: 29
+  s_limit_max: 256
+  s_limit_min: 83
+  use_camera_info: false
+
+closing_hls_color_filter_channel:
+  size: 2
+  iterations: 4
+
+opening_hls_color_filter_channel:
+  size: 1
+  iterations: 2
+
+channel_detection:
+  contour_area_size: 0 #for output the biggest contour
+  object_height: 1.7
+  debug_view: true
+  frame_id: channel_center

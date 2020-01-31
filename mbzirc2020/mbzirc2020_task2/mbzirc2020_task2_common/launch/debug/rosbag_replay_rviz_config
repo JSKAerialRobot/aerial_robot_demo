@@ -5,9 +5,10 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /TF1/Frames1
-        - /hls color filter1
+        - /PoseArray1
+        - /PoseArray2
       Splitter Ratio: 0.5
-    Tree Height: 209
+    Tree Height: 1373
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -26,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: rgb image
+    SyncSource: ""
   - Class: rviz/Views
     Expanded:
       - /Current View1
@@ -298,179 +299,13 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        bat1:
-          Value: true
-        bat2:
-          Value: true
-        bat3:
-          Value: true
-        bat4:
-          Value: true
-        cog:
-          Value: true
-        fc:
-          Value: true
-        fixed_joint_unit:
-          Value: true
-        gps:
-          Value: true
-        leddarone:
-          Value: true
-        leg1:
-          Value: true
-        leg2:
-          Value: true
-        leg3:
-          Value: true
-        leg4:
-          Value: true
-        leg_collision_model1:
-          Value: true
-        leg_collision_model2:
-          Value: true
-        leg_collision_model3:
-          Value: true
-        leg_collision_model4:
-          Value: true
-        leg_collision_model5:
-          Value: true
-        link1:
-          Value: true
-        link2:
-          Value: true
-        link3:
-          Value: true
-        link4:
-          Value: true
-        magnet:
-          Value: true
-        neuron3:
-          Value: true
-        pc:
-          Value: true
-        realsense1_pose_frame:
-          Value: true
-        ring_gripper_left:
-          Value: true
-        ring_gripper_right:
-          Value: true
-        root:
-          Value: true
-        rs_d435_color_frame:
-          Value: true
-        rs_d435_color_optical_frame:
-          Value: true
-        rs_d435_depth_frame:
-          Value: true
-        rs_d435_depth_optical_frame:
-          Value: true
-        rs_d435_left_ir_frame:
-          Value: true
-        rs_d435_left_ir_optical_frame:
-          Value: true
-        rs_d435_link:
-          Value: true
-        rs_d435_mount:
-          Value: true
-        rs_d435_right_ir_frame:
-          Value: true
-        rs_d435_right_ir_optical_frame:
-          Value: true
-        rs_d435_servo:
-          Value: true
-        rs_d435_unit:
-          Value: true
-        thrust1:
-          Value: true
-        thrust2:
-          Value: true
-        thrust3:
-          Value: true
-        thrust4:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        cog:
-          {}
-        root:
-          link1:
-            bat1:
-              {}
-            leg1:
-              leg_collision_model1:
-                {}
-            leg2:
-              leg_collision_model2:
-                {}
-            link2:
-              bat2:
-                {}
-              fc:
-                {}
-              gps:
-                magnet:
-                  {}
-              leddarone:
-                {}
-              link3:
-                bat3:
-                  {}
-                fixed_joint_unit:
-                  {}
-                leg_collision_model5:
-                  {}
-                link4:
-                  bat4:
-                    {}
-                  leg3:
-                    leg_collision_model3:
-                      {}
-                  leg4:
-                    leg_collision_model4:
-                      {}
-                  ring_gripper_right:
-                    {}
-                  thrust4:
-                    {}
-                realsense1_pose_frame:
-                  {}
-                thrust3:
-                  {}
-              neuron3:
-                {}
-              pc:
-                {}
-              rs_d435_mount:
-                {}
-              rs_d435_servo:
-                rs_d435_unit:
-                  rs_d435_link:
-                    rs_d435_depth_frame:
-                      rs_d435_color_frame:
-                        rs_d435_color_optical_frame:
-                          {}
-                      rs_d435_depth_optical_frame:
-                        {}
-                      rs_d435_left_ir_frame:
-                        rs_d435_left_ir_optical_frame:
-                          {}
-                      rs_d435_right_ir_frame:
-                        rs_d435_right_ir_optical_frame:
-                          {}
-              thrust2:
-                {}
-            ring_gripper_left:
-              {}
-            thrust1:
-              {}
-        world:
-          {}
+        {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -502,78 +337,6 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /rs_d435/color/image_rect_color
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: rgb image
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /rs_d435/aligned_depth_to_color/image_raw
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: depth image
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /opening_depth_distance_filter/output
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: depth distance filter
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /opening_hls_color_filter/output
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: hls color filter
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /rectangle_detection_depth/debug_image
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: rectangle_detection_depth
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /rectangle_detection_color/debug_image
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: rectangle detection color
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
       Value: true
     - Align Bottom: false
       Background Alpha: 0.800000012
@@ -632,12 +395,12 @@ Visualization Manager:
       Color: 255; 25; 0
       Enabled: true
       Head Length: 0.0700000003
-      Head Radius: 0.0299999993
+      Head Radius: 0.100000001
       Name: PoseArray
       Shaft Length: 0.230000004
-      Shaft Radius: 0.00999999978
-      Shape: Arrow (Flat)
-      Topic: /rectangle_detection_color/target_object_color
+      Shaft Radius: 0.0500000007
+      Shape: Arrow (3D)
+      Topic: /rectangle_detection_color/target_object_color_orig
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -648,24 +411,12 @@ Visualization Manager:
       Color: 255; 25; 0
       Enabled: true
       Head Length: 0.0700000003
-      Head Radius: 0.0299999993
+      Head Radius: 0.100000001
       Name: PoseArray
       Shaft Length: 0.230000004
-      Shaft Radius: 0.00999999978
-      Shape: Arrow (Flat)
-      Topic: /rectangle_detection_depth/target_object_depth
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /hls_color_filter_channel/image
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: hls color filter channel
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
+      Shaft Radius: 0.0500000007
+      Shape: Arrow (3D)
+      Topic: /rectangle_detection_depth/target_object_depth_orig
       Unreliable: false
       Value: true
   Enabled: true
@@ -693,35 +444,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.0664482
+      Distance: 18.2088356
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.70503974
-        Y: -0.977106512
-        Z: -1.07137668
+        X: 0.487596363
+        Y: 1.26916707
+        Z: -0.199793175
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.455398202
+      Pitch: 0.705203414
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.680398226
+      Yaw: 0.217213005
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1056
+  Height: 1576
   Hide Left Dock: false
   Hide Right Dock: false
   PublishTopic:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000003000000000000026900000396fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006100fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002800000112000000d700fffffffb000000160064006500700074006800200069006d0061006700650100000140000000a50000001600fffffffb0000002a00640065007000740068002000640069007300740061006e00630065002000660069006c00740065007201000001eb000000e60000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000003200720065006300740061006e0067006c0065005f0064006500740065006300740069006f006e005f0064006500700074006801000002d7000000e70000001600fffffffb0000000a0056006900650077007300000002e4000000da000000ad00fffffffb00000018005000750062006c0069007300680054006f007000690063000000035a000000640000006400fffffffb000000100044006900730070006c006100790073000000029600000128000000d700fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730000000312000000ac0000006100ffffff00000001000001b900000396fc0200000007fb0000001200720067006200200069006d0061006700650100000028000001010000001600fffffffb000000200068006c007300200063006f006c006f0072002000660069006c007400650072010000012f000000d00000001600fffffffb000000300068006c007300200063006f006c006f0072002000660069006c0074006500720020006300680061006e006e0065006c0100000205000000d00000001600fffffffc000002db000000e30000001600fffffffa000000000100000001fb0000003200720065006300740061006e0067006c006500200064006500740065006300740069006f006e00200063006f006c006f00720100000000ffffffff000000de00fffffffb0000003200720065006300740061006e0067006c006500200064006500740065006300740069006f006e00200063006f006c006f0072010000029e000001200000000000000000fb0000000a005600690065007700730000000028000002e2000000ad00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000030000073f0000003efc0100000002fb0000000800540069006d006501000000000000073f0000030000fffffffb0000000800540069006d00650100000000000004500000000000000000000003110000039600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000003000000000000023d0000059efc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006100fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000280000059e000000d700fffffffb000000160064006500700074006800200069006d0061006700650100000267000001570000000000000000fb0000002a00640065007000740068002000640069007300740061006e00630065002000660069006c0074006500720100000287000001370000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000003200720065006300740061006e0067006c0065005f0064006500740065006300740069006f006e005f0064006500700074006801000002d7000000e70000000000000000fb0000000a0056006900650077007300000002e4000000da000000ad00fffffffb00000018005000750062006c0069007300680054006f007000690063000000035a000000640000006400fffffffb000000100044006900730070006c006100790073000000029600000128000000d700fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730000000312000000ac0000006100ffffff00000001000001b900000396fc0200000007fb0000001200720067006200200069006d0061006700650100000028000003960000000000000000fb000000200068006c007300200063006f006c006f0072002000660069006c0074006500720100000225000001990000000000000000fb000000300068006c007300200063006f006c006f0072002000660069006c0074006500720020006300680061006e006e0065006c0100000205000000d00000000000000000fc00000295000001290000000000fffffffa000000000100000001fb0000003200720065006300740061006e0067006c006500200064006500740065006300740069006f006e00200063006f006c006f00720100000000ffffffff0000000000000000fb0000003200720065006300740061006e0067006c006500200064006500740065006300740069006f006e00200063006f006c006f0072010000029e000001200000000000000000fb0000000a005600690065007700730000000028000002e2000000ad00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b2000000000000000000000003000009bf0000003efc0100000002fb0000000800540069006d00650100000000000009bf0000030000fffffffb0000000800540069006d006501000000000000045000000000000000000000077c0000059e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -730,20 +481,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1855
-  X: 65
+  Width: 2495
+  X: 1985
   Y: 24
-  depth distance filter:
-    collapsed: false
-  depth image:
-    collapsed: false
-  hls color filter:
-    collapsed: false
-  hls color filter channel:
-    collapsed: false
-  rectangle detection color:
-    collapsed: false
-  rectangle_detection_depth:
-    collapsed: false
-  rgb image:
-    collapsed: false
