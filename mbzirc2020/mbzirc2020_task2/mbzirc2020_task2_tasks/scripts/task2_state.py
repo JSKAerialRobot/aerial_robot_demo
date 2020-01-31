@@ -48,7 +48,7 @@ class Start(Task2State):
         self.robot.startAndTakeoff()
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
-        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2])
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_lookdown_height, self.robot.getTargetYaw())
 
         self.robot.setCameraJointAngle(np.pi / 2)
         return 'succeeded'
@@ -131,7 +131,7 @@ class LookDown(Task2State):
         uav_target_yaw = object_global_yaw - self.grasping_yaw
 
         rospy.logwarn("succeed to find valid object: %f, %f", object_global_pos[0], object_global_pos[1])
-        self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'
@@ -206,7 +206,7 @@ class AdjustGraspPosition(Task2State):
             rospy.logwarn("go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], uav_target_yaw)
 
         self.robot.preshape()
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getBaselinkPos()[2], uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.object_grasping_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'
@@ -282,7 +282,7 @@ class MoveToPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
 
-        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.global_place_channel_z + self.place_z_offset, self.robot.getBaselinkRPY()[2], pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, timeout=60)
         return 'succeeded'
 
@@ -351,7 +351,7 @@ class Ungrasp(Task2State):
         self.remove_object_model_func(self.robot)
         userdata.object_count += 1
         self.object_count_pub.publish(userdata.object_count)
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.3)
         self.robot.resetPose()
 
         if userdata.object_count == self.object_num:
