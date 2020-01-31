@@ -12,6 +12,9 @@
   <depend>mbzirc2020_task2_simulation</depend>
   <depend>gazebo_ros</depend>
   <depend>timed_roslaunch</depend>
+  <depend>message_generation</depend>
+  <depend>jsk_topic_tools</depend>
+  <depend>jsk_network_tools</depend>
 
   <export>
 

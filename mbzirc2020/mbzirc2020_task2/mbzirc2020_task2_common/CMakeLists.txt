@@ -8,6 +8,20 @@ find_package(catkin REQUIRED COMPONENTS
   mbzirc2020_task2_simulation
   gazebo_ros
   timed_roslaunch
+  message_generation
+  sensor_msgs
+  jsk_topic_tools
+  jsk_network_tools
+  )
+
+add_message_files(
+  FILES
+  FC2OCSData.msg
+  )
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
   )
 
 catkin_package(

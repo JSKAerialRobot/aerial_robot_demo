@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="GROUND_STATION_IP" default="localhost" />
+  <arg name="UAV_IP" default="localhost" />
+  <arg name="HIGH_PORT" default="16484" />
+
+  <!-- Ground Station (from UAV) -->
+  <node pkg="jsk_network_tools" type="silverhammer_highspeed_receiver.py" output="screen" name="receiver">
+    <param name="message" value="mbzirc2020_task2_common/FC2OCSData" />
+    <param name="receive_ip" value="$(arg GROUND_STATION_IP)" />
+    <param name="receive_port" value="$(arg HIGH_PORT)" />
+    <param name="topic_prefix" value="" />
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task2_common)/launch/communication/groundstation_rviz_config" respawn="true"/>
+
+</launch>

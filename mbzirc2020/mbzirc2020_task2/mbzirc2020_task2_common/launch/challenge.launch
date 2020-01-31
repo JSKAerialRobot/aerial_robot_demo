@@ -1,7 +1,31 @@
 <launch>
-  <arg name="object_pos_recognition" default="true"/>
-  <arg name="object_recognition_debug_view" default="true"/>
+  <arg name="do_object_recognition" default="true"/>
+  <arg name="do_channel_recognition" default="true"/>
+  <arg name="world" default="kashiwa_202002"/>
 
-  <param name="/simulation" value="false"/>
+  ### bringup
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="True"/>
+    <arg name="simulation" value="False"/>
+    <arg name="ring_gripper" value="true"/>
+    <arg name="headless" value="True"/>
+  </include>
+
+  ### motion
+  <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
+    <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+    <arg name="do_object_recognition" value="$(arg do_object_recognition)"/>
+    <arg name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
+    <arg name="debug_look_down" value="false"/>
+    <arg name="debug_adjust_grasp" value="false"/>
+    <arg name="debug_grasp" value="false"/>
+    <arg name="debug_adjust_place" value="false"/>
+  </include>
+
+  ### recognition
+  <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+    <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+    <arg name="external_manager" value="false"/>
+  </include>
 
 </launch>

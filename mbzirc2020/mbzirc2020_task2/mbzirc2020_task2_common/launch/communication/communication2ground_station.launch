@@ -1,0 +1,31 @@
+<launch>
+  <arg name="GROUND_STATION_IP" default="localhost" />
+  <arg name="UAV_IP" default="$(env ROS_IP)" />
+  <arg name="HIGH_PORT" default="16484" />
+  <arg name="camera_nodelet_manager" default="/rs_d435/realsense_camera_manager"/>
+
+  <node pkg="nodelet" type="nodelet" name="rgb_image_throttle"
+        args="load jsk_topic_tools/LightweightThrottle $(arg camera_nodelet_manager)" output="screen">
+    <remap from="~input"  to="/rs_d435/color/image_rect_color"/>
+    <remap from="~output" to="/rs_d435/color/image_rect_color_throttle" />
+    <param name="update_rate" value="3" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="depth_image_throttle"
+        args="load jsk_topic_tools/LightweightThrottle $(arg camera_nodelet_manager)" output="screen">
+    <remap from="~input"  to="/rs_d435/aligned_depth_to_color/image_raw"/>
+    <remap from="~output" to="/rs_d435/aligned_depth_to_color/image_raw_throttle" />
+    <param name="update_rate" value="3" />
+  </node>
+
+  ### UAV to GroundStation
+  <node pkg="jsk_network_tools" type="silverhammer_highspeed_streamer.py" name="highspeed_streamer">
+    <param name="message" value="mbzirc2020_task2_common/FC2OCSData" />
+    <param name="to_ip" value="$(arg GROUND_STATION_IP)" />
+    <param name="to_port" value="$(arg HIGH_PORT)" />
+    <param name="send_rate" value="5" />
+    <param name="bandwidth" value="2000000" />
+    <param name="packet_size" value="1000" />
+  </node>
+
+</launch>
