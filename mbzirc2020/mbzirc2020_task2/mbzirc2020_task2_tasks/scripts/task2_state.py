@@ -53,18 +53,18 @@ class Start(Task2State):
         self.robot.setCameraJointAngle(np.pi / 2)
         return 'succeeded'
 
-class MoveToGraspPosition(Task2State):
+class ApproachPickPosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot, outcomes=['succeeded'], input_keys=['object_count'], output_keys=['object_count'])
         self.global_object_pos = rospy.get_param('~global_object_pos')
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
-        self.skip_move_to_grasp_position = rospy.get_param('~skip_move_to_grasp_position', False)
+        self.skip_approach_pick_position = rospy.get_param('~skip_approach_pick_position', False)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
 
-        if self.skip_move_to_grasp_position:
+        if self.skip_approach_pick_position:
             return 'succeeded'
 
         #calc uav target coords
@@ -237,7 +237,7 @@ class Grasp(Task2State):
         else:
             return 'failed'
 
-class MoveToPlacePosition(Task2State):
+class ApproachPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot, outcomes=['succeeded'],
                             input_keys=['object_count'],
@@ -247,7 +247,7 @@ class MoveToPlacePosition(Task2State):
         self.global_place_channel_pos = rospy.get_param('~global_place_channel_pos')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.place_z_offset = rospy.get_param('~place_z_offset')
-        self.skip_move_to_place_position = rospy.get_param('~skip_move_to_place_position', False)
+        self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -256,7 +256,7 @@ class MoveToPlacePosition(Task2State):
     def execute(self, userdata):
         self.waitUntilTaskStart()
 
-        if self.skip_move_to_place_position:
+        if self.skip_approach_place_position:
             return 'succeeded'
 
         #calc place coords

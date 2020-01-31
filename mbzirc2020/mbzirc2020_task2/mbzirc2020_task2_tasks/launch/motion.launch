@@ -13,7 +13,7 @@
     <group if="$(arg debug_look_down)">
       <rosparam>
         skip_takeoff: true
-        skip_move_to_grasp_position: true
+        skip_approach_pick_position: true
         skip_look_down: false
         skip_adjust_grasp_position: false
         skip_grasp: false
@@ -26,7 +26,7 @@
     <group if="$(arg debug_adjust_grasp)">
       <rosparam>
         skip_takeoff: true
-        skip_move_to_grasp_position: true
+        skip_approach_pick_position: true
         skip_look_down: true
         skip_adjust_grasp_position: false
         skip_grasp: false
@@ -39,7 +39,7 @@
     <group if="$(arg debug_grasp)">
       <rosparam>
         skip_takeoff: true
-        skip_move_to_grasp_position: true
+        skip_approach_pick_position: true
         skip_look_down: true
         skip_adjust_grasp_position: true
         skip_grasp: false
@@ -52,7 +52,7 @@
     <group if="$(arg debug_adjust_place)">
       <rosparam>
         skip_takeoff: true
-        skip_move_to_grasp_position: true
+        skip_approach_pick_position: true
         skip_look_down: true
         skip_adjust_grasp_position: true
         skip_grasp: true
