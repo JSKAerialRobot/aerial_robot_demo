@@ -10,7 +10,7 @@
 
   <!-- gazebo for FLIR -->
   <!-- RGB camera instead of IR camera -->
-  <gazebo reference="flir_thermal_frame">
+  <gazebo reference="lepton_camera">
     <sensor type="camera" name="flir_thermal_camera">
       <update_rate>20.0</update_rate>
       <camera name="thermal">
@@ -36,7 +36,7 @@
         <cameraName>flir</cameraName>
         <imageTopicName>image_raw</imageTopicName>
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>flir_thermal_optical_frame</frameName>
+        <frameName>lepton_camera_optical</frameName>
         <hackBaseline>0.07</hackBaseline>
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
