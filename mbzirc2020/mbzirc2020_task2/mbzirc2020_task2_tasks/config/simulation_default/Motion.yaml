@@ -22,3 +22,4 @@ global_place_channel_pos: [[4.0, 0.0, 8.0, 0.0]] #in world frame [end1_x, end1_y
 global_place_channel_z: 1.7 #[m]
 place_z_margin: 0.6 #[m]
 place_z_offset: 1.3 #[m]
+channel_tf_frame_id: channel_center

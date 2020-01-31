@@ -96,7 +96,12 @@ def main():
 
         with sm_place:
             smach.StateMachine.add('MoveToPlacePosition', MoveToPlacePosition(robot),
-                                   transitions={'succeeded':'Ungrasp'},
+                                   transitions={'succeeded':'AdjustPlacePosition'},
+                                   remapping={'object_count':'object_count'})
+
+            smach.StateMachine.add('AdjustPlacePosition', AdjustPlacePosition(robot),
+                                   transitions={'succeeded':'Ungrasp',
+                                                'failed':'Ungrasp'},
                                    remapping={'object_count':'object_count'})
 
             smach.StateMachine.add('Ungrasp', Ungrasp(robot, remove_object_model_func),

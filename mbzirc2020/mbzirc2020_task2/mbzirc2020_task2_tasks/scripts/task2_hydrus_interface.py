@@ -43,8 +43,8 @@ class Task2HydrusInterface(HydrusInterface):
         joint_state.position = [angle] #look down
         self.setExtraJointAngle(joint_state, time = 1000)
 
-    def getCameraTransform(self, frame_id):
-        cam_trans = self.tf_buffer.lookup_transform('world', frame_id, rospy.Time(), rospy.Duration(0.5))
-        cam_trans.transform.translation.x -= self.xy_pos_offset_[0]
-        cam_trans.transform.translation.y -= self.xy_pos_offset_[1]
-        return cam_trans
+    def getTF(self, frame_id, wait=0.5, parent_frame_id='world'):
+        trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, rospy.Time(), rospy.Duration(wait))
+        trans.transform.translation.x -= self.xy_pos_offset_[0]
+        trans.transform.translation.y -= self.xy_pos_offset_[1]
+        return trans
