@@ -1,19 +1,25 @@
-grasp_z_offset: 0.5
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
-preshape_joint_angle: [0.9, 0.9]
+preshape_joint_angle: [0.78, 0.78]
+reset_joint_angle: [1.5, 1.5]
+
 object_translation: [0.1, 0.5, 0.0] #in link2 frame
 object_yaw: -0.785
 object_mass: 1.0
 
 object_num: 4
 global_object_pos: [[-1.5, 0, 3.141], [-2.1, 0, 3.141], [-2.7, 0, 3.141], [-3.3, 0, 3.141]] #in world frame, [x, y, yaw]
-global_object_z: 0.16
+object_lookdown_height: 3.0
+object_approach_height: 1.2
+object_grasping_height: 0.2
+object_yaw_thresh: 0.2
 
-grasping_point: [-0.455, 0.455, 0.00] #in fc frame
+grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
+joint_torque_thresh: 5 #[Nm]
 
 global_place_channel_pos: [[4.0, 0.0, 8.0, 0.0]] #in world frame [end1_x, end1_y, end2_x, end2_y]
 global_place_channel_z: 1.7 #[m]
 place_z_margin: 0.6 #[m]
-place_z_offset: 0.9 #[m]
+place_z_offset: 1.3 #[m]
+channel_tf_frame_id: channel_center

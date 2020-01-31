@@ -8,9 +8,13 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="ground_mode" default="False" />
   <arg name="passive_gripper" default="False"/>
-  <arg name="ring_gripper" default="False"/>
+  <arg name="ring_gripper" default="True"/>
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
+  <arg name="spawn_x" default="0.0"/>
+  <arg name="spawn_y" default="0.0"/>
+
+  <param name="/simulation" value="$(arg simulation)"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
@@ -25,6 +29,7 @@
     <arg name="model_suffix" value="_ground_mode" if="$(arg ground_mode)"/>
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rviz_config"/>
   </include>
 
   ######### config for actuated legs #########
@@ -34,13 +39,18 @@
 
   <group unless="$(arg ground_mode)">
     <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
-    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" if="$(arg real_machine)">
-      <arg name="camera" value="rs_d435" />
-    </include>
+    <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
+          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" if="$(arg real_machine)"/>
   </group>
 
   <group if="$(arg passive_gripper)">
     <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load"/>
   </group>
+
+  <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle"/>
+
+  <node if="$(arg simulation)"
+        pkg="timed_roslaunch" type="timed_roslaunch.sh"
+        args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y)" name="timed_roslaunch" output="screen"/>
 
 </launch>

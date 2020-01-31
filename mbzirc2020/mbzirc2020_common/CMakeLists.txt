@@ -4,6 +4,7 @@ project(mbzirc2020_common)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  jsk_rviz_plugins
 )
 
 catkin_python_setup()

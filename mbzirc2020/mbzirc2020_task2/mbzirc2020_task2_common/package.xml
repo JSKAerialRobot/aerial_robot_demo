@@ -11,6 +11,7 @@
   <depend>hydrus</depend>
   <depend>mbzirc2020_task2_simulation</depend>
   <depend>gazebo_ros</depend>
+  <depend>timed_roslaunch</depend>
 
   <export>
 

@@ -7,7 +7,7 @@
       <collision name='collision'>
         <geometry>
           <mesh>
-            <uri>model://uchannel_place/mesh/uchannel_place.dae</uri>
+            <uri>model://uchannel_place/mesh/uchannel_place_collision.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -17,7 +17,7 @@
         <transparency>0</transparency>
         <geometry>
           <mesh>
-            <uri>model://uchannel_place/mesh/uchannel_place.dae</uri>
+            <uri>model://uchannel_place/mesh/uchannel_place_visual.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

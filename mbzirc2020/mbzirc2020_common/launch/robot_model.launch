@@ -5,6 +5,7 @@
   <arg name="task" default="1" />
   <arg name="horizontal_vio" default="0" />
   <arg name="model_suffix" default="" />
+  <arg name="rviz_config_path" default="$(find aerial_robot_model)/launch/rviz_config"/>
 
   <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).$(arg description_mode).xacro" />
 
@@ -29,5 +30,5 @@
   <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' horizontal_vio:=$(arg horizontal_vio)" />
 
   <node name="$(anon rviz)" pkg="rviz" type="rviz" unless="$(arg headless)"
-        args="-d $(find aerial_robot_model)/launch/rviz_config" respawn="true" />
+        args="-d $(arg rviz_config_path)" respawn="true" />
 </launch>

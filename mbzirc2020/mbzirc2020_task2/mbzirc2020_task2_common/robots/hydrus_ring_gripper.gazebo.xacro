@@ -96,12 +96,12 @@
     <sensor type="depth" name="rs_d435_camera">
       <update_rate>20.0</update_rate>
       <camera name="head">
-	<horizontal_fov>1.59174</horizontal_fov>
-	<vertical_fov>1.14319</vertical_fov>
+	<horizontal_fov>0.95725190791890935</horizontal_fov>
+	<vertical_fov>0.74223480644853568</vertical_fov>
 	<image>
-	  <width>1280</width>
-	  <height>720</height>
-	  <format>RGB</format>
+	  <width>640</width>
+	  <height>480</height>
+	  <format>B8G8R8</format>
 	</image>
 	<clip>
 	  <near>0.02</near>

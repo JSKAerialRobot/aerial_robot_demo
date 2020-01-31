@@ -1,0 +1,11 @@
+<launch>
+  <node name="image_republish1" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/rs_d435/color/image_rect_color" />
+    <remap from="out" to="/rs_d435/color/image_rect_color" />
+  </node>
+
+  <node name="image_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
+    <remap from="in" to="/rs_d435/aligned_depth_to_color/image_raw" />
+    <remap from="out" to="/rs_d435/aligned_depth_to_color/image_raw" />
+  </node>
+</launch>

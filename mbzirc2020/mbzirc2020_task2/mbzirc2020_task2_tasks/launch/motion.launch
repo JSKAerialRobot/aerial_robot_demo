@@ -1,0 +1,84 @@
+<launch>
+  <arg name="world" default="simulation_default"/>
+  <arg name="do_object_recognition" default="true"/>
+  <arg name="do_channel_recognition" default="true"/>
+  <arg name="smach_viewer" default="false"/>
+  <arg name="outdoor" default="false"/>
+  <arg name="debug_look_down" default="false"/>
+  <arg name="debug_adjust_grasp" default="false"/>
+  <arg name="debug_grasp" default="false"/>
+  <arg name="debug_adjust_place" default="false"/>
+
+  <group ns="task2_motion">
+    <group if="$(arg debug_look_down)">
+      <rosparam>
+        skip_takeoff: true
+        skip_approach_pick_position: true
+        skip_look_down: false
+        skip_adjust_grasp_position: false
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_adjust_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
+    <group if="$(arg debug_adjust_grasp)">
+      <rosparam>
+        skip_takeoff: true
+        skip_approach_pick_position: true
+        skip_look_down: true
+        skip_adjust_grasp_position: false
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_adjust_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
+    <group if="$(arg debug_grasp)">
+      <rosparam>
+        skip_takeoff: true
+        skip_approach_pick_position: true
+        skip_look_down: true
+        skip_adjust_grasp_position: true
+        skip_grasp: false
+        skip_move_to_place_position: false
+        skip_adjust_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
+    <group if="$(arg debug_adjust_place)">
+      <rosparam>
+        skip_takeoff: true
+        skip_approach_pick_position: true
+        skip_look_down: true
+        skip_adjust_grasp_position: true
+        skip_grasp: true
+        skip_move_to_place_position: true
+        skip_adjust_place_position: false
+        skip_ungrasp: false
+      </rosparam>
+    </group>
+
+  </group>
+
+  <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
+        output="screen">
+    <rosparam command="load" file="$(find mbzirc2020_task2_tasks)/config/$(arg world)/Motion.yaml"/>
+    <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
+    <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
+  </node>
+
+  <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+    <arg name="world" value="$(arg world)"/>
+    <arg if="$(arg outdoor)" name="external_manager" value="true" />
+    <arg if="$(arg outdoor)" name="manager" value="/rs_d435/realsense2_camera_manager" />
+  </include>
+
+  <group unless="$(arg outdoor)">
+    <node if="$(arg smach_viewer)"
+          name="smach_viewer" type="smach_viewer.py" pkg="smach_viewer"/>
+  </group>
+</launch>
