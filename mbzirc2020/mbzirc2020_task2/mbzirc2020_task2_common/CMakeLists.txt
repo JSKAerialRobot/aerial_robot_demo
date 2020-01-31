@@ -12,13 +12,15 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   jsk_topic_tools
   jsk_network_tools
-  tf2_msgs
+  geometry_msgs
+  nav_msgs
   jsk_rviz_plugins
   )
 
 add_message_files(
   FILES
   FC2OCSData.msg
+  OCS2FCData.msg
   )
 
 generate_messages(
@@ -27,6 +29,7 @@ generate_messages(
   tf2_msgs
   jsk_rviz_plugins
   geometry_msgs
+  nav_msgs
   )
 
 catkin_package(

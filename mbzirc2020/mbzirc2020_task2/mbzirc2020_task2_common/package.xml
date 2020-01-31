@@ -15,9 +15,9 @@
   <depend>message_generation</depend>
   <depend>jsk_topic_tools</depend>
   <depend>jsk_network_tools</depend>
-  <depend>tf2_msgs</depend>
   <depend>jsk_rviz_plugins</depend>
   <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
   <export>
 
   </export>

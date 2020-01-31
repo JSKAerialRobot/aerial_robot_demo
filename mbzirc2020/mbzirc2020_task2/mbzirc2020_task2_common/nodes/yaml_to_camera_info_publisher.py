@@ -33,5 +33,6 @@ if __name__ == "__main__":
 
     # Run publisher
     while not rospy.is_shutdown():
+        camera_info_msg.header.stamp = rospy.Time.now()
         publisher.publish(camera_info_msg)
         rate.sleep()
