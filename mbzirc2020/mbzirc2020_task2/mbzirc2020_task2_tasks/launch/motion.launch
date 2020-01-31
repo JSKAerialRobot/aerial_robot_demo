@@ -68,4 +68,12 @@
     <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
     <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
   </node>
+
+  <node pkg="jsk_rviz_plugins" type="rosconsole_overlay_text.py" respawn="true" name="rosconsole_overlay_text">
+    <rosparam>
+      nodes: ["/task2_motion"]
+      reverse_lines: false
+    </rosparam>
+  </node>
+
 </launch>
