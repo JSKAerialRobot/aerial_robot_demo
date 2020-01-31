@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   jsk_topic_tools
   jsk_network_tools
+  tf2_msgs
+  jsk_rviz_plugins
   )
 
 add_message_files(
@@ -22,6 +24,9 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   sensor_msgs
+  tf2_msgs
+  jsk_rviz_plugins
+  geometry_msgs
   )
 
 catkin_package(

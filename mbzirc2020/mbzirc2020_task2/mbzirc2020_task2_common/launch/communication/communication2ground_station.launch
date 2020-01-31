@@ -1,7 +1,8 @@
 <launch>
-  <arg name="GROUND_STATION_IP" default="192.168.1.117" />
+  <arg name="GROUND_STATION_IP" default="192.168.1.10" />
   <arg name="UAV_IP" default="$(env ROS_IP)" />
   <arg name="HIGH_PORT" default="16484" />
+  <arg name="LOW_PORT" default="1024" />
   <arg name="camera_nodelet_manager" default="/rs_d435/realsense2_camera_manager"/>
 
   <node pkg="nodelet" type="nodelet" name="rgb_image_throttle"
@@ -26,6 +27,15 @@
     <param name="send_rate" value="5" />
     <param name="bandwidth" value="2000000" />
     <param name="packet_size" value="1000" />
+  </node>
+
+  ### GroundStation to UAV
+  <node pkg="jsk_network_tools" type="silverhammer_lowspeed_receiver.py" name="lowspeed_receiver">
+    <remap from="/lowspeed_receiver/output" to="/task_start" />
+    <param name="message" value="std_msgs/Empty" />
+    <param name="receive_ip" value="$(arg UAV_IP)" />
+    <param name="receive_port" value="$(arg LOW_PORT)" />
+    <param name="receive_buffer_size" value="1000" />
   </node>
 
 </launch>

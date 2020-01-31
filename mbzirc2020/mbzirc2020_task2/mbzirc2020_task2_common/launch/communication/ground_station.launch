@@ -1,15 +1,27 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="GROUND_STATION_IP" default="$(env ROS_IP)" />
-  <arg name="UAV_IP" default="192.168.1.120" />
+  <arg name="UAV_IP" default="192.168.1.110" />
   <arg name="HIGH_PORT" default="16484" />
+  <arg name="LOW_PORT" default="1024" />
+  <arg name="model_suffix" default="_ring_gripper"/>
 
-  <!-- Ground Station (from UAV) -->
-  <node pkg="jsk_network_tools" type="silverhammer_highspeed_receiver.py" output="screen" name="receiver">
+  ### UAV to GroundStation
+  <node pkg="jsk_network_tools" type="silverhammer_highspeed_receiver.py" name="receiver">
     <param name="message" value="mbzirc2020_task2_common/FC2OCSData" />
     <param name="receive_ip" value="$(arg GROUND_STATION_IP)" />
     <param name="receive_port" value="$(arg HIGH_PORT)" />
     <param name="topic_prefix" value="" />
+  </node>
+
+  ### GroundStation to UAV
+  <node pkg="jsk_network_tools" type="silverhammer_lowspeed_streamer.py" name="lowspeed_streamer">
+    <remap from="~input" to="/task_start" />
+    <param name="message" value="std_msgs/Empty" />
+    <param name="to_ip" value="$(arg UAV_IP)" />
+    <param name="to_port" value="$(arg LOW_PORT)" />
+    <param name="send_rate" value="1" />
+    <param name="event_driven" value="True" />
   </node>
 
   <node name="image_republish1" pkg="image_transport" type="republish" args="compressed raw">
@@ -22,6 +34,25 @@
     <remap from="out" to="/rs_d435/aligned_depth_to_color/image_raw/throttle" />
   </node>
 
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task2_common)/launch/communication/groundstation_rviz_config" respawn="true"/>
+  <include file="$(find mbzirc2020_common)/launch/robot_model.launch">
+    <arg name="description_mode" default="gazebo"/>
+    <arg name="task" value="2"/>
+    <arg name="need_joint_state" value="false"/>
+    <arg name="model_suffix" value="$(arg model_suffix)"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/launch/communication/groundstation_rviz_config"/>
+  </include>
+
+  <node pkg="mbzirc2020_task2_common" type="yaml_to_camera_info_publisher.py" name="camera_info_publisher">
+    <param name="camera_info_file" value="$(find mbzirc2020_task2_common)/config/camera/RSD435ColorCameraInfo.yaml"/>
+    <remap from="~camera_info" to="/rs_d435/color/camera_info"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
+        args="standalone depth_image_proc/point_cloud_xyzrgb" >
+    <remap from="rgb/camera_info" to="/rs_d435/color/camera_info"/>
+    <remap from="rgb/image_rect_color" to="/rs_d435/color/image_rect_color/throttle"/>
+    <remap from="depth_registered/image_rect" to="/rs_d435/aligned_depth_to_color/image_raw/throttle"/>
+    <remap from="depth_registered/points" to="/rs_d435/points"/>
+  </node>
 
 </launch>
