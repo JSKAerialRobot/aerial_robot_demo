@@ -12,6 +12,16 @@
     <param name="topic_prefix" value="" />
   </node>
 
+  <node name="image_republish1" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/rs_d435/color/image_rect_color/throttle" />
+    <remap from="out" to="/rs_d435/color/image_rect_color/throttle" />
+  </node>
+
+  <node name="image_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
+    <remap from="in" to="/rs_d435/aligned_depth_to_color/image_raw/throttle" />
+    <remap from="out" to="/rs_d435/aligned_depth_to_color/image_raw/throttle" />
+  </node>
+
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task2_common)/launch/communication/groundstation_rviz_config" respawn="true"/>
 
 </launch>
