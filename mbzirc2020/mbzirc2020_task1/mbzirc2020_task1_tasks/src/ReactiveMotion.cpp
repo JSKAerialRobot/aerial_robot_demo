@@ -40,6 +40,11 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       sendControlCmd(cur_pos_);
       return;
     }
+    double net_cog_yaw_offset = -M_PI / 4.0;
+    if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
+      ROS_WARN("[ReactiveMotion] Estimation in bad quality, follow previous cmd");
+      return;
+    }
     if (ransac_line_estimator_->isNearTarget(cur_pos_)){ // target is too near
       motion_state_ = STOP_TRACKING;
       stop_tracking_cnt_ = 0;
@@ -108,6 +113,12 @@ void ReactiveMotion::cogOdomCallback(const nav_msgs::OdometryConstPtr & msg){
   cur_pos_ << cog_odom_.pose.pose.position.x,
     cog_odom_.pose.pose.position.y,
     cog_odom_.pose.pose.position.z;
+  tf::Quaternion q(cog_odom_.pose.pose.orientation.x,
+                   cog_odom_.pose.pose.orientation.y,
+                   cog_odom_.pose.pose.orientation.z,
+                   cog_odom_.pose.pose.orientation.w);
+  tf::Matrix3x3  uav_rot_mat(q);
+  uav_rot_mat.getRPY(euler_ang_[0], euler_ang_[1], euler_ang_[2]);
   geometry_msgs::PointStamped cog_pt_msg;
   cog_pt_msg.header = cog_odom_.header;
   cog_pt_msg.header.frame_id = "world";

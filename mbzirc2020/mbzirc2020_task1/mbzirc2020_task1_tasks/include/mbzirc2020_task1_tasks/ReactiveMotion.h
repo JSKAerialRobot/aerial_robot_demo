@@ -24,6 +24,7 @@ private:
   int motion_state_;
   Eigen::Vector3d cur_pos_;
   Eigen::Vector3d target_pos_;
+  Eigen::Vector3d euler_ang_;
   int stop_tracking_cnt_;
   double cog_net_offset_;
 
