@@ -7,6 +7,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("control_frequency", control_freq_, 100.0);
   nhp_.param("cog_net_offset", cog_net_offset_, 0.15);
   nhp_.param("target_pos_xy_threshold", target_pos_xy_thre_, 3.0);
+  nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -107,6 +108,7 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
   nav_msg.target_pos_z = cur_pos_(2) + delta_pos(2);
   nav_msg.target_pos_z += cog_net_offset_;
+  nav_msg.target_pos_z += experiment_safety_z_offset_;
   // todo: add psi
   // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
   // nav_msg.target_psi = -math.pi / 2.0 # 0.0
