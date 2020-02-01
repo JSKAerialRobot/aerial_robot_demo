@@ -4,8 +4,10 @@
   <arg name="vision" default="true" />
   <node pkg="mbzirc2020_task1_tasks" type="ransac_line_fitting_node" name="ransac_line_fitting_node" output="screen" >
     <param name="target_point_sub_topic_name" value="/treasure/point_detected"/>
-    <param name="cand_points2d_max_size" value="30"/>
-    <param name="cand_points3d_max_size" value="30"/>
+    <param name="cand_points2d_initial_size" value="15"/>
+    <param name="cand_points3d_initial_size" value="15"/>
+    <param name="cand_points2d_max_size" value="60"/>
+    <param name="cand_points3d_max_size" value="60"/>
     <param name="ransac_3d_mode" value="False"/>
     <param name="target_point_maximum_disappear_time" value="0.8"/>
     <param name="target_close_distance_threshold" value="1.0"/>
