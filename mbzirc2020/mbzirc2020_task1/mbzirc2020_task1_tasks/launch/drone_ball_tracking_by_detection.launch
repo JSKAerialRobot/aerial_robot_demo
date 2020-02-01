@@ -7,20 +7,28 @@
   <arg name= "color_image_topic" default = "/camera/image_raw" />
   <arg name= "depth_image_topic" default = "/depth/image_raw" />
   <arg name= "model_file"  default = "$(find edgetpu_roscpp)/test/data/drone_detection_edgetpu.tflite" />
-  <arg name= "coarse_detection_score_threshold" default = "0.3" />
-  <arg name= "refined_detection_score_threshold" default = "0.8" />
+  <arg name= "coarse_detection_score_threshold" default = "0.0" />
+  <arg name= "refined_detection_score_threshold" default = "0.71" />
   <arg name= "tracking_score_threshold" default = "0.7" />
   <arg name= "expanding_bounding_box_aspect_ratio" default = "1.0" /> <!-- general SSD is 1:1 -->
   <arg name= "expanding_bounding_box_rate" default = "2.0" />
   <arg name= "larger_expanding_bounding_box_rate" default = "3.0" />
-  <arg name= "ball_radius_lpf_gain" default = "0.2" />
+
+  <arg name= "ball_real_radius" default = "0.075" />
+  <arg name= "drone_real_width" default = "1.1" />
+  <arg name= "ball_depth_lpf_gain" default = "0.2" />
+  <arg name= "far_depth" default = "20" />
+  <arg name= "close_depth" default = "5" />
+  <arg name= "ball_far_depth_outlier_threshold" default = "10" />
+  <arg name= "ball_close_depth_outlier_threshold" default = "5" />
+  <arg name= "bbox_valid_bound_margin" default = "10" />
 
   <arg name= "detection_check_frame_num" default = "10" />
   <arg name= "lost_target_check_frame_num" default = "5" />
   <arg name= "redetection_after_lost_target_frame_num" default = "30" /> <!-- this is associated with the frame rate (fps) -->
 
   <arg name= "subscribe_depth_image" default ="false" />
-  <arg name= "quick_detection" default = "false" />
+  <arg name= "quick_detection" default = "true" />
   <arg name= "keep_aspect_ratio_in_inference" default = "false" />
 
   <arg name="h_limit_max" default="80" doc="The maximum allowed field value Hue: yellow" />
@@ -48,7 +56,15 @@
     <param name="detection_check_frame_num" value="$(arg detection_check_frame_num)"/>
     <param name="lost_target_check_frame_num" value="$(arg lost_target_check_frame_num)"/>
     <param name="redetection_after_lost_target_frame_num" value="$(arg redetection_after_lost_target_frame_num)"/>
-    <param name= "ball_radius_lpf_gain" value = "$(arg ball_radius_lpf_gain)" />
+
+    <param name= "ball_real_radius" value = "$(arg ball_real_radius)" />
+    <param name= "drone_real_width" value = "$(arg drone_real_width)" />
+    <param name= "bbox_valid_bound_margin" value = "$(arg bbox_valid_bound_margin)" />
+    <param name= "ball_far_depth_outlier_threshold" value = "$(arg ball_far_depth_outlier_threshold)" />
+    <param name= "ball_close_depth_outlier_threshold" value = "$(arg ball_close_depth_outlier_threshold)" />
+    <param name= "far_depth" value = "$(arg far_depth)" />
+    <param name= "close_depth" value = "$(arg close_depth)" />
+    <param name= "ball_depth_lpf_gain" value = "$(arg ball_depth_lpf_gain)" />
 
     <param name="subscribe_depth_image" value="$(arg subscribe_depth_image)"/>
     <param name="quick_detection" value="$(arg quick_detection)"/>
