@@ -44,6 +44,8 @@ private:
   int estimator_state_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points2d_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points3d_;
+  int cand_points2d_init_size_;
+  int cand_points3d_init_size_;
   int cand_points2d_max_size_;
   int cand_points3d_max_size_;
   GRANSAC::RANSAC<Line2DModel, 2> estimator_2d_;
