@@ -39,5 +39,7 @@ namespace GRANSAC
         virtual std::array<std::shared_ptr<AbstractParameter>, t_NumParams> GetModelParams(void) { return m_MinModelParams; };
 
       virtual std::shared_ptr<GRANSAC::AbstractParameter> ComputeNearestPoint(std::shared_ptr<AbstractParameter> Param) = 0;
+
+      virtual VPFloat getSlope() = 0;
     };
 } // namespace GRANSAC

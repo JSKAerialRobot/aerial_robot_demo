@@ -157,5 +157,10 @@ public:
 
 		return std::dynamic_pointer_cast<GRANSAC::AbstractParameter>(pt);
 	};
+
+	virtual GRANSAC::VPFloat getSlope() override
+  {
+    return m_m;
+  };
 };
 
