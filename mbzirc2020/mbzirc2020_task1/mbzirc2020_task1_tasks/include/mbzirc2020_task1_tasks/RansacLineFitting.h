@@ -19,6 +19,8 @@
 #include <eigen3/Eigen/Geometry>
 #include <eigen3/Eigen/Eigenvalues>
 
+#include <tf/LinearMath/Transform.h>
+
 class RansacLineFitting{
 #define STOP_ESTIMATION 0
 #define IN_ESTIMATION 1
@@ -28,6 +30,7 @@ public:
   bool isEstimated();
   bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
   bool isNearTarget(Eigen::Vector3d pos);
+  bool checkEstimationWithYawAng(double yaw);
 
 private:
   /* basic */
@@ -52,6 +55,7 @@ private:
   double target_pt_update_time_;
   double target_pt_dispear_time_thre_;
   double target_close_dist_thre_;
+  double yaw_diff_thre_;
 
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void visualizeRansacLine();

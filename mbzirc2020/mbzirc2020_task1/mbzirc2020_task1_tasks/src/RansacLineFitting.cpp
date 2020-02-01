@@ -13,6 +13,7 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
   nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 1.0);
   nhp_.param("lpf_z_gain", lpf_z_gain_, 0.8);
+  nhp_.param("yaw_diff_threshold", yaw_diff_thre_, M_PI / 3.0);
 
   initializeEstimatorParam();
 
@@ -94,6 +95,26 @@ void RansacLineFitting::update(){
   visualizeRansacLine();
   if (ransac_vis_flag_)
     visualizeRansacInliers();
+}
+
+bool RansacLineFitting::checkEstimationWithYawAng(double yaw){
+  if (ransac_3d_mode_){
+    // to develop
+    return false;
+  }
+  else{
+    double slope = estimator_2d_.GetBestModel()->getSlope();
+    double slope_diff = fabs(yaw - M_PI - slope);
+    while (slope_diff > M_PI)
+      slope_diff -= 2 * M_PI;
+    if (fabs(slope_diff) > yaw_diff_thre_){
+      // debug
+      // std::cout << "slope: " << slope << ", yaw: " << yaw << "\n";
+      return false;
+    }
+    else
+      return true;
+  }
 }
 
 bool RansacLineFitting::getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt){
