@@ -8,6 +8,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("cog_net_offset", cog_net_offset_, 0.15);
   nhp_.param("target_pos_xy_threshold", target_pos_xy_thre_, 3.0);
   nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
+  nhp_.getParam("motion_cmd_threshold_list", motion_cmd_thre_vec_);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -90,12 +91,11 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nearest_waypoint_pub_.publish(target_pt_msg);
 
   Eigen::Vector3d delta_pos = target_pos - cur_pos_;
-  Eigen::Vector3d pos_cmd_thre(1.0, 1.0, 0.5);
   for (int i = 0; i < 3; ++i){
-    if (delta_pos[i] > pos_cmd_thre[i])
-      delta_pos[i] = pos_cmd_thre[i];
-    else if (delta_pos[i] < -pos_cmd_thre[i])
-      delta_pos[i] = -pos_cmd_thre[i];
+    if (delta_pos[i] > motion_cmd_thre_vec_[i])
+      delta_pos[i] = motion_cmd_thre_vec_[i];
+    else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
+      delta_pos[i] = -motion_cmd_thre_vec_[i];
   }
   aerial_robot_msgs::FlightNav nav_msg;
   nav_msg.header.stamp = ros::Time::now();
