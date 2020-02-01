@@ -31,6 +31,7 @@ private:
 
   Eigen::Vector3d task_initial_waiting_pos_;
   bool task_initial_waiting_pos_flag_;
+  double experiment_safety_z_offset_;
 
   ros::Timer control_timer_;
   ros::Subscriber cog_odom_sub_;
