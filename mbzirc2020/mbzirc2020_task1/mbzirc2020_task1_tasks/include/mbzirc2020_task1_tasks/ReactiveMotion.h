@@ -27,6 +27,10 @@ private:
   Eigen::Vector3d euler_ang_;
   int stop_tracking_cnt_;
   double cog_net_offset_;
+  double target_pos_xy_thre_;
+
+  Eigen::Vector3d task_initial_waiting_pos_;
+  bool task_initial_waiting_pos_flag_;
 
   ros::Timer control_timer_;
   ros::Subscriber cog_odom_sub_;
@@ -36,6 +40,7 @@ private:
   ros::Publisher uav_cog_point_pub_;
 
   void sendControlCmd(Eigen::Vector3d target_pos);
+  bool isTargetPosInSearchRegion();
 
   void controlTimerCallback(const ros::TimerEvent& event);
   void cogOdomCallback(const nav_msgs::OdometryConstPtr & msg);
