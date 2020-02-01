@@ -54,4 +54,5 @@
         pkg="timed_roslaunch" type="timed_roslaunch.sh"
         args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y)" name="timed_roslaunch" output="screen"/>
 
+  <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
 </launch>
