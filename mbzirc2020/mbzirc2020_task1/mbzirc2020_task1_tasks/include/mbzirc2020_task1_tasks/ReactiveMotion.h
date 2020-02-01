@@ -28,6 +28,7 @@ private:
   int stop_tracking_cnt_;
   double cog_net_offset_;
   double target_pos_xy_thre_;
+  std::vector<double> motion_cmd_thre_vec_;
 
   Eigen::Vector3d task_initial_waiting_pos_;
   bool task_initial_waiting_pos_flag_;
