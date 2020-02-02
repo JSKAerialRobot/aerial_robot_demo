@@ -31,12 +31,23 @@ class Task2State(smach.State):
 
 class Start(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded'])
+
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.skip_takeoff = rospy.get_param('~skip_takeoff', False)
+        self.do_object_recognition = rospy.get_param('~do_object_recognition')
+        self.do_channel_recognition = rospy.get_param('~do_channel_recognition')
+
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
+
+        if not self.do_object_recognition:
+            rospy.logerr('WARNING!! NO OBJECT RECOGNITION')
+        if not self.do_channel_recognition:
+            rospy.logerr('WARNING!! NO CHANNEL RECOGNITION')
+
 
         self.robot.setXYPosOffset(self.robot.getBaselinkPos()[0:2])
 
@@ -55,7 +66,11 @@ class Start(Task2State):
 
 class ApproachPickPosition(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded'], input_keys=['object_count'], output_keys=['object_count'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded'],
+                            input_keys=['object_count'],
+                            output_keys=['object_count'])
+
         self.skip_approach_pick_position = rospy.get_param('~skip_approach_pick_position', False)
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.global_lookdown_pos_gps = rospy.get_param('~global_lookdown_pos_gps')
@@ -77,7 +92,9 @@ class ApproachPickPosition(Task2State):
 
 class LookDown(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded', 'failed'])
+
         self.skip_look_down = rospy.get_param('~skip_look_down', False)
         self.do_object_recognition = rospy.get_param('~do_object_recognition')
         self.object_approach_height = rospy.get_param('~object_approach_height')
@@ -139,7 +156,11 @@ class LookDown(Task2State):
 
 class AdjustGraspPosition(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'], input_keys=['object_count'], output_keys=['object_count'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded', 'failed'],
+                            input_keys=['object_count'],
+                            output_keys=['object_count'])
+
         self.skip_adjust_grasp_position = rospy.get_param('~skip_adjust_grasp_position', False)
         self.do_object_recognition = rospy.get_param('~do_object_recognition')
         self.object_grasping_height = rospy.get_param('~object_grasping_height')
@@ -228,7 +249,9 @@ class AdjustGraspPosition(Task2State):
 
 class Grasp(Task2State):
     def __init__(self, robot, add_object_model_func):
-        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded', 'failed'])
+
         self.add_object_model_func = add_object_model_func
         self.joint_torque_thresh = rospy.get_param('~joint_torque_thresh')
         self.skip_grasp = rospy.get_param('~skip_grasp', False)
@@ -255,18 +278,22 @@ class Grasp(Task2State):
 class ApproachPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot, outcomes=['succeeded'],
-                            input_keys=['object_count'],
-                            output_keys=['object_count'])
+                            input_keys=['object_count', 'orig_channel_xy_yaw'],
+                            output_keys=['object_count', 'orig_channel_xy_yaw'])
 
         self.simulation = rospy.get_param('/simulation')
-        self.global_place_channel_pos = rospy.get_param('~global_place_channel_pos')
-        self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
-        self.place_z_offset = rospy.get_param('~place_z_offset')
         self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
+        self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
+        self.grasping_yaw = rospy.get_param('~grasping_yaw')
+        self.place_z_offset = rospy.get_param('~place_z_offset')
 
-        grasping_point = rospy.get_param('~grasping_point')
-        grasping_yaw = rospy.get_param('~grasping_yaw')
-        self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
+        self.global_place_channel_front_pos_gps = rospy.get_param('~global_place_channel_front_pos_gps')
+        self.global_place_channel_back_pos_gps = rospy.get_param('~global_place_channel_back_pos_gps')
+
+        global_place_channel_xy = gps2xy(self.global_place_channel_front_pos_gps, self.global_place_channel_back_pos_gps)
+        self.place_channel_yaw = np.arctan2(global_place_channel_xy[1], global_place_channel_xy[0]) + np.pi
+        self.lat_unit = (self.global_place_channel_back_pos_gps[0] - self.global_place_channel_front_pos_gps[0]) / 5.0
+        self.lon_unit = (self.global_place_channel_back_pos_gps[1] - self.global_place_channel_front_pos_gps[1]) / 5.0
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -274,17 +301,10 @@ class ApproachPlacePosition(Task2State):
         if self.skip_approach_place_position:
             return 'succeeded'
 
-        #calc place coords
-        target_channel_pos = self.global_place_channel_pos[0]
-        object_count_in_channel = (userdata.object_count % 4) + 1
-        place_pos_x = target_channel_pos[0] + (target_channel_pos[2] - target_channel_pos[0]) * object_count_in_channel / 5.0
-        place_pos_y = target_channel_pos[1] + (target_channel_pos[3] - target_channel_pos[1]) * object_count_in_channel / 5.0
-        place_pos_yaw = np.arctan2(target_channel_pos[1] - target_channel_pos[3], target_channel_pos[0] - target_channel_pos[2])
-        place_pos_coords = tft.compose_matrix(translate=[place_pos_x, place_pos_y, self.global_place_channel_z], angles=[0, 0, place_pos_yaw])
-
-        uav_target_coords = tft.concatenate_matrices(place_pos_coords, tft.inverse_matrix(self.grasping_point_coords))
-        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-        uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+        #calc place coords in gps
+        place_pos_lat = self.global_place_channel_front_pos_gps[0] + self.lat_unit * (userdata.object_count + 1)
+        place_pos_lon = self.global_place_channel_front_pos_gps[1] + self.lon_unit * (userdata.object_count + 1)
+        uav_target_yaw = self.place_channel_yaw - self.grasping_yaw
 
         if self.simulation:
             client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
@@ -298,12 +318,18 @@ class ApproachPlacePosition(Task2State):
                 print "Service call failed: %s"%e
 
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, timeout=60)
+        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.place_channel_yaw)
+
         return 'succeeded'
 
 class AdjustPlacePosition(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, robot, outcomes=['succeeded', 'failed'])
+        Task2State.__init__(self, robot,
+                            outcomes=['succeeded', 'failed'],
+                            input_keys=['orig_channel_xy_yaw'],
+                            output_keys=['orig_channel_xy_yaw'])
+
         self.skip_adjust_place_position = rospy.get_param('~skip_adjust_place_position', False)
         self.do_channel_recognition = rospy.get_param('~do_channel_recognition')
         self.channel_tf_frame_id = rospy.get_param('~channel_tf_frame_id')
@@ -331,9 +357,18 @@ class AdjustPlacePosition(Task2State):
             channel_pos = tft.translation_from_matrix(channel_trans)
             channel_center_coords = tft.compose_matrix(translate=channel_pos, angles=[0, 0, my_object_global_yaw])
             rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
+
             uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
             uav_target_pos = tft.translation_from_matrix(uav_target_coords)
 
+            self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+
+        else:
+            rospy.logwarn(self.__class__.__name__ + ': no recognition, skip')
+            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1]])
+            uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
+            uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+            rospy.logwarn(self.__class__.__name__ + ": Directly go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
             self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'

@@ -84,16 +84,18 @@ def main():
                                transitions={'succeeded':'Place'})
 
         sm_place = smach.StateMachine(outcomes=['finish', 'continue'], input_keys=['object_count'], output_keys=['object_count'])
+        sm_place.userdata.orig_channel_xy_yaw = None
 
         with sm_place:
             smach.StateMachine.add('ApproachPlacePosition', ApproachPlacePosition(robot),
                                    transitions={'succeeded':'AdjustPlacePosition'},
-                                   remapping={'object_count':'object_count'})
+                                   remapping={'object_count':'object_count',
+                                              'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
 
             smach.StateMachine.add('AdjustPlacePosition', AdjustPlacePosition(robot),
                                    transitions={'succeeded':'Ungrasp',
                                                 'failed':'Ungrasp'},
-                                   remapping={'object_count':'object_count'})
+                                   remapping={'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
 
             smach.StateMachine.add('Ungrasp', Ungrasp(robot, remove_object_model_func),
                                    transitions={'finish':'finish',
