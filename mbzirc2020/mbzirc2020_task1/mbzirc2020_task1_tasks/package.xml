@@ -25,6 +25,8 @@
   <build_depend>aerial_robot_msgs</build_depend>
   <build_depend>tf2_geometry_msgs</build_depend>
   <build_depend>tf2_ros</build_depend>
+  <build_depend>smach</build_depend>
+  <build_depend>smach_ros</build_depend>
 
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>edgetpu_roscpp</run_depend>
@@ -39,6 +41,8 @@
   <run_depend>tf2_geometry_msgs</run_depend>
   <run_depend>tf2_ros</run_depend>
   <run_depend>nodelet</run_depend>
+  <run_depend>smach</run_depend>
+  <run_depend>smach_ros</run_depend>
 
   <run_depend>jsk_data</run_depend>
   <run_depend>python-gdown-pip</run_depend>

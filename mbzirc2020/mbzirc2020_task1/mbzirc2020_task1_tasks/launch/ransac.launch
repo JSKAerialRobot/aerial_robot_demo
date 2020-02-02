@@ -2,6 +2,7 @@
 <launch>
   <arg name="headless" default="true" />
   <arg name="vision" default="true" />
+  <arg name="from_ground" default="false" />
   <node pkg="mbzirc2020_task1_tasks" type="ransac_line_fitting_node" name="ransac_line_fitting_node" output="screen" >
     <param name="target_point_sub_topic_name" value="/treasure/point_detected"/>
     <param name="cand_points2d_initial_size" value="15"/>
@@ -29,6 +30,12 @@
     <include file="$(find mbzirc2020_task1_tasks)/launch/ransac_visualization.launch" >
     </include>
     <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task1_tasks)/config/task1_ransac_vis.rviz" /> -->
+  </group>
+
+  <group if="$(arg from_ground)">
+    <node pkg="mbzirc2020_task1_tasks" type="task1_motion_state_machine.py" name="task1_motion_state_machine"  output="screen">
+      <rosparam file="$(find mbzirc2020_task1_tasks)/config/task1_state_machine.yaml" command="load" />
+    </node>
   </group>
 
 </launch>
