@@ -88,8 +88,11 @@ namespace edgetpu_roscpp
     int s_max_;
     int l_min_;
     int l_max_;
-    double approx_contour_rate_;
+    int closing_iteration_;
+    double circle_protrude_threshold_; // if the circumscribed circle of contour protrude the bounding box beyond this threshold, invalid
+    double circle_baseline_margin_; // if the lowest point of the circumscribed circle of contour can not reach the baselink of the bounding box within this margin, invalid
     cv::Mat color_filtered_img_;
+    double ball_pixel_radius_;
     cv::Point2f ball_pixel_center_;
     tf2::Vector3 ball_pos_;
 
