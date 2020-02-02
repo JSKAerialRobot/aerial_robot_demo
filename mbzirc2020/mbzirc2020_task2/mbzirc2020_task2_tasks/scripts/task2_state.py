@@ -163,7 +163,6 @@ class AdjustGraspPosition(Task2State):
 
         self.skip_adjust_grasp_position = rospy.get_param('~skip_adjust_grasp_position', False)
         self.do_object_recognition = rospy.get_param('~do_object_recognition')
-        self.object_grasping_height = rospy.get_param('~object_grasping_height')
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.global_first_object_pos = rospy.get_param('~global_first_object_pos')
         self.object_interval = rospy.get_param('~object_interval')
@@ -243,7 +242,6 @@ class AdjustGraspPosition(Task2State):
 
         self.robot.preshape()
         self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.object_grasping_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         return 'succeeded'
 
@@ -255,12 +253,24 @@ class Grasp(Task2State):
         self.add_object_model_func = add_object_model_func
         self.joint_torque_thresh = rospy.get_param('~joint_torque_thresh')
         self.skip_grasp = rospy.get_param('~skip_grasp', False)
+        self.object_grasping_height = rospy.get_param('~object_grasping_height')
+        self.grasp_land_mode = rospy.get_param('~grasp_land_mode')
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
 
         if self.skip_grasp:
             return 'succeeded'
+
+        if self.grasp_land_mode:
+            rospy.logwarn(self.__class__.__name__ + ": land mode, landing")
+            self.robot.land()
+            while not (self.robot.getFlightState() == self.robot.ARM_OFF_STATE):
+                pass
+
+        else:
+            #descend
+            self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         self.robot.grasp()
         rospy.sleep(1);
@@ -269,11 +279,22 @@ class Grasp(Task2State):
         joint_torque.append(joint_state.effort[joint_state.name.index('joint1')])
         joint_torque.append(joint_state.effort[joint_state.name.index('joint3')])
 
+        result = 'succeeded'
+
         if all(np.array(joint_torque) > self.joint_torque_thresh):
             self.add_object_model_func(self.robot)
-            return 'succeeded'
+            result = 'succeeded'
         else:
-            return 'failed'
+            rospy.logerr("%s: grasp failed! joint1: %f, joint3: %f, thresh: %f", self.__class__.__name__, joint_torque[0], joint_torque[1], self.joint_torque_thresh)
+            result = 'failed'
+
+        if self.grasp_land_mode:
+            rospy.logwarn(self.__class__.__name__ + ": land mode, takeoff")
+            self.robot.startAndTakeoff()
+            while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
+                pass
+
+        return result
 
 class ApproachPlacePosition(Task2State):
     def __init__(self, robot):
