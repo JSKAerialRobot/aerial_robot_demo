@@ -12,16 +12,16 @@ object_lookdown_height: 3.0
 object_approach_height: 1.2
 object_grasping_height: 0.2
 object_yaw_thresh: 0.2
-global_object_pos: [[-1.5, 0, 3.141], [-2.1, 0, 3.141], [-2.7, 0, 3.141], [-3.3, 0, 3.141]] #in world frame, [x, y, yaw]
+global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
+object_interval: 0.6 #object center to center in a lane
+lane_interval: 0.75 #constant
 global_lookdown_pos_gps: [49.8999868314, 8.90000509811] #lati, long
-approach_pick_position_gps_mode: true
 global_object_yaw: 3.141
 
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
 joint_torque_thresh: 5 #[Nm]
 
-global_place_channel_pos: [[4.0, 0.0, 8.0, 0.0]] #in world frame [end1_x, end1_y, end2_x, end2_y]
 global_place_channel_front_pos_gps: [49.9000360144, 8.90000012378]
 global_place_channel_back_pos_gps: [49.9000708464, 8.90000009041]
 global_place_channel_z: 1.7 #[m]
