@@ -153,7 +153,8 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
     if (!task_initial_waiting_pos_flag_){
       task_initial_waiting_pos_flag_ = true;
       task_initial_waiting_pos_ = cur_pos_;
-      ROS_INFO("[ReactiveMotion] Task start waiting pos is recorded.");
+      ransac_line_estimator_->startEstimation();
+      ROS_WARN("[ReactiveMotion] Start waiting pos recorded, estimation prepared to work.");
     }
   }
   else if (msg->data == 2){
