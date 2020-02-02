@@ -29,4 +29,5 @@
     <arg name="config_dir" value="$(arg config_dir)"/>
   </include>
 
+  <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
 </launch>
