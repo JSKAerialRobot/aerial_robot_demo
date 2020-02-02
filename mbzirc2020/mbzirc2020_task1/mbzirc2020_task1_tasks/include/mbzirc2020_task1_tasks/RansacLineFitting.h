@@ -24,6 +24,7 @@
 class RansacLineFitting{
 #define STOP_ESTIMATION 0
 #define IN_ESTIMATION 1
+#define PAUSE_ESTIMATION 2
 public:
   RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp);
   void update();
@@ -31,6 +32,8 @@ public:
   bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
   bool isNearTarget(Eigen::Vector3d pos);
   bool checkEstimationWithYawAng(double yaw);
+  void stopEstimation();
+  void startEstimation();
 
 private:
   /* basic */

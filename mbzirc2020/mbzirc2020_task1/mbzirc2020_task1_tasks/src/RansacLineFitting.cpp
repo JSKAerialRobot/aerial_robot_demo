@@ -18,6 +18,7 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("yaw_diff_threshold", yaw_diff_thre_, M_PI / 3.0);
 
   initializeEstimatorParam();
+  estimator_state_ = STOP_ESTIMATION;
 
   estimator_2d_.Initialize(0.1, 100); // Threshold, iterations
   estimator_3d_.Initialize(0.1, 100); // Threshold, iterations
@@ -29,6 +30,8 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
 }
 
 void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg){
+  if (estimator_state_ == STOP_ESTIMATION)
+    return;
   double cur_time = msg->header.stamp.toSec();
   if (target_pt_update_time_ < 0.0) // when in initial case
     target_pt_update_time_ = cur_time;
@@ -68,11 +71,12 @@ void RansacLineFitting::initializeEstimatorParam(){
     lpf_z_ = -1;
     cand_points3d_.clear();
     cand_points2d_.clear();
-    estimator_state_ = STOP_ESTIMATION;
+    estimator_state_ = PAUSE_ESTIMATION;
+    ROS_INFO("[RansacLineFitting] Ransac estimation initialized");
 }
 
 bool RansacLineFitting::isEstimated(){
-  if (estimator_state_ == STOP_ESTIMATION)
+  if (estimator_state_ == PAUSE_ESTIMATION)
     return false;
   else if (estimator_state_ == IN_ESTIMATION){
     double cur_time = ros::Time::now().toSec();
@@ -86,7 +90,10 @@ bool RansacLineFitting::isEstimated(){
 }
 
 void RansacLineFitting::update(){
-  estimator_state_ = IN_ESTIMATION;
+  if (estimator_state_ == PAUSE_ESTIMATION){
+    estimator_state_ = IN_ESTIMATION;
+    ROS_INFO("[RansacLineFitting] Ransac estimation starts");
+  }
   // ROS_INFO("Estimator.Initialize");
   if (ransac_3d_mode_)
     estimator_3d_.Estimate(cand_points3d_);
@@ -152,6 +159,15 @@ bool RansacLineFitting::isNearTarget(Eigen::Vector3d pos){
     else
       return false;
   }
+}
+
+void RansacLineFitting::stopEstimation(){
+  initializeEstimatorParam();
+  estimator_state_ = STOP_ESTIMATION;
+}
+
+void RansacLineFitting::startEstimation(){
+  initializeEstimatorParam();
 }
 
 void RansacLineFitting::visualizeRansacLine(){
