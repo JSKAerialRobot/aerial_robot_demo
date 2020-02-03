@@ -10,7 +10,6 @@
   <arg name="monocular_camera" default="True" />
   <arg name="camera_height" default="0" />
   <arg name="camera_name" default="elp_1080P_fov60" />
-  <arg name="mpc" default="False" />
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
@@ -22,7 +21,6 @@
     <arg name="task" value="1" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
     <arg name="worldtype" value="$(find mbzirc2020_task1_common)/gazebo_model/world/mbzirc_arena_task_1.world" />
-    <arg name="mpc" value="$(arg mpc)" />
   </include>
 
   <group if="$(arg real_machine)">
