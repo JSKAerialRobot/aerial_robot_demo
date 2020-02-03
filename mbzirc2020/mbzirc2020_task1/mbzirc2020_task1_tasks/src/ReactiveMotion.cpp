@@ -6,10 +6,14 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
 
   nhp_.param("control_frequency", control_freq_, 100.0);
   nhp_.param("cog_net_offset", cog_net_offset_, 0.15);
+  nhp_.param("target_pos_xy_threshold", target_pos_xy_thre_, 3.0);
+  nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
+  nhp_.getParam("motion_cmd_threshold_list", motion_cmd_thre_vec_);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
-  // motion_state_ = STILL;
-  motion_state_ = WAITING;
+  motion_state_ = STILL;
+  // motion_state_ = WAITING;
+  task_initial_waiting_pos_flag_ = false;
 
   control_timer_ = nh_.createTimer(ros::Duration(1.0 / control_freq_), &ReactiveMotion::controlTimerCallback, this);
 
@@ -40,6 +44,11 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       sendControlCmd(cur_pos_);
       return;
     }
+    double net_cog_yaw_offset = -M_PI / 4.0;
+    if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
+      ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
+      return;
+    }
     if (ransac_line_estimator_->isNearTarget(cur_pos_)){ // target is too near
       motion_state_ = STOP_TRACKING;
       stop_tracking_cnt_ = 0;
@@ -48,7 +57,12 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       return;
     }
     if (ransac_line_estimator_->getNearestWaypoint(cur_pos_, target_pos_)){
-      sendControlCmd(target_pos_);
+      if (isTargetPosInSearchRegion())
+        sendControlCmd(target_pos_);
+      else{
+        ROS_WARN("[ReactiveMotion] Estimation is out of initial search region, follow previous cmd");
+        return;
+      }
     }
     else{
       ROS_ERROR("[ReactiveMotion] Could not get nearest waypoint, change to WAITING mode");
@@ -77,12 +91,11 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nearest_waypoint_pub_.publish(target_pt_msg);
 
   Eigen::Vector3d delta_pos = target_pos - cur_pos_;
-  Eigen::Vector3d pos_cmd_thre(1.0, 1.0, 0.5);
   for (int i = 0; i < 3; ++i){
-    if (delta_pos[i] > pos_cmd_thre[i])
-      delta_pos[i] = pos_cmd_thre[i];
-    else if (delta_pos[i] < -pos_cmd_thre[i])
-      delta_pos[i] = -pos_cmd_thre[i];
+    if (delta_pos[i] > motion_cmd_thre_vec_[i])
+      delta_pos[i] = motion_cmd_thre_vec_[i];
+    else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
+      delta_pos[i] = -motion_cmd_thre_vec_[i];
   }
   aerial_robot_msgs::FlightNav nav_msg;
   nav_msg.header.stamp = ros::Time::now();
@@ -95,19 +108,32 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
   nav_msg.target_pos_z = cur_pos_(2) + delta_pos(2);
   nav_msg.target_pos_z += cog_net_offset_;
+  nav_msg.target_pos_z += experiment_safety_z_offset_;
   // todo: add psi
   // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
   // nav_msg.target_psi = -math.pi / 2.0 # 0.0
   flight_nav_pub_.publish(nav_msg);
 }
 
-
+bool ReactiveMotion::isTargetPosInSearchRegion(){
+  for (int i = 0; i < 2; ++i){
+    if (fabs(target_pos_(i) - task_initial_waiting_pos_(i)) > target_pos_xy_thre_)
+      return false;
+  }
+  return true;
+}
 
 void ReactiveMotion::cogOdomCallback(const nav_msgs::OdometryConstPtr & msg){
   cog_odom_ = *msg;
   cur_pos_ << cog_odom_.pose.pose.position.x,
     cog_odom_.pose.pose.position.y,
     cog_odom_.pose.pose.position.z;
+  tf::Quaternion q(cog_odom_.pose.pose.orientation.x,
+                   cog_odom_.pose.pose.orientation.y,
+                   cog_odom_.pose.pose.orientation.z,
+                   cog_odom_.pose.pose.orientation.w);
+  tf::Matrix3x3  uav_rot_mat(q);
+  uav_rot_mat.getRPY(euler_ang_[0], euler_ang_[1], euler_ang_[2]);
   geometry_msgs::PointStamped cog_pt_msg;
   cog_pt_msg.header = cog_odom_.header;
   cog_pt_msg.header.frame_id = "world";
@@ -124,6 +150,12 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
   else if (msg->data == 1){
     motion_state_ = WAITING;
     ROS_INFO("[ReactiveMotion] Change motion state: WAITING");
+    if (!task_initial_waiting_pos_flag_){
+      task_initial_waiting_pos_flag_ = true;
+      task_initial_waiting_pos_ = cur_pos_;
+      ransac_line_estimator_->startEstimation();
+      ROS_WARN("[ReactiveMotion] Start waiting pos recorded, estimation prepared to work.");
+    }
   }
   else if (msg->data == 2){
     motion_state_ = TRACKING;

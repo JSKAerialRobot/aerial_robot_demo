@@ -19,15 +19,21 @@
 #include <eigen3/Eigen/Geometry>
 #include <eigen3/Eigen/Eigenvalues>
 
+#include <tf/LinearMath/Transform.h>
+
 class RansacLineFitting{
 #define STOP_ESTIMATION 0
 #define IN_ESTIMATION 1
+#define PAUSE_ESTIMATION 2
 public:
   RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp);
   void update();
   bool isEstimated();
   bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
   bool isNearTarget(Eigen::Vector3d pos);
+  bool checkEstimationWithYawAng(double yaw);
+  void stopEstimation();
+  void startEstimation();
 
 private:
   /* basic */
@@ -41,6 +47,8 @@ private:
   int estimator_state_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points2d_;
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points3d_;
+  int cand_points2d_init_size_;
+  int cand_points3d_init_size_;
   int cand_points2d_max_size_;
   int cand_points3d_max_size_;
   GRANSAC::RANSAC<Line2DModel, 2> estimator_2d_;
@@ -52,6 +60,7 @@ private:
   double target_pt_update_time_;
   double target_pt_dispear_time_thre_;
   double target_close_dist_thre_;
+  double yaw_diff_thre_;
 
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void visualizeRansacLine();
