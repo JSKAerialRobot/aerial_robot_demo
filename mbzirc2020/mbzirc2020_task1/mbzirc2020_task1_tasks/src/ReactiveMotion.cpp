@@ -77,6 +77,8 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       motion_state_ = STILL;
       sendControlCmd(cur_pos_);
       ROS_INFO("[ReactiveMotion] After open-loop tracking for %f secs, switch back to STILL mode.", stop_tracking_period);
+      ransac_line_estimator_->stopEstimation();
+      ROS_INFO("[ReactiveMotion] Estimation stops");
     }
   }
 }
@@ -145,7 +147,9 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
   if (msg->data == 0){
     motion_state_ = STILL;
     sendControlCmd(cur_pos_);
+    ransac_line_estimator_->stopEstimation();
     ROS_INFO("[ReactiveMotion] Change motion state: STILL");
+    ROS_INFO("[ReactiveMotion] Estimation stops");
   }
   else if (msg->data == 1){
     motion_state_ = WAITING;
@@ -153,8 +157,11 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
     if (!task_initial_waiting_pos_flag_){
       task_initial_waiting_pos_flag_ = true;
       task_initial_waiting_pos_ = cur_pos_;
+      ROS_WARN("[ReactiveMotion] Start waiting pos recorded.");
+    }
+    if (!ransac_line_estimator_->isEstimated()){
       ransac_line_estimator_->startEstimation();
-      ROS_WARN("[ReactiveMotion] Start waiting pos recorded, estimation prepared to work.");
+      ROS_INFO("[ReactiveMotion] Estimation prepared to work");
     }
   }
   else if (msg->data == 2){
