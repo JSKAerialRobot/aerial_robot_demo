@@ -41,12 +41,17 @@ class GoPositionState(smach.State):
         self.approach_margin = approach_margin
 
         self.target_pos = target_pos
+        self.cmd_pub_flag = False
 
     def execute(self, userdata):
-        self.commander.change_height(self.target_pos[2])
-        self.commander.move_to(self.target_pos[0], self.target_pos[1])
-
-        rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
+        if not self.cmd_pub_flag:
+            print(self.target_pos)
+            if len(self.target_pos) == 3:
+                self.commander.move_to_xyz(self.target_pos[0], self.target_pos[1], self.target_pos[2])
+            elif len(self.target_pos) == 1:
+                self.commander.change_height(self.target_pos[0])
+            self.cmd_pub_flag = True
+            rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
 
         target_pos_err = self.commander.target_pos_error()
         if abs(target_pos_err[0]) < self.approach_margin[0] and abs(target_pos_err[1]) < self.approach_margin[1] and abs(target_pos_err[2]) < self.approach_margin[2]:
@@ -64,12 +69,17 @@ class GoGpsPositionState(smach.State):
         self.approach_margin = approach_margin
 
         self.target_pos = target_pos
+        self.cmd_pub_flag = False
 
     def execute(self, userdata):
-        self.commander.change_height(self.target_pos[2])
-        self.commander.move_to(self.target_pos[0], self.target_pos[1], 5)
-
-        rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
+        if not self.cmd_pub_flag:
+            print(self.target_pos)
+            if len(self.target_pos) == 3:
+                self.commander.move_to_xyz(self.target_pos[0], self.target_pos[1], self.target_pos[2], override_nav_mode=5)
+            elif len(self.target_pos) == 1:
+                self.commander.change_height(self.target_pos[0])
+            self.cmd_pub_flag = True
+            rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
 
         target_pos_err = self.commander.target_pos_error()
         if abs(target_pos_err[0]) < self.approach_margin[0] and abs(target_pos_err[1]) < self.approach_margin[1] and abs(target_pos_err[2]) < self.approach_margin[2]:
