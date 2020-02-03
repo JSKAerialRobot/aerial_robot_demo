@@ -8,11 +8,20 @@ def main():
 
     download_data(
         pkg_name=PKG,
-        path='models/drone_detection_edgetpu_617.tflite',
+        path='models/drone_detection_edgetpu_20200103_617.tflite',
         url='https://drive.google.com/uc?id=1xuZRpfeeGwe_A7GC6u-6RKtUm_CPF1Mk',
         md5='6aec8cf3ff7f9cdb5b15425b08cbf118',
         extract=False,
     )
+
+    download_data(
+        pkg_name=PKG,
+        path='models/drone_detection_edgetpu_20200130_509.tflite',
+        url='https://drive.google.com/uc?id=1DLCTH_MWnXKpQ9OMWZ4WRMeM0qQQ9JHT',
+        md5='d0ea9489b52a2ef65cbc36aac559e722',
+        extract=False,
+    )
+
 
 if __name__ == '__main__':
     main()

@@ -58,7 +58,7 @@ namespace edgetpu_roscpp
     DroneBallTrackingDetection():
       SingleObjectDeepTrackingDetection(),
       f_dash_(0),
-      ball_pixel_radius_(-1)
+      ball_depth_(-1)
     {}
 
   protected:
@@ -74,24 +74,39 @@ namespace edgetpu_roscpp
 
     /* parameter */
     bool subscribe_depth_image_;
+
+    /* bounding box based depth detection */
+    int bbox_valid_bound_margin_;
+    double drone_real_width_; // this is very naive parameter, since the width will change acoording to the view angle
+
+    /* color filter of ball detection */
     double ball_real_radius_;
     double ball_candidate_area_rate_;
-    double ball_radius_lpf_gain_;
     int h_min_;
     int h_max_;
     int s_min_;
     int s_max_;
     int l_min_;
     int l_max_;
-    double approx_contour_rate_;
+    int closing_iteration_;
+    double circle_protrude_threshold_; // if the circumscribed circle of contour protrude the bounding box beyond this threshold, invalid
+    double circle_baseline_margin_; // if the lowest point of the circumscribed circle of contour can not reach the baselink of the bounding box within this margin, invalid
+    cv::Mat color_filtered_img_;
+    double ball_pixel_radius_;
+    cv::Point2f ball_pixel_center_;
+    tf2::Vector3 ball_pos_;
 
+    /* overrall evaluation */
+    double ball_depth_;
+    double ball_depth_lpf_gain_;
+    double ball_far_depth_outlier_threshold_;
+    double ball_close_depth_outlier_threshold_;
+    double far_depth_;
+    double close_depth_;
+
+    /* camera info */
     double f_dash_;
     tf2::Matrix3x3 camera_K_inv_;
-
-    cv::Mat color_filtered_img_;
-    cv::Point2f ball_pixel_center_;
-    float ball_pixel_radius_;
-    tf2::Vector3 ball_pos_;
 
     /* HLS is better than HSV */
     opencv_apps::HLSColorFilterConfig color_filter_config_;
@@ -102,6 +117,9 @@ namespace edgetpu_roscpp
 
     void colorDepthSyncCallback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg);
     void cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
+
+    bool widthBasedDetection(cv::Mat& src_img, double& drone_depth);
+    bool colorFilterBallDetection(cv::Mat& src_img, double& ball_depth);
 
     void onInit() override;
     void subscribe() override;

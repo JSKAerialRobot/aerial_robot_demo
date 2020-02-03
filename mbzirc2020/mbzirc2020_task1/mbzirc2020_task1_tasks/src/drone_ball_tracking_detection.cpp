@@ -42,10 +42,23 @@ namespace edgetpu_roscpp
     SingleObjectDeepTrackingDetection::onInit();
 
     pnh_->param("subscribe_depth_image", subscribe_depth_image_, false);
-    pnh_->param("ball_candidate_area_rate", ball_candidate_area_rate_, 0.5); // rate of the lower part of the bounding box
     pnh_->param("ball_real_radius", ball_real_radius_, 0.075);
-    pnh_->param("ball_radius_lpf_gain", ball_radius_lpf_gain_, 0.2);
-    pnh_->param("approx_contour_rate", approx_contour_rate_, 0.1);
+    pnh_->param("drone_real_width", drone_real_width_, 1.0);
+
+    pnh_->param("ball_candidate_area_rate", ball_candidate_area_rate_, 0.5); // rate of the lower part of the bounding box
+
+    pnh_->param("bbox_valid_bound_margin", bbox_valid_bound_margin_, 10);
+
+    pnh_->param("closing_iteration", closing_iteration_, 5);
+    pnh_->param("closing_iteration", circle_protrude_threshold_, 0.05);
+    pnh_->param("circle_baseline_margin", circle_baseline_margin_, 0.2);
+
+    pnh_->param("ball_depth_lpf_gain", ball_depth_lpf_gain_, 0.2);
+    pnh_->param("ball_far_depth_outlier_threshold", ball_far_depth_outlier_threshold_, 10.0);
+    pnh_->param("ball_close_depth_outlier_threshold", ball_close_depth_outlier_threshold_, 5.0);
+    pnh_->param("far_depth", far_depth_, 30.0);
+    pnh_->param("close_depth", close_depth_, 10.0);
+
 
     color_filter_reconfigure_server_ = boost::make_shared<dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig> >(*pnh_);
     typename dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig>::CallbackType f = boost::bind(&DroneBallTrackingDetection::colorFilterReconfigureCallback, this, _1, _2);
@@ -124,11 +137,113 @@ namespace edgetpu_roscpp
 
     if(!detected_)
       {
-        ball_pixel_radius_ = -1;
-        return;
+        ball_depth_ = -1;
+        return ;
       }
 
     double start_t = ros::Time::now().toSec();
+
+    /* depth of ball from color filter */
+    double ball_depth = 0;
+    bool ball_detection = colorFilterBallDetection(src_img, ball_depth);
+
+    /* depth of drone from bbox width */
+    double drone_depth = 0;
+    bool drone_width_detection = widthBasedDetection(src_img, drone_depth);
+
+    /* decide the depth with overall evaluation */
+    if (!ball_detection && !drone_width_detection) return; // can not get confident depth of either drone or ball
+
+    if (ball_detection && !drone_width_detection)
+      {
+        /* low pass filter */
+        if(ball_depth_ < 0) ball_depth_ = ball_depth;
+        else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * ball_depth;
+
+      }
+    if (!ball_detection && drone_width_detection)
+      {
+        /* low pass filter */
+        if(ball_depth_ < 0) ball_depth_ = drone_depth;
+        else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+
+        /* the center point of the lower side of the bounding box */
+        ball_pixel_center_.x = (best_detection_candidate_.corners.xmin + best_detection_candidate_.corners.xmax) / 2;
+        ball_pixel_center_.y = best_detection_candidate_.corners.ymax;
+      }
+
+    if(ball_detection && drone_width_detection)
+      {
+        if (ball_depth_ > far_depth_)
+          {
+            /* only trust bbox width when the distance is far */
+
+            /* low pass filter */
+            ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+
+            /* the center point of the lower side of the bounding box */
+            ball_pixel_center_.x = (best_detection_candidate_.corners.xmin + best_detection_candidate_.corners.xmax) / 2;
+            ball_pixel_center_.y = best_detection_candidate_.corners.ymax;
+          }
+        else if(ball_depth_ > close_depth_)
+          {
+            /* TODO: trust both bbox width and color filter */
+            /* low pass filter */
+            /* twice */
+            ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+            ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * ball_depth;
+
+
+            /* the center point of the lower side of the bounding box */
+            ball_pixel_center_.x = (ball_pixel_center_.x + (best_detection_candidate_.corners.xmin + best_detection_candidate_.corners.xmax) / 2) / 2;
+            ball_pixel_center_.y = (ball_pixel_center_.y + best_detection_candidate_.corners.ymax) / 2;
+          }
+        else
+          {
+
+            if(ball_depth_ < 0)
+              {
+                /* initialize */
+                if (drone_depth > far_depth_)
+                  ball_depth_ = drone_depth;
+                else
+                  ball_depth_ = (ball_depth + drone_depth) / 2;
+              }
+            else
+              {
+                /* low pass filter */
+                ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * ball_depth;
+              }
+          }
+      }
+
+    //ROS_WARN("ball detection: %f", ros::Time::now().toSec() - start_t);
+    ball_pos_ = camera_K_inv_ * tf2::Vector3(ball_pixel_center_.x, ball_pixel_center_.y, 1.0) * ball_depth_;
+
+    if(verbose_) ROS_INFO("ball position: [%f, %f, %f], depth: %f", ball_pos_.x(),
+                          ball_pos_.y(), ball_pos_.z(), ball_depth);
+
+    //ROS_INFO("drone depth: %f, ball depth: %f, depth_: %f", drone_depth, ball_depth, ball_depth_);
+  }
+
+  bool DroneBallTrackingDetection::widthBasedDetection(cv::Mat& src_img, double& drone_depth)
+  {
+    /* if the bounding box is too close the image bounds, the width is not confident */
+    if(best_detection_candidate_.corners.xmin < bbox_valid_bound_margin_ ||
+       best_detection_candidate_.corners.ymin < bbox_valid_bound_margin_ ||
+       best_detection_candidate_.corners.xmax > src_img.size().width - bbox_valid_bound_margin_ ||
+       best_detection_candidate_.corners.ymax > src_img.size().height - bbox_valid_bound_margin_)
+      return false;
+
+    /* low pass filter for drone pixel width */
+    double detected_bbox_width = best_detection_candidate_.corners.xmax - best_detection_candidate_.corners.xmin;
+    drone_depth = f_dash_ * drone_real_width_ / detected_bbox_width;
+
+    return true;
+  }
+
+  bool DroneBallTrackingDetection::colorFilterBallDetection(cv::Mat& src_img, double& ball_depth)
+  {
 
     /* further crop from the bonding box to find the ball */
     double detected_bbox_width = best_detection_candidate_.corners.xmax - best_detection_candidate_.corners.xmin;
@@ -136,127 +251,110 @@ namespace edgetpu_roscpp
 
     /* assumption: ball is in the lower part of the bounding box since it is hung by drone */
     cv::Mat ball_search_img;
-    //ball_search_img = src_img(cv::Rect(best_detection_candidate_.corners.xmin, best_detection_candidate_.corners.ymax - detected_bbox_height * ball_candidate_area_rate_, best_detection_candidate_.corners.xmax - best_detection_candidate_.corners.xmin, detected_bbox_height * ball_candidate_area_rate_));
     auto ball_search_area = best_detection_candidate_.corners;
     ball_search_area.ymin = best_detection_candidate_.corners.ymax - detected_bbox_height * ball_candidate_area_rate_;
 
-    //std::cout << "[" << ball_search_area.xmin << ", " << ball_search_area.ymin << ", " << ball_search_area.xmax << ", " << ball_search_area.ymax << "] -> ";
     expandedBoundingImage(src_img, ball_search_area, 1.2, ball_search_img, ball_search_area); // expand
-    //std::cout << "[" << ball_search_area.xmin << ", " << ball_search_area.ymin << ", " << ball_search_area.xmax << ", " << ball_search_area.ymax << "]" << std::endl;
 
     /* color filter */
-
     colorFilter(ball_search_img, color_filtered_img_);
+
+    /* closing */
+    double t = ros::Time::now().toSec();
+    cv::Mat temp_img;
+    color_filtered_img_.copyTo(temp_img);
+    cv::morphologyEx(temp_img, color_filtered_img_, cv::MORPH_CLOSE, cv::Mat(),  cv::Point(-1,-1), closing_iteration_);
+    //ROS_INFO("closing: %f", ros::Time::now().toSec() - t);
 
     /* find contours */
     std::vector<std::vector<cv::Point> > contours;
     std::vector<cv::Vec4i> hierarchy;
     cv::findContours(color_filtered_img_, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
 
-    if(contours.size() == 0) return;
+    if(contours.size() == 0)
+      {
+        ball_pixel_radius_ = -1;
+        return false;
+      }
 
     std::vector<cv::Point> target_contour;
-    double target_contour_area = 0;
+    double target_contour_radius = 0;
+    cv::Point2f target_contour_center;
     for(const auto& contour : contours)
       {
         double contour_area = cv::contourArea(contour);
 
-        if(contour_area >  target_contour_area)
+        /* estiamte the ball radius and center from contour */
+        float contour_radius;
+        cv::Point2f contour_center;
+        cv::minEnclosingCircle(contour, contour_center, contour_radius);
+        contour_center.x += ball_search_area.xmin;
+        contour_center.y += ball_search_area.ymin;
+        cv::circle(src_img, contour_center, (int)contour_radius, cv::Scalar(0, 0, 255), 1);
+
+        /* filter out the invliad candidate that protrudes the bounding box, or does not reach the baseline of the bbox */
+        if (contour_center.x - contour_radius < best_detection_candidate_.corners.xmin - detected_bbox_width * circle_protrude_threshold_ ||
+            contour_center.x + contour_radius > best_detection_candidate_.corners.xmax + detected_bbox_width * circle_protrude_threshold_ ||
+            contour_center.y + contour_radius > best_detection_candidate_.corners.ymax + detected_bbox_height * circle_protrude_threshold_ ||
+            contour_center.y + contour_radius < best_detection_candidate_.corners.ymax - detected_bbox_height * circle_baseline_margin_)
+          continue;
+
+        /* max radius */
+        if(contour_radius > target_contour_radius)
           {
-            target_contour_area = contour_area;
             target_contour = contour;
+            target_contour_radius = contour_radius;
+            target_contour_center = contour_center;
           }
       }
-    if(target_contour.size() == 0) return;
 
-    /* estiamte the ball radius and center from contour */
-#if 0
-    /* https://docs.opencv.org/3.4/da/d0c/tutorial_bounding_rects_circles.html */
-    std::vector<cv::Point> approx_contour;
-    double epsilon = approx_contour_rate_ * cv::arcLength(target_contour, true);
-    cv::approxPolyDP(target_contour, approx_contour, epsilon, true);
-    target_contour = approx_contour;
-#endif
-
-#if 0 // draw the contour in the src img
-    for (auto& point: target_contour)
+    if(target_contour.size() == 0)
       {
-        point.x += ball_search_area.xmin;
-        point.y += ball_search_area.ymin;
-      }
-    std::vector<std::vector<cv::Point> > contours_for_drawing(1, target_contour);
-    cv::drawContours(src_img, contours_for_drawing, 0, cv::Scalar(0, 255, 255), 2);
-#endif
-
-    float ball_pixel_radius;
-    cv::minEnclosingCircle(target_contour, ball_pixel_center_, ball_pixel_radius);
-    ball_pixel_center_.x += ball_search_area.xmin;
-    ball_pixel_center_.y += ball_search_area.ymin;
-    if(verbose_) ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius);
-    cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius, cv::Scalar(255, 0, 0), 2);
-
-
-    /* low pass filter for radius */
-    if(ball_pixel_radius_ < 0) ball_pixel_radius_ = ball_pixel_radius;
-    else ball_pixel_radius_ = (1 - ball_radius_lpf_gain_) * ball_pixel_radius_ + ball_radius_lpf_gain_ * ball_pixel_radius;
-
-#if 0   // debug, check every pixel (HLS) of the ball
-    cv::Mat temp_image;
-    cv::cvtColor(ball_search_img, temp_image, cv::COLOR_RGB2HLS);
-    for(int j = -ball_pixel_radius_; j < ball_pixel_radius_; j++)
-      {
-        for(int i = -ball_pixel_radius_; i < ball_pixel_radius_; i++)
-          {
-            if(i*i + j * j > ball_pixel_radius_ * ball_pixel_radius_)
-              std::cout <<  std::setw(3) << "---";
-            else
-              std::cout <<  std::setw(3) << 2 * (int)temp_image.at<cv::Vec3b>(ball_pixel_center_.y + j, ball_pixel_center_.x + i)[0];
-            std::cout << ", ";
-          }
-        std::cout << std::endl;
-      }
-    for(int j = -ball_pixel_radius_; j < ball_pixel_radius_; j++)
-      {
-        for(int i = -ball_pixel_radius_; i < ball_pixel_radius_; i++)
-          {
-            if(i*i + j * j > ball_pixel_radius_ * ball_pixel_radius_)
-              std::cout <<  std::setw(3) << "---";
-            else
-              std::cout <<  std::setw(3) << (int)temp_image.at<cv::Vec3b>(ball_pixel_center_.y + j, ball_pixel_center_.x + i)[1];
-            std::cout << ", ";
-          }
-        std::cout << std::endl;
-      }
-    for(int j = -ball_pixel_radius_; j < ball_pixel_radius_; j++)
-      {
-        for(int i = -ball_pixel_radius_; i < ball_pixel_radius_; i++)
-          {
-            if(i*i + j * j > ball_pixel_radius_ * ball_pixel_radius_)
-              std::cout <<  std::setw(3) << "---";
-            else
-              std::cout <<  std::setw(3) << (int)temp_image.at<cv::Vec3b>(ball_pixel_center_.y + j, ball_pixel_center_.x + i)[2];
-            std::cout << ", ";
-          }
-        std::cout << std::endl;
+        ball_pixel_radius_ = -1;
+        return false;
       }
 
-    throw std::runtime_error("test");
-#endif
+    ball_pixel_center_ = target_contour_center;
+    ball_pixel_radius_ = target_contour_radius;
+    if(verbose_) ROS_INFO("ball pixel center: [%f, %f], radius: %f", ball_pixel_center_.x, ball_pixel_center_.y, ball_pixel_radius_);
 
     /* 3d position of ball */
-    if(f_dash_ == 0) return;
-    double ball_depth = f_dash_ * ball_real_radius_ / ball_pixel_radius_;
-    ball_pos_ = camera_K_inv_ * tf2::Vector3(ball_pixel_center_.x, ball_pixel_center_.y, 1.0) * ball_depth;
+    if(f_dash_ == 0)
+      {
+        ball_pixel_radius_ = -1;
+        return false;
+      }
+    ball_depth = f_dash_ * ball_real_radius_ / ball_pixel_radius_;
 
-    if(verbose_) ROS_INFO("ball position: [%f, %f, %f], depth: %f", ball_pos_.x(),
-             ball_pos_.y(), ball_pos_.z(), ball_depth);
-    //ROS_WARN("ball detection: %f", ros::Time::now().toSec() - start_t);
+    cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius_, cv::Scalar(0, 255, 0), 1);
+
+    //ROS_WARN("ball_depth: %f, ball_depth_: %f", ball_depth, ball_depth_);
+    /* check the outlier using the overral depth */
+    if(ball_depth_ > far_depth_)
+      {
+        if(fabs(ball_depth - ball_depth_) > ball_far_depth_outlier_threshold_)
+          {
+            ball_pixel_radius_ = -1;
+            return false;
+          }
+      }
+    else if(ball_depth_ > 0)
+      {
+        if(fabs(ball_depth - ball_depth_) > ball_close_depth_outlier_threshold_)
+          {
+            ball_pixel_radius_ = -1;
+            return false;
+          }
+      }
+
+    cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius_, cv::Scalar(255, 0, 0), 2);
+
+    return true;
   }
 
   void DroneBallTrackingDetection::colorFilter(const cv::Mat& input_image, cv::Mat& output_image)
   {
     cv::Mat cvt_image;
-    //cv::cvtColor(input_image, cvt_image, cv::COLOR_RGB2CVT);
     cv::cvtColor(input_image, cvt_image, cv::COLOR_RGB2HLS);
     if (lower_color_range_[0] < upper_color_range_[0])
       {
@@ -297,8 +395,7 @@ namespace edgetpu_roscpp
   {
     SingleObjectDeepTrackingDetection::publish(msg_header, src_img);
 
-
-    if(ball_pixel_radius_ < 0) return;
+    if(ball_depth_ < 0) return;
 
     /* publish the position of ball */
     geometry_msgs::PointStamped ball_pos_msg;
