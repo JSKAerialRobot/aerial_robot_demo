@@ -20,8 +20,8 @@ def main():
 
     sm = smach.StateMachine(outcomes=['DONE', 'FAIL'])
     with sm:
-        nav_control_rate = rospy.get_param('~control_rate', 5.0)
-        nav_approach_margin = rospy.get_param('~navigation_approach_margin', [0.1, 0.1, 0.1])
+        nav_control_rate = rospy.get_param('~control_rate', 1.0)
+        nav_approach_margin = rospy.get_param('~navigation_approach_margin', [0.5, 0.5, 0.5])
 
         nav_mode = rospy.get_param('~nav_mode', 2)
 
