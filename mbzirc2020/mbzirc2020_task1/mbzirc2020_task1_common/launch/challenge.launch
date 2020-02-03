@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="world" default="kashiwa" />
+  ###########  bring up  ###########
+  <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
+    <arg name="estimate_mode" value="0" />
+    <arg name="monocular_camera" value="false" />
+  </include>
+
+  ########### perception ###########
+  <include file="$(find mbzirc2020_task1_tasks)/launch/drone_ball_tracking_by_detection.launch" >
+    <arg name="image_view" value="true" />
+    <arg name="verbose" value="false" />
+    <arg name="coarse_detection_score_threshold" value="0.0" />
+    <arg name="refined_detection_score_threshold" value="0.71" />
+    <arg name="tracking_score_threshold" value="0.7" />
+    <!-- <arg name="keep_aspect_ratio_in_expanded_bbox" value="true" /> -->
+    <arg name="keep_aspect_ratio_in_inference" value="false" />
+    <arg name="quick_detection" value="true" />
+    <arg name="model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200130_509.tflite" />
+    <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" />
+    <arg name="expanding_bounding_box_rate" value="2.0" />
+    <arg name="expanding_bounding_box_aspect_ratio" value="1.0" />
+    <arg name="camera_info_topic" value="/rs_d435/color/camera_info" />
+    <!-- <arg name="depth_image_topic" value="/rs_d435/aligned_depth_to_color/image_raw" /> -->
+    <!-- <arg name="subscribe_depth_image" value="true" /> -->
+    <arg name="image_pub_throttle_rate" value="5.0" />
+  </include>
+
+  ###########   motion   ###########
+  <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
+    <arg name="vision" value="true" />
+    <arg name="from_ground" value="true" />
+  </include>
+
+</launch>
