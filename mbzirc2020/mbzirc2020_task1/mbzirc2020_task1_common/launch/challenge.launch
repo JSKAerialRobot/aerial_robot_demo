@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="world" default="kashiwa" />
+  <arg name="estimate_mode" default="0" />
+  <arg name="monocular_camera" default="true" />
+
   ###########  bring up  ###########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
-    <arg name="estimate_mode" value="0" />
-    <arg name="monocular_camera" value="false" />
+    <arg name="estimate_mode" value="$(arg estimate_mode)" />
+    <arg name="monocular_camera" value="$(arg monocular_camera)" />
   </include>
 
   ########### perception ###########
@@ -18,13 +21,13 @@
     <arg name="keep_aspect_ratio_in_inference" value="false" />
     <arg name="quick_detection" value="true" />
     <arg name="model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200130_509.tflite" />
-    <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" />
     <arg name="expanding_bounding_box_rate" value="2.0" />
     <arg name="expanding_bounding_box_aspect_ratio" value="1.0" />
-    <arg name="camera_info_topic" value="/rs_d435/color/camera_info" />
-    <!-- <arg name="depth_image_topic" value="/rs_d435/aligned_depth_to_color/image_raw" /> -->
-    <!-- <arg name="subscribe_depth_image" value="true" /> -->
-    <arg name="image_pub_throttle_rate" value="5.0" />
+    <arg name="camera_info_topic" value="/usb_cam/camera_info" if="$(arg monocular_camera)"/>
+    <arg name="camera_info_topic" value="/rs_d435/color/camera_info" unless="$(arg monocular_camera)"/>
+    <arg name="color_image_topic" value="/usb_cam/image_raw" if="$(arg monocular_camera)"/>
+    <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" unless="$(arg monocular_camera)"/>
+    <arg name="image_pub_throttle_rate" value="30.0" />
   </include>
 
   ###########   motion   ###########
