@@ -23,6 +23,8 @@
   <arg name= "quick_detection" default = "false" />
   <arg name= "keep_aspect_ratio_in_inference" default = "false" />
 
+  <arg name= "image_pub_throttle_rate" default="5.0"/>
+
   <arg name="h_limit_max" default="80" doc="The maximum allowed field value Hue: yellow" />
   <arg name="h_limit_min" default="40" doc="The minimum allowed field value Hue: yellow" />
   <arg name="s_limit_max" default="255" doc="The maximum allowed field value Saturation" />
@@ -54,6 +56,7 @@
     <param name="quick_detection" value="$(arg quick_detection)"/>
     <param name="keep_aspect_ratio_in_inference" value="$(arg keep_aspect_ratio_in_inference)"/>
     <param name="image_view" value="$(arg image_view)"/>
+    <param name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)"/>
     <param name="verbose" value="$(arg verbose)"/>
 
     <param name="h_limit_max" value="$(arg h_limit_max)" />
@@ -62,6 +65,10 @@
     <param name="s_limit_min" value="$(arg s_limit_min)" />
     <param name="l_limit_max" value="$(arg l_limit_max)" />
     <param name="l_limit_min" value="$(arg l_limit_min)" />
+
+    <param name="detection_result_image/compressed/jpeg_quality" value="20" />
   </node>
+
+
 
 </launch>
