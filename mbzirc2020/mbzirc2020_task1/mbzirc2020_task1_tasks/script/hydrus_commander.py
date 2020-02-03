@@ -45,6 +45,26 @@ class HydrusCommander():
         self.land_pub.publish(Empty())
         time.sleep(self.WAIT_TIME)
 
+    def move_to_xyz(self, pos_x, pos_y, pos_z, override_nav_mode=None):
+        """move to target x, y position"""
+        # send desired position
+        nav_msg = FlightNav()
+
+        if override_nav_mode is None:
+            nav_mode = self.nav_mode
+        else:
+            nav_mode = override_nav_mode
+
+        nav_msg.target = nav_msg.COG
+        nav_msg.pos_xy_nav_mode = nav_mode
+        nav_msg.target_pos_x = pos_x
+        nav_msg.target_pos_y = pos_y
+        nav_msg.pos_z_nav_mode = nav_msg.POS_MODE
+        nav_msg.target_pos_z = pos_z
+        time.sleep(self.WAIT_TIME)
+        self.nav_control_pub.publish(nav_msg)
+        time.sleep(self.WAIT_TIME)
+
     def move_to(self, pos_x, pos_y, override_nav_mode=None):
         """move to target x, y position"""
         # send desired position
