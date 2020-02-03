@@ -21,6 +21,15 @@ class PrepareEstimation(smach.State):
         self.task_commander.prepare_estimation()
         return 'success'
 
+class StopEstimation(smach.State):
+    def __init__(self, wait_time=20):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.task_commander = TaskCommander()
+
+    def execute(self, userdata):
+        self.task_commander.stop_estimation()
+        return 'success'
+
 class TakeoffState(smach.State):
     def __init__(self, wait_time=20):
         smach.State.__init__(self, outcomes=['success', 'fail'])

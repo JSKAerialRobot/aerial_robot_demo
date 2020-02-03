@@ -25,6 +25,9 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nearest_waypoint_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/target", 1);
   uav_cog_point_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/cog_point", 1);
 
+  task_return_initial_waypt_pub_ = nh_.advertise<std_msgs::Empty>("/task1_motion_state_machine/task1_return_initial_flag", 1);
+  task_track_flag_pub_ = nh_.advertise<std_msgs::Empty>("/task1_motion_state_machine/task1_track_flag", 1);
+
   sleep(0.1);
 }
 
@@ -34,6 +37,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
   else if (motion_state_ == WAITING){
     if (ransac_line_estimator_->isEstimated()){
       motion_state_ = TRACKING;
+      task_track_flag_pub_.publish(std_msgs::Empty());
       ROS_INFO("[ReactiveMotion] Ransac result is updated, start to track target");
     }
   }
@@ -79,6 +83,8 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       ROS_INFO("[ReactiveMotion] After open-loop tracking for %f secs, switch back to STILL mode.", stop_tracking_period);
       ransac_line_estimator_->stopEstimation();
       ROS_INFO("[ReactiveMotion] Estimation stops");
+      task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+      ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
     }
   }
 }
@@ -166,6 +172,7 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
   }
   else if (msg->data == 2){
     motion_state_ = TRACKING;
+    task_track_flag_pub_.publish(std_msgs::Empty());
     ROS_INFO("[ReactiveMotion] Change motion state: TRACKING");
   }
   else if (msg->data == 3){
