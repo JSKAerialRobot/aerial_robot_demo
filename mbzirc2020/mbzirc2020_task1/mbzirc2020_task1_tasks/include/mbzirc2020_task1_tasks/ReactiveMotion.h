@@ -4,6 +4,7 @@
 #include <aerial_robot_msgs/FlightNav.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Int8.h>
+#include <std_msgs/Empty.h>
 
 class ReactiveMotion{
 #define STILL 0
@@ -40,6 +41,8 @@ private:
   ros::Publisher flight_nav_pub_;
   ros::Publisher nearest_waypoint_pub_;
   ros::Publisher uav_cog_point_pub_;
+  ros::Publisher task_return_initial_waypt_pub_;
+  ros::Publisher task_track_flag_pub_;
 
   void sendControlCmd(Eigen::Vector3d target_pos);
   bool isTargetPosInSearchRegion();

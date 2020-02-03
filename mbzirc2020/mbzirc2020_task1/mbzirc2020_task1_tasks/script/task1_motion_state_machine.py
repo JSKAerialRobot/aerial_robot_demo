@@ -18,6 +18,7 @@ def track_flag_cb(ud, msg):
     return False
 
 def return_initial_flag_cb(ud, msg):
+    StopEstimation()
     return False
 
 def main():
