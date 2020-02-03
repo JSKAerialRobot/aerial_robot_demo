@@ -12,8 +12,8 @@
     <param name="ransac_3d_mode" value="False"/>
     <param name="target_point_maximum_disappear_time" value="0.8"/>
     <param name="target_close_distance_threshold" value="1.0"/>
-    <param name="yaw_diff_threshold" value="0.785"/>
-    <param name="experiment_safety_z_offset" value="-0.4"/>
+    <param name="yaw_diff_threshold" value="1.5"/>
+    <param name="experiment_safety_z_offset" value="-0.45"/>
     <rosparam file="$(find mbzirc2020_task1_tasks)/config/reactive_motion.yaml" command="load" />
   </node>
 
