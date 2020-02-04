@@ -3,6 +3,7 @@
   <arg name="world" default="kashiwa" />
   <arg name="estimate_mode" default="0" />
   <arg name="monocular_camera" default="true" />
+  <arg name="image_pub_throttle_rate" default="10.0" />
 
   ###########  bring up  ###########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
@@ -27,7 +28,7 @@
     <arg name="camera_info_topic" value="/rs_d435/color/camera_info" unless="$(arg monocular_camera)"/>
     <arg name="color_image_topic" value="/usb_cam/image_raw" if="$(arg monocular_camera)"/>
     <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" unless="$(arg monocular_camera)"/>
-    <arg name="image_pub_throttle_rate" value="30.0" />
+    <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
   </include>
 
   ###########   motion   ###########
