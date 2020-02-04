@@ -28,6 +28,7 @@ def main():
         nav_mode = rospy.get_param('~nav_mode', 2)
 
         search_params = {}
+        search_type = rospy.get_param('~search_type', 'rectangular_grid')
         search_params['nav_mode'] = nav_mode
         search_params['target_topic_name'] = rospy.get_param('~target_topic_name', '/target_object/pos')
         search_params['control_rate'] = rospy.get_param('~control_rate', 5.0)
@@ -57,7 +58,7 @@ def main():
 
             search_params['area_corners'] = area_corners_list[i]
             search_sm_creator = PlaneFireFightStateMachineCreator()
-            sm_sub = search_sm_creator.create('rectangular_grid', search_params)
+            sm_sub = search_sm_creator.create(search_type, search_params)
             if i==search_area_number-1:
                 next_state = 'FAIL'
             else:
