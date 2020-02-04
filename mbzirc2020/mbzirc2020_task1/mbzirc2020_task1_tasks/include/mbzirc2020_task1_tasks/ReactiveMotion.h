@@ -11,6 +11,7 @@ class ReactiveMotion{
 #define WAITING 1
 #define TRACKING 2
 #define STOP_TRACKING 3
+#define LOSING_TRACKING 4
 public:
   ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp);
 
@@ -34,6 +35,9 @@ private:
   Eigen::Vector3d task_initial_waiting_pos_;
   bool task_initial_waiting_pos_flag_;
   double experiment_safety_z_offset_;
+  int losing_tracking_cnt_;
+  double losing_tracking_period_thre_;
+  int task_track_flag_pub_cnt_;
 
   ros::Timer control_timer_;
   ros::Subscriber cog_odom_sub_;
