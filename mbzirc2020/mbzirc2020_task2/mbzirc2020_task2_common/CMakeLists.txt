@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   jsk_rviz_plugins
+  std_msgs
   )
 
 add_message_files(
@@ -30,6 +31,7 @@ generate_messages(
   jsk_rviz_plugins
   geometry_msgs
   nav_msgs
+  std_msgs
   )
 
 catkin_package(

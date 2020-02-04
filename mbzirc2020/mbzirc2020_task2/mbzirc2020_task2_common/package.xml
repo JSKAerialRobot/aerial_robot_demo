@@ -18,6 +18,7 @@
   <depend>jsk_rviz_plugins</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
+  <depend>std_msgs</depend>
   <export>
 
   </export>

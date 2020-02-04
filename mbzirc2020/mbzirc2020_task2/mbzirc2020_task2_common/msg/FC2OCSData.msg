@@ -5,3 +5,4 @@ jsk_rviz_plugins/OverlayText task2_motion__nav_debug
 jsk_rviz_plugins/OverlayText rosconsole_overlay_text__output
 geometry_msgs/TransformStamped cog2baselink
 nav_msgs/Odometry uav__cog__odom
+std_msgs/Float32 battery_voltage_status
