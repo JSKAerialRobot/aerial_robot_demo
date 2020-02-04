@@ -9,6 +9,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("target_pos_xy_threshold", target_pos_xy_thre_, 3.0);
   nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
   nhp_.getParam("motion_cmd_threshold_list", motion_cmd_thre_vec_);
+  nhp_.param("losing_tracking_period_threshold", losing_tracking_period_thre_, 4.0);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -34,19 +35,39 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
 void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
   if (motion_state_ == STILL)
     return;
-  else if (motion_state_ == WAITING){
+  else if (motion_state_ == WAITING || motion_state_ == LOSING_TRACKING){
     if (ransac_line_estimator_->isEstimated()){
       motion_state_ = TRACKING;
+      task_track_flag_pub_cnt_ = 0;
       task_track_flag_pub_.publish(std_msgs::Empty());
       ROS_INFO("[ReactiveMotion] Ransac result is updated, start to track target");
+    }
+    if (motion_state_ == LOSING_TRACKING){
+      ++losing_tracking_cnt_;
+      if (losing_tracking_cnt_ >= losing_tracking_period_thre_ * control_freq_){
+        motion_state_ = STILL;
+        ROS_INFO("[ReactiveMotion] Losing tracking for %f secs", losing_tracking_period_thre_);
+        ransac_line_estimator_->stopEstimation();
+        ROS_INFO("[ReactiveMotion] Estimation stops");
+        task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+        ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
+        sleep(0.5);
+        task_return_initial_waypt_pub_.publish(std_msgs::Empty()); // publish two times in case msg is missed
+        sleep(0.5);
+      }
     }
   }
   if (motion_state_ == TRACKING){
     if (!ransac_line_estimator_->isEstimated()){ // target is losing
-      motion_state_ = WAITING;
+      motion_state_ = LOSING_TRACKING;
+      losing_tracking_cnt_ = 0;
       ROS_INFO("[ReactiveMotion] Ransac result is losing, keep waiting");
       sendControlCmd(cur_pos_);
       return;
+    }
+    if (task_track_flag_pub_cnt_ < 10){ // publish multiple times in case message is missed
+      ++task_track_flag_pub_cnt_;
+      task_track_flag_pub_.publish(std_msgs::Empty());
     }
     double net_cog_yaw_offset = -M_PI / 4.0;
     if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
@@ -85,6 +106,9 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       ROS_INFO("[ReactiveMotion] Estimation stops");
       task_return_initial_waypt_pub_.publish(std_msgs::Empty());
       ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
+      sleep(0.5);
+      task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+      sleep(0.5);
     }
   }
 }
