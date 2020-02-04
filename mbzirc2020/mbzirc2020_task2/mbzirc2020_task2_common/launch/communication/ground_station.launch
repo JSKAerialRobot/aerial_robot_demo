@@ -73,4 +73,5 @@
     <param name="dev" type="string" value="/dev/input/js0"/>
   </node>
 
+  <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
 </launch>
