@@ -38,7 +38,7 @@ class VitalChecker:
         self.odom_timestamp_ = rospy.Time.now()
 
     def battCallback(self, msg):
-        self.bat_vol_ = msg.data
+        self.batt_vol_ = msg.data
 
     def leddarCallback(self, msg):
         self.leddar_timestamp_ = rospy.Time.now()
