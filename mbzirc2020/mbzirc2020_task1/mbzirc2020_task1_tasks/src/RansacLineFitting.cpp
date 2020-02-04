@@ -84,7 +84,7 @@ void RansacLineFitting::initializeEstimatorParam(){
 }
 
 bool RansacLineFitting::isEstimated(){
-  if (estimator_state_ == PAUSE_ESTIMATION)
+  if (estimator_state_ == PAUSE_ESTIMATION || estimator_state_ == STOP_ESTIMATION)
     return false;
   else if (estimator_state_ == IN_ESTIMATION){
     double cur_time = ros::Time::now().toSec();

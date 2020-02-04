@@ -21,6 +21,15 @@ class PrepareEstimation(smach.State):
         self.task_commander.prepare_estimation()
         return 'success'
 
+class StopEstimation(smach.State):
+    def __init__(self, wait_time=20):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.task_commander = TaskCommander()
+
+    def execute(self, userdata):
+        self.task_commander.stop_estimation()
+        return 'success'
+
 class TakeoffState(smach.State):
     def __init__(self, wait_time=20):
         smach.State.__init__(self, outcomes=['success', 'fail'])
@@ -55,6 +64,7 @@ class GoPositionState(smach.State):
 
         target_pos_err = self.commander.target_pos_error()
         if abs(target_pos_err[0]) < self.approach_margin[0] and abs(target_pos_err[1]) < self.approach_margin[1] and abs(target_pos_err[2]) < self.approach_margin[2]:
+            self.cmd_pub_flag = False
             return 'success'
 
         rospy.sleep(1/self.control_rate)
@@ -83,6 +93,7 @@ class GoGpsPositionState(smach.State):
 
         target_pos_err = self.commander.target_pos_error()
         if abs(target_pos_err[0]) < self.approach_margin[0] and abs(target_pos_err[1]) < self.approach_margin[1] and abs(target_pos_err[2]) < self.approach_margin[2]:
+            self.cmd_pub_flag = False
             return 'success'
 
         rospy.sleep(1/self.control_rate)

@@ -25,7 +25,15 @@ class TaskCommander():
         # send arm and takeoff
         time.sleep(self.WAIT_TIME)
         msg = Int8()
-        msg.data = 1
+        msg.data = 1 ## WAITING
+        self.reactive_motion_state_pub.publish(msg)
+        time.sleep(self.WAIT_TIME)
+
+    def stop_estimation(self):
+        # send arm and takeoff
+        time.sleep(self.WAIT_TIME)
+        msg = Int8()
+        msg.data = 0 ## STILL
         self.reactive_motion_state_pub.publish(msg)
         time.sleep(self.WAIT_TIME)
 
