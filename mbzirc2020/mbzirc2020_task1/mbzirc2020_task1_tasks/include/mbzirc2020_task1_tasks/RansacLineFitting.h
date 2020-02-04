@@ -25,12 +25,17 @@ class RansacLineFitting{
 #define STOP_ESTIMATION 0
 #define IN_ESTIMATION 1
 #define PAUSE_ESTIMATION 2
+#define MIDDLE_PROCEUDRE 0
+#define END_PROCEDURE 1
 public:
   RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp);
   void update();
   bool isEstimated();
   bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
   bool isNearTarget(Eigen::Vector3d pos);
+  bool isInEndProcedureRegion(Eigen::Vector3d pos);
+  bool isEndProcedureMode();
+  void ransacEndProcedureMode();
   bool checkEstimationWithYawAng(double yaw);
   void stopEstimation();
   void startEstimation();
@@ -49,8 +54,13 @@ private:
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> cand_points3d_;
   int cand_points2d_init_size_;
   int cand_points3d_init_size_;
-  int cand_points2d_max_size_;
-  int cand_points3d_max_size_;
+  int cand_points2d_middle_max_size_;
+  int cand_points3d_middle_max_size_;
+  int cand_points2d_end_max_size_;
+  int cand_points3d_end_max_size_;
+  double target_end_procedure_dist_thre_;
+  int procedure_cand_max_size_;
+  int estimator_procedure_;
   GRANSAC::RANSAC<Line2DModel, 2> estimator_2d_;
   GRANSAC::RANSAC<Line3DModel, 2> estimator_3d_;
   double lpf_z_;

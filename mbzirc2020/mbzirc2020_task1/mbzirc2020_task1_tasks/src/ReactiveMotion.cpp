@@ -49,6 +49,9 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
       return;
     }
+    if (!ransac_line_estimator_->isEndProcedureMode() && ransac_line_estimator_->isInEndProcedureRegion(cur_pos_)){ // target is in end search region
+      ransac_line_estimator_->ransacEndProcedureMode();
+    }
     if (ransac_line_estimator_->isNearTarget(cur_pos_)){ // target is too near
       motion_state_ = STOP_TRACKING;
       stop_tracking_cnt_ = 0;

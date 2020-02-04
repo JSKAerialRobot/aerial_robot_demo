@@ -8,12 +8,15 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("target_point_sub_topic_name", target_pt_sub_topic_name, std::string("/treasure/point_detected"));
   nhp_.param("cand_points2d_initial_size", cand_points2d_init_size_, 15);
   nhp_.param("cand_points3d_initial_size", cand_points3d_init_size_, 15);
-  nhp_.param("cand_points2d_max_size", cand_points2d_max_size_, 50);
-  nhp_.param("cand_points3d_max_size", cand_points3d_max_size_, 50);
+  nhp_.param("cand_points2d_middle_max_size", cand_points2d_middle_max_size_, 50);
+  nhp_.param("cand_points3d_middle_max_size", cand_points3d_middle_max_size_, 50);
+  nhp_.param("cand_points2d_end_max_size", cand_points2d_end_max_size_, 30);
+  nhp_.param("cand_points3d_end_max_size", cand_points3d_end_max_size_, 30);
   nhp_.param("ransac_visualization_flag", ransac_vis_flag_, true);
   nhp_.param("ransac_3d_mode", ransac_3d_mode_, false);
   nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
   nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 1.0);
+  nhp_.param("target_end_procedure_distance_threshold", target_end_procedure_dist_thre_, 10.0);
   nhp_.param("lpf_z_gain", lpf_z_gain_, 0.8);
   nhp_.param("yaw_diff_threshold", yaw_diff_thre_, M_PI / 3.0);
 
@@ -50,14 +53,14 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
     lpf_z_ = lpf_z_ * lpf_z_gain_ + (1 - lpf_z_gain_) * msg->point.z; // low-pass filter
 
   if (cand_points3d_.size() > cand_points3d_init_size_){
-    while (cand_points3d_.size() > cand_points3d_max_size_)
+    while (cand_points3d_.size() > procedure_cand_max_size_)
       cand_points3d_.erase(cand_points3d_.begin());
     // todo: update trigger by time event or subscribe
     if (ransac_3d_mode_)
       update();
   }
   if (cand_points2d_.size() > cand_points2d_init_size_){
-    while (cand_points2d_.size() > cand_points2d_max_size_)
+    while (cand_points2d_.size() > procedure_cand_max_size_)
       cand_points2d_.erase(cand_points2d_.begin());
     // todo: update trigger by time event or subscribe
     if (!ransac_3d_mode_)
@@ -72,6 +75,11 @@ void RansacLineFitting::initializeEstimatorParam(){
     cand_points3d_.clear();
     cand_points2d_.clear();
     estimator_state_ = PAUSE_ESTIMATION;
+    estimator_procedure_ = MIDDLE_PROCEUDRE;
+    if (ransac_3d_mode_)
+      procedure_cand_max_size_ = cand_points3d_middle_max_size_;
+    else
+      procedure_cand_max_size_ = cand_points2d_middle_max_size_;
     ROS_INFO("[RansacLineFitting] Ransac estimation initialized");
 }
 
@@ -159,6 +167,41 @@ bool RansacLineFitting::isNearTarget(Eigen::Vector3d pos){
     else
       return false;
   }
+}
+
+bool RansacLineFitting::isInEndProcedureRegion(Eigen::Vector3d pos){
+  int checked_point_cnt = 5;
+  if (ransac_3d_mode_){
+    // to develop
+    return false;
+  }
+  else{
+    if (checked_point_cnt > cand_points2d_.size()) checked_point_cnt = cand_points2d_.size();
+    int near_point_cnt = 0;
+    for (int i = 0; i < checked_point_cnt; ++i){
+      auto pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_.size() - 1 - i]);
+      double dist = sqrt(pow(pos[0] - pt->m_Point2D[0], 2.0) + pow(pos[1] - pt->m_Point2D[1], 2.0));
+      if (dist < 0.7 + target_end_procedure_dist_thre_)
+        ++near_point_cnt;
+    }
+    if (near_point_cnt >= checked_point_cnt / 2 + 1)
+      return true;
+    else
+      return false;
+  }
+}
+
+bool RansacLineFitting::isEndProcedureMode(){
+  return estimator_procedure_ == END_PROCEDURE;
+}
+
+void RansacLineFitting::ransacEndProcedureMode(){
+  estimator_procedure_ = END_PROCEDURE;
+  if (ransac_3d_mode_)
+    procedure_cand_max_size_ = cand_points3d_end_max_size_;
+  else
+    procedure_cand_max_size_ = cand_points2d_end_max_size_;
+  ROS_INFO("[RansacLineFitting] Ransac in end search region");
 }
 
 void RansacLineFitting::stopEstimation(){
