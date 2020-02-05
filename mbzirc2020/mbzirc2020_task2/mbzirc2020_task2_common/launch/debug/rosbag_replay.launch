@@ -13,7 +13,7 @@
     <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rosbag_replay_rviz_config"/>
   </include>
 
-  <include file="$(find mbzirc2020_task2_common)/launch/image_republish.launch"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/debug/image_republish.launch"/>
 
   <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
         args="standalone depth_image_proc/point_cloud_xyzrgb" >
@@ -23,7 +23,7 @@
     <remap from="depth_registered/points" to="/rs_d435/points"/>
   </node>
 
-  <include file="$(find mbzirc2020_task2_common)/launch/tile_images.launch"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/debug/tile_images.launch"/>
 
   <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
     <arg name="config_dir" value="$(arg config_dir)"/>
