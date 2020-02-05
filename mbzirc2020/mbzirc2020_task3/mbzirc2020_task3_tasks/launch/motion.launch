@@ -9,7 +9,8 @@
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
   <arg name="horizontal_vio" default="False" />
   <arg name="headless" default="True" />
-  <arg name="config_filename" default="motion_outdoor.yaml"/>
+  <arg name="motion_config_filename" default="motion_outdoor.yaml"/>
+  <arg name="waypoint_config_filename" default="waypoint_simulation.yaml"/>
   <arg name="dummy_target" default="False"/>
   <arg name="dummy_x" default="0"/>
   <arg name="dummy_y" default="0"/>
@@ -60,6 +61,7 @@
   <!-- <node pkg="mbzirc2020_task3_tasks" type="motion.py" name="task3_motion_planner" output="screen"> -->
   <node pkg="mbzirc2020_task3_tasks" type="find_ground_fire.py" name="task3_motion_planner" output="screen">
     <param name="target_tf_name" value="$(arg target_tf_name)"/>
-    <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg config_filename)" command="load"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg motion_config_filename)" command="load"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg waypoint_config_filename)" command="load"/>
   </node>
 </launch>
