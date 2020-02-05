@@ -71,7 +71,7 @@ class HydrusInterface:
         self.gps_lat_lon_ = [msg.latitude, msg.longitude]
 
     def gpsCallback(self, msg):
-        self.gps_lat_lon_ = msg.location
+        self.gps_lat_lon_ = [msg.location[0] * 1e-7, msg.location[1] * 1e-7]
 
     def jointStateCallback(self, msg):
         self.joint_state_ = msg
