@@ -94,8 +94,10 @@ add_executable(trajectory_tracker_node src/trajectory_tracker_node.cpp)
 target_link_libraries(trajectory_tracker_node trajectory_tracker ${catkin_LIBRARIES})
 
 # Detection
-add_library(drone_ball_tracking_detection SHARED src/drone_ball_tracking_detection.cpp)
-target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+add_library(drone_ball_tracking_detection SHARED
+  src/vision/color_filter_based_tracking_detection.cpp
+  src/vision/cascaded_deep_tracking_detection.cpp)
+target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(ransac_line_fitting_node src/ransac_line_fitting_node.cpp)
 target_link_libraries(ransac_line_fitting_node reactive_motion ransac_line_fitting ${catkin_LIBRARIES})

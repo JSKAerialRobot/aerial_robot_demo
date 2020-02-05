@@ -5,23 +5,15 @@
 
   <arg name= "camera_info_topic" default = "/camera/camera_info" />
   <arg name= "color_image_topic" default = "/camera/image_raw" />
-  <arg name= "depth_image_topic" default = "/depth/image_raw" />
-  <arg name= "model_file"  default = "$(find edgetpu_roscpp)/test/data/drone_detection_edgetpu.tflite" />
+
+  <!-- common parameter for binding model detection -->
+  <arg name= "binding_model_file"  default = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200130_bind_model_509_edgetpu.tflite" />
   <arg name= "coarse_detection_score_threshold" default = "0.0" />
   <arg name= "refined_detection_score_threshold" default = "0.71" />
   <arg name= "tracking_score_threshold" default = "0.7" />
   <arg name= "expanding_bounding_box_aspect_ratio" default = "1.0" /> <!-- general SSD is 1:1 -->
   <arg name= "expanding_bounding_box_rate" default = "2.0" />
   <arg name= "larger_expanding_bounding_box_rate" default = "3.0" />
-
-  <arg name= "ball_real_radius" default = "0.075" />
-  <arg name= "drone_real_width" default = "1.1" />
-  <arg name= "ball_depth_lpf_gain" default = "0.2" />
-  <arg name= "far_depth" default = "20" />
-  <arg name= "close_depth" default = "5" />
-  <arg name= "ball_far_depth_outlier_threshold" default = "10" />
-  <arg name= "ball_close_depth_outlier_threshold" default = "5" />
-  <arg name= "bbox_valid_bound_margin" default = "10" />
 
   <arg name= "detection_check_frame_num" default = "10" />
   <arg name= "lost_target_check_frame_num" default = "5" />
@@ -31,8 +23,17 @@
   <arg name= "quick_detection" default = "true" />
   <arg name= "keep_aspect_ratio_in_inference" default = "false" />
 
-  <arg name= "image_pub_throttle_rate" default="5.0"/>
+  <arg name= "image_pub_throttle_rate" default="30.0"/>
 
+
+  <!-- common parameter for ball position/depth estimation -->
+  <arg name= "ball_real_radius" default = "0.075" />
+  <arg name= "drone_real_width" default = "1.1" />
+  <arg name= "ball_depth_lpf_gain" default = "0.2" />
+  <arg name= "far_depth" default = "20" />
+  <arg name= "close_depth" default = "5" />
+
+  <!-- specific parameter for ball color filter -->
   <arg name="h_limit_max" default="80" doc="The maximum allowed field value Hue: yellow" />
   <arg name="h_limit_min" default="40" doc="The minimum allowed field value Hue: yellow" />
   <arg name="s_limit_max" default="255" doc="The maximum allowed field value Saturation" />
@@ -40,15 +41,25 @@
   <arg name="l_limit_max" default="255" doc="The maximum allowed field value Lightness" />
   <arg name="l_limit_min" default="90" doc="The minimum allowed field value Lightness" />
 
+  <arg name= "ball_far_depth_outlier_threshold" default = "10" />
+  <arg name= "ball_close_depth_outlier_threshold" default = "5" />
+
+  <!-- specific parameter for drone width estimation -->
+  <arg name= "bbox_valid_bound_margin" default = "10" />
+
+  <!-- specific parameter for cascaded model detection -->
+  <arg name= "cascaded_detection" default = "false" />
+  <arg name= "separate_model_file" default = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200203_separate_model_704_edgetpu.tflite" />
+
+
   <node pkg="nodelet" type="nodelet" name="detection_nodelet" args="manager" output="screen" if="$(arg need_nodelet_manager)"/>
 
   <node pkg="nodelet" type="nodelet" name="drone_ball_detection_and_tracking"
-        args="load edgetpu_roscpp/DroneBallTrackingDetection detection_nodelet" output="screen">
+        args="load edgetpu_roscpp/ColorFilterBallTracking detection_nodelet" output="screen" unless="$(arg cascaded_detection)">
     <remap from="image" to="$(arg color_image_topic)" />
     <remap from="color_image" to="$(arg color_image_topic)" />
-    <remap from="depth_image" to="$(arg depth_image_topic)" />
     <remap from="color_camera_info" to="$(arg camera_info_topic)" />
-    <param name="model_file" value="$(arg model_file)"/>
+    <param name="model_file" value="$(arg binding_model_file)"/>
     <param name="coarse_detection_score_threshold" value="$(arg coarse_detection_score_threshold)"/>
     <param name="refined_detection_score_threshold" value="$(arg refined_detection_score_threshold)"/>
     <param name="tracking_score_threshold" value="$(arg tracking_score_threshold)"/>
@@ -85,6 +96,40 @@
     <param name="detection_result_image/compressed/jpeg_quality" value="20" />
   </node>
 
+  <node pkg="nodelet" type="nodelet" name="drone_ball_detection_and_tracking"
+        args="load edgetpu_roscpp/CascadedDeepBallTracking detection_nodelet" output="screen" if="$(arg cascaded_detection)">
+    <remap from="image" to="$(arg color_image_topic)" />
+    <remap from="color_image" to="$(arg color_image_topic)" />
+    <remap from="color_camera_info" to="$(arg camera_info_topic)" />
+    <param name="model_file" value="$(arg binding_model_file)"/>
+    <param name="coarse_detection_score_threshold" value="$(arg coarse_detection_score_threshold)"/>
+    <param name="refined_detection_score_threshold" value="$(arg refined_detection_score_threshold)"/>
+    <param name="tracking_score_threshold" value="$(arg tracking_score_threshold)"/>
+    <param name="expanding_bounding_box_aspect_ratio" value="$(arg expanding_bounding_box_aspect_ratio)"/>
+    <param name="expanding_bounding_box_rate" value="$(arg expanding_bounding_box_rate)"/>
+    <param name="larger_expanding_bounding_box_rate" value="$(arg larger_expanding_bounding_box_rate)"/>
+    <param name="detection_check_frame_num" value="$(arg detection_check_frame_num)"/>
+    <param name="lost_target_check_frame_num" value="$(arg lost_target_check_frame_num)"/>
+    <param name="redetection_after_lost_target_frame_num" value="$(arg redetection_after_lost_target_frame_num)"/>
 
+    <param name= "separate_model_file" value="$(arg separate_model_file)"/>
+    <param name= "ball_real_radius" value = "$(arg ball_real_radius)" />
+    <param name= "drone_real_width" value = "$(arg drone_real_width)" />
+    <param name= "bbox_valid_bound_margin" value = "$(arg bbox_valid_bound_margin)" />
+    <param name= "ball_far_depth_outlier_threshold" value = "$(arg ball_far_depth_outlier_threshold)" />
+    <param name= "ball_close_depth_outlier_threshold" value = "$(arg ball_close_depth_outlier_threshold)" />
+    <param name= "far_depth" value = "$(arg far_depth)" />
+    <param name= "close_depth" value = "$(arg close_depth)" />
+    <param name= "ball_depth_lpf_gain" value = "$(arg ball_depth_lpf_gain)" />
+
+    <param name="subscribe_depth_image" value="$(arg subscribe_depth_image)"/>
+    <param name="quick_detection" value="$(arg quick_detection)"/>
+    <param name="keep_aspect_ratio_in_inference" value="$(arg keep_aspect_ratio_in_inference)"/>
+    <param name="image_view" value="$(arg image_view)"/>
+    <param name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)"/>
+    <param name="verbose" value="$(arg verbose)"/>
+
+    <param name="detection_result_image/compressed/jpeg_quality" value="20" />
+  </node>
 
 </launch>
