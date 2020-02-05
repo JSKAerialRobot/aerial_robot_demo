@@ -10,15 +10,20 @@
 #### general commands:
 - use both color filter and bounding box width
 ```
-$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false  model_file:=`rospack find mbzirc2020_task1_tasks`/models/drone_detection_edgetpu_20200130_509.tflite color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info
+$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info cascaded_detection:=false
 ```
 
 - only use color filter
 ```
-$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false  model_file:=`rospack find mbzirc2020_task1_tasks`/models/drone_detection_edgetpu_20200130_509.tflite color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info bbox_valid_bound_margin:=10000
+$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info cascaded_detection:=false bbox_valid_bound_margin:=10000 
 ```
 
 - only use bounding box width
 ```
-$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false  model_file:=`rospack find mbzirc2020_task1_tasks`/models/drone_detection_edgetpu_20200130_509.tflite color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info ball_far_depth_outlier_threshold:=-1 ball_close_depth_outlier_threshold:=-1
+$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info cascaded_detection:=false ball_far_depth_outlier_threshold:=-1 ball_close_depth_outlier_threshold:=-1
+```
+
+- use cacaded deep detection for ball and drone detection
+```
+$ roslaunch mbzirc2020_task1_tasks drone_ball_tracking_by_detection.launch  image_view:=true verbose:=false color_image_topic:=/rs_d435/color/image_rect_color camera_info_topic:=/rs_d435/color/camera_info cascaded_detection:=true
 ```

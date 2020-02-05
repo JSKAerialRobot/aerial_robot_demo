@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library path="lib/libdrone_ball_tracking_detection">
-  <class name="edgetpu_roscpp/DroneBallTrackingDetection"
-         type="edgetpu_roscpp::DroneBallTrackingDetection"
+  <class name="edgetpu_roscpp/ColorFilterBallTracking"
+         type="edgetpu_roscpp::ColorFilterBallTracking"
+         base_class_type="nodelet::Nodelet">
+  </class>
+  <class name="edgetpu_roscpp/CascadedDeepBallTracking"
+         type="edgetpu_roscpp::CascadedDeepBallTracking"
          base_class_type="nodelet::Nodelet">
   </class>
 </library>
