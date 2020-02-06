@@ -1,0 +1,17 @@
+gazebo_ros_control:
+  pid_gains:
+    passive_gripper_joint_left:
+      p: 5.0
+      i: 0.1
+      d: 1.0
+      i_clamp: 0.2
+      antiwindup: false
+      publish_state: true
+
+    passive_gripper_joint_right:
+      p: 5.0
+      i: 0.1
+      d: 1.0
+      i_clamp: 0.2
+      antiwindup: false
+      publish_state: true

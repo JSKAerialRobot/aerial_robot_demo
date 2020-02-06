@@ -1,0 +1,27 @@
+<launch>
+
+  <arg name="gui" default="true"/>
+
+  <node name="depth_image_format_converter" pkg="mbzirc2020_task2_common" type="depth_image_format_converter.py">
+    <remap from="~input" to="/rs_d435/aligned_depth_to_color/image_raw"/>
+  </node>
+
+  <node name="noimage_publisher" pkg="mbzirc2020_task2_common" type="noimage_publisher.py">
+    <remap from="~input" to="/channel_detection/debug_image"/>
+    <remap from="~camera_info" to="/rs_d435/color/camera_info"/>
+    <remap from="~image" to="/channel_detection/debug_image2"/>
+  </node>
+
+  <node name="tile_image" pkg="jsk_perception" type="tile_image.py">
+    <rosparam>
+      input_topics: [/depth_image_format_converter/image, /rs_d435/color/image_rect_color, /opening_hls_color_filter/output, /opening_depth_distance_filter/output, /rectangle_detection_depth/debug_image, /rectangle_detection_color/debug_image, /opening_hls_color_filter_channel/output, /channel_detection/debug_image2]
+      draw_topic_name: true
+      no_sync: true
+    </rosparam>
+  </node>
+
+  <node if="$(arg gui)" name="image_view" pkg="image_view" type="image_view">
+    <remap from="image" to="tile_image/output" />
+  </node>
+
+</launch>

@@ -72,89 +72,398 @@
       </link>
     </model>
 
-    <model name='goal1'>
-      <static>1</static>
-      <pose>0.1 17.0 0.05 0 0 0</pose>
-      <link name='link'>
-        <visual name='visual'>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <box>
-              <size>10 0.2 0.01</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>1.0 1.0 1.0 1</ambient>
-            <diffuse>1.0 1.0 1.0 1</diffuse>
-            <specular>0.01 0.01 0.01 1</specular>
-            <emissive>0 0 0 1</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
+    <model name="picking_place_1" >
+      <pose>-5 0 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
     </model>
 
-    <model name='goal2'>
-      <static>1</static>
-      <pose>5.0 22.1 0.05 0 0 0</pose>
-      <link name='link'>
-        <visual name='visual'>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.2 10 0.01</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>1.0 1.0 1.0 1</ambient>
-            <diffuse>1.0 1.0 1.0 1</diffuse>
-            <specular>0.01 0.01 0.01 1</specular>
-            <emissive>0 0 0 1</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
+    <model name="red_brick_1-1" >
+      <pose>-1.5 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
     </model>
 
-    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble1">
-      <bottom_right>8.0 40.0 0.0</bottom_right>
-      <top_left>10.0 42.0 1.0</top_left>
-      <brick_size>0.3 0.2 0.2</brick_size>
-      <brick_color>1.0 0.0 0.0</brick_color>
-      <brick_mass>0.381</brick_mass>
-      <count>50</count>
-    </plugin>
+    <model name="red_brick_1-2" >
+      <pose>-2.1 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
 
-    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble2">
-      <bottom_right>2.0 40.0 0.0</bottom_right>
-      <top_left>4.0 42.0 1.0</top_left>
-      <brick_size>0.6 0.2 0.2</brick_size>
-      <brick_color>0.0 1.0 0.0</brick_color>
-      <brick_mass>0.485</brick_mass>
-      <count>50</count>
-    </plugin>
+    <model name="red_brick_1-3" >
+      <pose>-2.7 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
 
-    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble3">
-      <bottom_right>-4.0 40 0.0</bottom_right>
-      <top_left>-2.0 42.0 1.0</top_left>
-      <brick_size>1.2 0.2 0.2</brick_size>
-      <brick_color>0.0 0.0 1.0</brick_color>
-      <brick_mass>0.907</brick_mass>
-      <count>50</count>
-    </plugin>
+    <model name="red_brick_1-4" >
+      <pose>-3.3 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
 
-    <plugin filename="libmbzirc2020_task2_rubble_plugin.so" name="rubble4">
-      <bottom_right>-10.0 40 0.0</bottom_right>
-      <top_left>-8.0 42.0 1.0</top_left>
-      <brick_size>1.8 0.2 0.2</brick_size>
-      <brick_color>1.0 0.647 0.0</brick_color>
-      <brick_mass>1.2</brick_mass>
-      <count>50</count>
-    </plugin>
+    <model name="red_brick_1-5" >
+      <pose>-3.9 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-6" >
+      <pose>-4.5 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-7" >
+      <pose>-5.1 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-8" >
+      <pose>-5.7 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-9" >
+      <pose>-6.3 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-10" >
+      <pose>-6.9 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-11" >
+      <pose>-7.5 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_1-12" >
+      <pose>-8.1 0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_2" >
+      <pose>-5 -0.75 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-1" >
+      <pose>-1.5 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-2" >
+      <pose>-2.1 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-3" >
+      <pose>-2.7 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-4" >
+      <pose>-3.3 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-5" >
+      <pose>-3.9 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-6" >
+      <pose>-4.5 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-7" >
+      <pose>-5.1 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-8" >
+      <pose>-5.7 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-9" >
+      <pose>-6.3 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-10" >
+      <pose>-6.9 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-11" >
+      <pose>-7.5 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="red_brick_2-12" >
+      <pose>-8.1 -0.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://red_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_3" >
+      <pose>-5 -1.5 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-1" >
+      <pose>-2.0 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-2" >
+      <pose>-3.2 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-3" >
+      <pose>-4.4 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-4" >
+      <pose>-5.6 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-5" >
+      <pose>-6.8 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-6" >
+      <pose>-8.0 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_4" >
+      <pose>-5 -2.25 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-1" >
+      <pose>-2.0 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-2" >
+      <pose>-3.2 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-3" >
+      <pose>-4.4 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-4" >
+      <pose>-5.6 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-5" >
+      <pose>-6.8 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-6" >
+      <pose>-8.0 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_5" >
+      <pose>-5 -3.0 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_1" >
+      <pose>-1.8 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_2" >
+      <pose>-3.1 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_3" >
+      <pose>-4.4 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_4" >
+      <pose>-5.7 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_5" >
+      <pose>-7.0 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="blue_brick_6" >
+      <pose>-8.3 -3.0 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://blue_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_6" >
+      <pose>-5 -3.75 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="orange_brick_1" >
+      <pose>-2 -3.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://orange_brick</uri>
+      </include>
+    </model>
+
+    <model name="orange_brick_2" >
+      <pose>-4 -3.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://orange_brick</uri>
+      </include>
+    </model>
+
+    <model name="orange_brick_3" >
+      <pose>-6 -3.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://orange_brick</uri>
+      </include>
+    </model>
+
+    <model name="orange_brick_4" >
+      <pose>-8 -3.75 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://orange_brick</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_1" >
+      <pose>6 0 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_2" >
+      <pose>8.2 1.85 0 0 0 1.57</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_3" >
+      <pose>10.0 4.05 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_4" >
+      <pose>12.2 5.85 0 0 0 1.57</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
 
   </world>
 </sdf>

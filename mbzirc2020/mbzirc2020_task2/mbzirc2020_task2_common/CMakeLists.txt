@@ -7,6 +7,31 @@ find_package(catkin REQUIRED COMPONENTS
   hydrus
   mbzirc2020_task2_simulation
   gazebo_ros
+  timed_roslaunch
+  message_generation
+  sensor_msgs
+  jsk_topic_tools
+  jsk_network_tools
+  geometry_msgs
+  nav_msgs
+  jsk_rviz_plugins
+  std_msgs
+  )
+
+add_message_files(
+  FILES
+  FC2OCSData.msg
+  OCS2FCData.msg
+  )
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+  tf2_msgs
+  jsk_rviz_plugins
+  geometry_msgs
+  nav_msgs
+  std_msgs
   )
 
 catkin_package(

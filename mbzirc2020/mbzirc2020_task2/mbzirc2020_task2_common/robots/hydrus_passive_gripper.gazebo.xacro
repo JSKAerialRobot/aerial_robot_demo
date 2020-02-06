@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+
+  <!-- base robot model -->
+  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_passive_gripper.urdf.xacro" />
+
+  <!-- gazebo plugin for sensors -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
+
+  <!-- gazebo for Realsense D435 -->
+
+  <!--  The following values model the aluminum peripherial case for the
+        D435 camera, with the camera joint represented by the actual
+        peripherial camera tripod mount -->
+  <xacro:property name="d435_cam_depth_to_left_ir_offset" value="0.0"/>
+  <xacro:property name="d435_cam_depth_to_right_ir_offset" value="-0.050"/>
+  <xacro:property name="d435_cam_depth_to_color_offset" value="0.015"/>
+  <xacro:property name="d435_cam_width" value="0.090"/>
+  <xacro:property name="d435_cam_height" value="0.025"/>
+  <xacro:property name="d435_cam_depth" value="0.02505"/>
+  <xacro:property name="d435_cam_mount_from_center_offset" value="0.0149"/>
+
+  <!--  The following offset is relative the the physical D435 camera peripherial
+        camera tripod mount -->
+  <xacro:property name="d435_cam_depth_px" value="${d435_cam_mount_from_center_offset}"/>
+  <xacro:property name="d435_cam_depth_py" value="0.0175"/>
+  <xacro:property name="d435_cam_depth_pz" value="${d435_cam_height/2}"/>
+
+  <material name="aluminum">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+
+  <!-- camera depth joints and links -->
+  <joint name="rs_d435_depth_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="rs_d435_link"/>
+    <child link="rs_d435_depth_frame" />
+  </joint>
+  <link name="rs_d435_depth_frame"/>
+
+  <joint name="rs_d435_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_depth_optical_frame" />
+  </joint>
+  <link name="rs_d435_depth_optical_frame"/>
+
+  <!-- camera left IR joints and links -->
+  <joint name="rs_d435_left_ir_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_left_ir_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_left_ir_frame" />
+  </joint>
+  <link name="rs_d435_left_ir_frame"/>
+
+  <joint name="rs_d435_left_ir_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_left_ir_frame" />
+    <child link="rs_d435_left_ir_optical_frame" />
+  </joint>
+  <link name="rs_d435_left_ir_optical_frame"/>
+
+  <!-- camera right IR joints and links -->
+  <joint name="rs_d435_right_ir_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_right_ir_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_right_ir_frame" />
+  </joint>
+  <link name="rs_d435_right_ir_frame"/>
+
+  <joint name="rs_d435_right_ir_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_right_ir_frame" />
+    <child link="rs_d435_right_ir_optical_frame" />
+  </joint>
+  <link name="rs_d435_right_ir_optical_frame"/>
+
+  <!-- camera color joints and links -->
+  <joint name="rs_d435_color_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_color_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_color_frame" />
+  </joint>
+  <link name="rs_d435_color_frame"/>
+
+  <joint name="rs_d435_color_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_color_frame" />
+    <child link="rs_d435_color_optical_frame" />
+  </joint>
+  <link name="rs_d435_color_optical_frame"/>
+
+  <!-- gazebo plugin -->
+  <gazebo reference="rs_d435_color_frame">
+    <sensor type="depth" name="rs_d435_camera">
+      <update_rate>20.0</update_rate>
+      <camera name="head">
+	<horizontal_fov>1.59174</horizontal_fov>
+	<vertical_fov>1.14319</vertical_fov>
+	<image>
+	  <width>1280</width>
+	  <height>720</height>
+	  <format>RGB</format>
+	</image>
+	<clip>
+	  <near>0.02</near>
+	  <far>300</far>
+	</clip>
+	<noise>
+	  <type>gaussian</type>
+	  <mean>0.0</mean>
+	  <stddev>0.007</stddev>
+	</noise>
+      </camera>
+      <plugin name="depth_camera" filename="libgazebo_ros_openni_kinect.so">
+	<baseline>0.06</baseline>
+	<alwaysOn>true</alwaysOn>
+	<updateRate>0.0</updateRate>
+	<cameraName>rs_d435</cameraName>
+	<imageTopicName>color/image_rect_color</imageTopicName>
+	<cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
+	<depthImageCameraInfoTopicName>aligned_depth_to_color/camera_info</depthImageCameraInfoTopicName>
+	<depthImageTopicName>aligned_depth_to_color/image_raw</depthImageTopicName>
+	<pointCloudTopicName>depth_registered/points</pointCloudTopicName>
+	<frameName>rs_d435_color_optical_frame</frameName>
+	<pointCloudCutoff>0.05</pointCloudCutoff>
+	<distortionK1>0</distortionK1>
+	<distortionK2>0</distortionK2>
+	<distortionK3>0</distortionK3>
+	<distortionT1>0</distortionT1>
+	<distortionT2>0</distortionT2>
+	<CxPrime>0</CxPrime>
+	<Cx>0</Cx>
+	<Cy>0</Cy>
+	<focalLength>0</focalLength>
+	<hackBaseline>0</hackBaseline>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- gazebo grasp plugin -->
+  <xacro:include filename="$(find mbzirc2020_task2_simulation)/urdf/gzplugin_grasp_fix.urdf.xacro" />
+  <xacro:gzplugin_grasp_fix />
+
+  <xacro:macro name="mimic_joint_plugin_gazebo" params="name_prefix parent_joint mimic_joint has_pid:=false multiplier:=1.0 offset:=0 sensitiveness:=0.0 max_effort:=1.0 robot_namespace:=''">
+    <gazebo>
+      <plugin name="${name_prefix}mimic_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+        <joint>${parent_joint}</joint>
+        <mimicJoint>${mimic_joint}</mimicJoint>
+        <xacro:if value="${has_pid}">
+          <hasPID />
+        </xacro:if>
+        <multiplier>${multiplier}</multiplier>
+        <offset>${offset}</offset>
+        <sensitiveness>${sensitiveness}</sensitiveness>
+        <maxEffort>${max_effort}</maxEffort>
+        <xacro:unless value="${robot_namespace == ''}">
+          <robotNamespace>($robot_namespace)</robotNamespace>
+        </xacro:unless>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:mimic_joint_plugin_gazebo name_prefix="passive_gripper_left"
+                                   parent_joint="joint1" mimic_joint="passive_gripper_joint_left"
+                                   has_pid="true" multiplier="1.0" offset="${5*pi/4}" max_effort="3.3" />
+
+  <xacro:mimic_joint_plugin_gazebo name_prefix="passive_gripper_right"
+                                   parent_joint="joint3" mimic_joint="passive_gripper_joint_right"
+                                   has_pid="true" multiplier="1.0" offset="${pi/4}" max_effort="3.3" />
+
+</robot>
