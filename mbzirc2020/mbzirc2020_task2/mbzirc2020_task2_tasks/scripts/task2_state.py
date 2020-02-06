@@ -103,12 +103,14 @@ class LookDown(Task2State):
         self.object_approach_height = rospy.get_param('~object_approach_height')
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
+        self.recognition_wait = rospy.get_param('~recognition_wait')
 
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
         self.object_pose = PoseArray()
 
     def objectPoseCallback(self, msg):
-        self.object_pose = msg
+        if len(msg.poses) != 0:
+            self.object_pose = msg
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -122,7 +124,10 @@ class LookDown(Task2State):
 
         object_found = True
 
-        if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5 and len(self.object_pose.poses) != 0:
+        self.object_pose = PoseArray() #reset
+        rospy.sleep(self.recognition_wait)
+
+        if len(self.object_pose.poses) != 0:
             try:
                 cam_trans = self.robot.getTF(self.object_pose.header.frame_id)
                 cam_trans = ros_numpy.numpify(cam_trans.transform)
@@ -188,6 +193,7 @@ class AdjustGraspPosition(Task2State):
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
+        self.recognition_wait = rospy.get_param('~recognition_wait')
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -211,7 +217,10 @@ class AdjustGraspPosition(Task2State):
 
         object_found = True
 
-        if (len(self.object_pose.poses) != 0) and (rospy.Time.now() - self.object_pose.header.stamp).to_sec() < 0.5:
+        self.object_pose = PoseArray() #reset
+        rospy.sleep(self.recognition_wait)
+
+        if len(self.object_pose.poses) != 0:
             try:
                 cam_trans = self.robot.getTF(self.object_pose.header.frame_id)
                 cam_trans = ros_numpy.numpify(cam_trans.transform)
@@ -424,6 +433,7 @@ class AdjustPlacePosition(Task2State):
         self.do_channel_recognition = rospy.get_param('~do_channel_recognition')
         self.channel_tf_frame_id = rospy.get_param('~channel_tf_frame_id')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
+        self.recognition_wait = rospy.get_param('~recognition_wait')
 
         grasping_point = rospy.get_param('~grasping_point')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -437,7 +447,7 @@ class AdjustPlacePosition(Task2State):
 
         if self.do_channel_recognition:
             try:
-                channel_trans = self.robot.getTF(self.channel_tf_frame_id, wait=2.0)
+                channel_trans = self.robot.getTF(self.channel_tf_frame_id, wait=self.recognition_wait)
                 channel_trans = ros_numpy.numpify(channel_trans.transform)
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 rospy.logerr(self.__class__.__name__ + ": channel position detect failed")
