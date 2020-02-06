@@ -51,6 +51,8 @@ estimator:
                 estimate_mode: 6 # 1<<1 + 1<<2
         alt:
                 estimate_mode: 1 # 1<<0
+                outlier_threshold: 0.5
+                inlier_threshold: 0.25                                
         gps:
                 estimate_mode: 1 # 1<<0
         vo:
