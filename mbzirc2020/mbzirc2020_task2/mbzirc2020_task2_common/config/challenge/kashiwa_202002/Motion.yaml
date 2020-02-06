@@ -18,6 +18,7 @@ lane_interval: 0.75 #constant
 #global_lookdown_pos_gps: [35.89514880, 139.9447680] #lati, long
 global_lookdown_pos_gps: [35.89515520, 139.94476800] #lati, long 
 global_object_yaw: 0.0
+recognition_wait: 1.0
 
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
@@ -31,3 +32,12 @@ global_place_channel_z: 1.7 #[m]
 place_z_margin: 0.8 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center
+
+grid_lookdown: [[0, 1], [1, 1], [1, 0], [1, -1], [2, -1], [2, 0], [2, 1], [3, 1], [3, 0], [3, -1], [4, -1], [4, 0], [4, 1]]
+grid_size_lookdown: 0.7
+
+grid_adjust_grasp: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
+grid_size_adjust_grasp: 0.3
+
+grid_adjust_place: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
+grid_size_adjust_place: 0.6
