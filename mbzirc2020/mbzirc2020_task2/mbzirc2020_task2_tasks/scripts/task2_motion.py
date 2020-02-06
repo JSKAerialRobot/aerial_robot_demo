@@ -110,7 +110,9 @@ def main():
                                           'search_count':'search_count',
                                           'search_failed':'search_failed'})
 
-        sm_place = smach.StateMachine(outcomes=['finish', 'continue'], input_keys=['object_count'], output_keys=['object_count'])
+        sm_place = smach.StateMachine(outcomes=['finish', 'continue'],
+                                      input_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'],
+                                      output_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'])
         sm_place.userdata.orig_channel_xy_yaw = None
 
         with sm_place:
@@ -121,13 +123,22 @@ def main():
 
             smach.StateMachine.add('AdjustPlacePosition', AdjustPlacePosition(robot),
                                    transitions={'succeeded':'Ungrasp',
-                                                'failed':'Ungrasp'},
-                                   remapping={'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
+                                                'failed':'SearchAdjustPlace'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
+
+            smach.StateMachine.add('SearchAdjustPlace', SearchMotion(robot, 'adjust_place'),
+                                   transitions={'succeeded':'AdjustPlacePosition'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
 
             smach.StateMachine.add('Ungrasp', Ungrasp(robot, remove_object_model_func),
                                    transitions={'finish':'finish',
                                                 'continue':'continue'},
-                                   remapping={'object_count':'object_count'})
+                                   remapping={'object_count':'object_count',
+                                              'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
 
         smach.StateMachine.add('Place', sm_place,
                                transitions={'finish':'Finish',
@@ -135,7 +146,12 @@ def main():
                                remapping={'object_count':'object_count'})
 
         smach.StateMachine.add('Finish', Finish(robot),
-                               transitions={'succeeded':'succeeded'})
+                               transitions={'succeeded':'succeeded'},
+                               remapping={'object_count':'object_count',
+                                          'orig_global_trans':'orig_global_trans',
+                                          'search_count':'search_count',
+                                          'search_failed':'search_failed'})
+
 
         sis = smach_ros.IntrospectionServer('task2_smach_server', sm_top, '/SM_ROOT')
         sis.start()
