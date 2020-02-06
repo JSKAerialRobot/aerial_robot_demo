@@ -41,6 +41,9 @@ def main():
     rospy.init_node('mbzirc2020_task2_motion')
     sm_top = smach.StateMachine(outcomes=['succeeded'])
     sm_top.userdata.object_count = 0
+    sm_top.userdata.orig_global_trans = None
+    sm_top.userdata.search_count = 0
+    sm_top.userdata.search_failed = False
 
     robot = Task2HydrusInterface()
 
@@ -61,29 +64,55 @@ def main():
         smach.StateMachine.add('Start', Start(robot),
                                transitions={'succeeded':'Pick'})
 
-        sm_pick = smach.StateMachine(outcomes=['succeeded'], input_keys=['object_count'], output_keys=['object_count'])
+        sm_pick = smach.StateMachine(outcomes=['succeeded'],
+                                     input_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'],
+                                     output_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'])
 
         with sm_pick:
             smach.StateMachine.add('ApproachPickPosition', ApproachPickPosition(robot),
                                    transitions={'succeeded':'LookDown'})
 
             smach.StateMachine.add('LookDown', LookDown(robot),
-                                       transitions={'succeeded':'AdjustGraspPosition',
-                                                    'failed':'ApproachPickPosition'})
+                                   transitions={'succeeded':'AdjustGraspPosition',
+                                                'failed':'SearchLookDown'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
+
+            smach.StateMachine.add('SearchLookDown', SearchMotion(robot, 'lookdown'),
+                                   transitions={'succeeded':'LookDown'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
 
             smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
-                                       transitions={'succeeded':'Grasp',
-                                                    'failed':'ApproachPickPosition'},
-                                       remapping={'object_count':'object_count'})
+                                   transitions={'succeeded':'Grasp',
+                                                'failed':'SearchAdjustGrasp'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
+
+            smach.StateMachine.add('SearchAdjustGrasp', SearchMotion(robot, 'adjust_grasp'),
+                                   transitions={'succeeded':'AdjustGraspPosition'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
 
             smach.StateMachine.add('Grasp', Grasp(robot, add_object_model_func),
                                    transitions={'succeeded':'succeeded',
-                                                'failed':'ApproachPickPosition'})
+                                                'failed':'ApproachPickPosition'},
+                                   remapping={'object_count':'object_count'})
 
         smach.StateMachine.add('Pick', sm_pick,
-                               transitions={'succeeded':'Place'})
+                               transitions={'succeeded':'Place'},
+                               remapping={'object_count':'object_count',
+                                          'orig_global_trans':'orig_global_trans',
+                                          'search_count':'search_count',
+                                          'search_failed':'search_failed'})
 
-        sm_place = smach.StateMachine(outcomes=['finish', 'continue'], input_keys=['object_count'], output_keys=['object_count'])
+        sm_place = smach.StateMachine(outcomes=['finish', 'continue'],
+                                      input_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'],
+                                      output_keys=['object_count', 'orig_global_trans', 'search_count', 'search_failed'])
         sm_place.userdata.orig_channel_xy_yaw = None
 
         with sm_place:
@@ -94,13 +123,22 @@ def main():
 
             smach.StateMachine.add('AdjustPlacePosition', AdjustPlacePosition(robot),
                                    transitions={'succeeded':'Ungrasp',
-                                                'failed':'Ungrasp'},
-                                   remapping={'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
+                                                'failed':'SearchAdjustPlace'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
+
+            smach.StateMachine.add('SearchAdjustPlace', SearchMotion(robot, 'adjust_place'),
+                                   transitions={'succeeded':'AdjustPlacePosition'},
+                                   remapping={'orig_global_trans':'orig_global_trans',
+                                              'search_count':'search_count',
+                                              'search_failed':'search_failed'})
 
             smach.StateMachine.add('Ungrasp', Ungrasp(robot, remove_object_model_func),
                                    transitions={'finish':'finish',
                                                 'continue':'continue'},
-                                   remapping={'object_count':'object_count'})
+                                   remapping={'object_count':'object_count',
+                                              'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
 
         smach.StateMachine.add('Place', sm_place,
                                transitions={'finish':'Finish',
@@ -108,7 +146,12 @@ def main():
                                remapping={'object_count':'object_count'})
 
         smach.StateMachine.add('Finish', Finish(robot),
-                               transitions={'succeeded':'succeeded'})
+                               transitions={'succeeded':'succeeded'},
+                               remapping={'object_count':'object_count',
+                                          'orig_global_trans':'orig_global_trans',
+                                          'search_count':'search_count',
+                                          'search_failed':'search_failed'})
+
 
         sis = smach_ros.IntrospectionServer('task2_smach_server', sm_top, '/SM_ROOT')
         sis.start()
