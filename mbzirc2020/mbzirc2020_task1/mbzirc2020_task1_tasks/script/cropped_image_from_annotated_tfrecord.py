@@ -18,7 +18,7 @@ if __name__ == "__main__":
                 help='the name of tfrecord file', default='*', type=str)
 
         parser.add_argument(
-        '-o', '--output', dest='output', action="store",
+                '-o', '--output', dest='output', action="store",
                 help='the output path of the cropped image', default='/tmp', type=str)
 
         parser.add_argument(
@@ -46,13 +46,21 @@ if __name__ == "__main__":
                         example = tf.train.Example()
                         for raw_record in raw_dataset.take(1):
                                 example.ParseFromString(raw_record.numpy())
-                        width = example.features.feature['image/width'].int64_list.value[0]
-                        height = example.features.feature['image/height'].int64_list.value[0]
-                        xmin = width * example.features.feature['image/object/bbox/xmin'].float_list.value[0]
-                        xmax = width * example.features.feature['image/object/bbox/xmax'].float_list.value[0]
-                        ymin = height * example.features.feature['image/object/bbox/ymin'].float_list.value[0]
-                        ymax = height * example.features.feature['image/object/bbox/ymax'].float_list.value[0]
-                        raw_img = Image.open(BytesIO(example.features.feature['image/encoded'].bytes_list.value[0]))
+                        try:
+                                width = example.features.feature['image/width'].int64_list.value[0]
+                                height = example.features.feature['image/height'].int64_list.value[0]
+                                raw_img = Image.open(BytesIO(example.features.feature['image/encoded'].bytes_list.value[0]))
+                        except IndexError:
+                                print('\033[33m' + file + 'has no correct image format (e.g. image/width, image/height and image/encoded)' + '\033[0m')
+
+                        try:
+                                xmin = width * example.features.feature['image/object/bbox/xmin'].float_list.value[0]
+                                xmax = width * example.features.feature['image/object/bbox/xmax'].float_list.value[0]
+                                ymin = height * example.features.feature['image/object/bbox/ymin'].float_list.value[0]
+                                ymax = height * example.features.feature['image/object/bbox/ymax'].float_list.value[0]
+
+                        except IndexError:
+                                print('\033[33m' + file + 'has no bounding box information (e.g. image/object/bbox/xmin, xmax, ymin and ymax)' + '\033[0m')
                         draw = ImageDraw.Draw(raw_img)
                         draw.rectangle((xmin, ymin, xmax, ymax), fill=None, outline=(255, 255, 255))
                         if args.show:

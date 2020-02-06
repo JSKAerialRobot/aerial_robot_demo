@@ -25,9 +25,18 @@ $ source venv-py3-5/bin/activate
 $ pip install --upgrade tensorflow Pillow
 ```
 
-3. extract cropped image from pre-annotated image dataset
-```
-$ cd ./script
-$ ./cropped_image_from_annotated_tfrecord.py --path=`rospack find mbzirc2020_task1_tasks`/train/drone_and_ball/20191229_kashiwa_DJI450_mavic2pro_1080HD/class1_drone --filename=DJI_0052.MP4#t=5 --output=/tmp --show=True # single image 
-```
+3. extract single cropped image from pre-annotated image dataset
 
+- single image:
+  ```
+  $ cd ./script
+  $ ./cropped_image_from_annotated_tfrecord.py --path=`rospack find mbzirc2020_task1_tasks`/train/drone_and_ball/20191229_kashiwa_DJI450_mavic2pro_1080HD/class1_drone --filename=DJI_0052.MP4#t=5 --output=/tmp --show=True # single image 
+  ```
+
+- dataset:
+  ```
+  $ cd ./script
+  $ ./cropped_image_from_annotated_tfrecord.py -p `rospack find mbzirc2020_task1_tasks`/train/drone_and_ball/20200121_kashwia_DJI450_hydrus_rsd435_720HD -o /tmp
+  ```
+
+Then, you can find cropped images in `/tmp`
