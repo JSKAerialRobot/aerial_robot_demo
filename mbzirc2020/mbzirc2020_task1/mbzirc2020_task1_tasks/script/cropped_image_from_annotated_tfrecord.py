@@ -61,15 +61,17 @@ if __name__ == "__main__":
 
                         except IndexError:
                                 print('\033[33m' + file + 'has no bounding box information (e.g. image/object/bbox/xmin, xmax, ymin and ymax)' + '\033[0m')
-                        draw = ImageDraw.Draw(raw_img)
-                        draw.rectangle((xmin, ymin, xmax, ymax), fill=None, outline=(255, 255, 255))
-                        if args.show:
-                                raw_img.show()
                         cropped_img = raw_img.crop((xmin, ymin, xmax, ymax))
-                        if args.show:
-                                cropped_img.show()
+
                         cropped_img = cropped_img.convert("RGB")
                         cropped_img.save(args.output + '/' + base + '_cropped.jpg', quality=100)
+
+                        if args.show:
+                                draw = ImageDraw.Draw(raw_img)
+                                draw.rectangle((xmin, ymin, xmax, ymax), fill=None, outline=(255, 255, 255))
+                                raw_img.show()
+                                cropped_img.show()
+
                         #print(example)
 
         '''
