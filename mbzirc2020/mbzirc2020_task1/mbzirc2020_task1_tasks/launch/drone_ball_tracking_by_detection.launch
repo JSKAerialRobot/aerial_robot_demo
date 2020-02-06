@@ -7,7 +7,7 @@
   <arg name= "color_image_topic" default = "/camera/image_raw" />
 
   <!-- common parameter for binding model detection -->
-  <arg name= "binding_model_file"  default = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200130_bind_model_509_edgetpu.tflite" />
+  <arg name= "binding_model_file"  default = "$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200204_611.tflite" />
   <arg name= "coarse_detection_score_threshold" default = "0.0" />
   <arg name= "refined_detection_score_threshold" default = "0.71" />
   <arg name= "tracking_score_threshold" default = "0.7" />

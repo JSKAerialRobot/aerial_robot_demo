@@ -23,7 +23,15 @@ def main():
         extract=False,
     )
 
-    ##### single detection model for separate model in bouding box (drone OR ball)
+    download_data(
+        pkg_name=PKG,
+        path='models/drone_detection_edgetpu_20200204_611.tflite',
+        url='https://drive.google.com/uc?id=1DAeD4b6Z0Kyusz_vw0pPuWAOKScdzMxV',
+        md5='0f9b7cd7adf9530bd6ac4f4e6da61d72',
+        extract=False,
+    )
+
+    ##### cacscaded detection model for separate model in bouding box (drone OR ball)
     download_data(
         pkg_name=PKG,
         path='models/cocompile_model_202001300509_202002030704.tar.gz',
