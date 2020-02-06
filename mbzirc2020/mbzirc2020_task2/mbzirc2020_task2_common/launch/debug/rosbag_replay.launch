@@ -10,7 +10,7 @@
     <arg name="task" value="2"/>
     <arg name="need_joint_state" value="false"/>
     <arg name="model_suffix" value="$(arg model_suffix)"/>
-    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rosbag_replay_rviz_config"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/launch/debug/rosbag_replay_rviz_config"/>
   </include>
 
   <include file="$(find mbzirc2020_task2_common)/launch/debug/image_republish.launch"/>
