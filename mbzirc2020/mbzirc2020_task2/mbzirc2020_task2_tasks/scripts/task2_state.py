@@ -12,6 +12,7 @@ import ros_numpy
 from std_msgs.msg import UInt8, Empty
 from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
 import copy
+import std_srvs.srv
 
 class Task2State(smach.State):
     def __init__(self, robot, outcomes=[], input_keys=[], output_keys=[], io_keys=[]):
@@ -255,6 +256,9 @@ class Grasp(Task2State):
         self.skip_grasp = rospy.get_param('~skip_grasp', False)
         self.object_grasping_height = rospy.get_param('~object_grasping_height')
         self.grasp_land_mode = rospy.get_param('~grasp_land_mode')
+        self.reset_realsense_odom = rospy.get_param('~reset_realsense_odom')
+
+        self.reset_realsense_client = rospy.ServiceProxy('/realsense1/odom/reset', std_srvs.srv.Empty)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -290,6 +294,16 @@ class Grasp(Task2State):
 
         if self.grasp_land_mode:
             rospy.logwarn(self.__class__.__name__ + ": land mode, takeoff")
+
+            if self.reset_realsense_odom:
+                rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
+                try:
+                    self.reset_realsense_client()
+                    rospy.sleep(1.0)
+
+                except rospy.ServiceException, e:
+                    rospy.logerr("Service call failed: %s", e)
+
             self.robot.startAndTakeoff()
             while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
                 pass
