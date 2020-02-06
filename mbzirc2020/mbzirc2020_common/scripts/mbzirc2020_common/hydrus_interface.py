@@ -71,7 +71,7 @@ class HydrusInterface:
         self.gps_lat_lon_ = [msg.latitude, msg.longitude]
 
     def gpsCallback(self, msg):
-        self.gps_lat_lon_ = msg.location
+        self.gps_lat_lon_ = [msg.location[0] * 1e-7, msg.location[1] * 1e-7]
 
     def jointStateCallback(self, msg):
         self.joint_state_ = msg
@@ -249,11 +249,12 @@ class HydrusInterface:
         self.target_z_ = target_z
         self.target_yaw_ = target_yaw
 
-    def isConvergent(self, frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh):
+    def isConvergent(self, frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh=0.06):
         current_xy = self.getBaselinkPos()[0:2]
         current_z = self.getBaselinkPos()[2]
         current_yaw = self.getBaselinkRPY()[2]
         current_vel = self.getBaselinkLinearVel()
+        current_rp = self.getBaselinkRPY()[0:2]
 
         if gps_mode:
             delta_pos = gps2xy(self.gps_lat_lon_, target_xy)
@@ -281,20 +282,20 @@ class HydrusInterface:
             text.text_size = 12
             text.line_width = 2
             text.font = "DejaVu Sans Mono"
-            text.text = """%f %f %f """ % (np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel))
+            text.text = 'Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n  roll: {:.4g}, pitch: {:.4g}\nSetPoint\n  x: {:.11g} y: {:.11g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), abs(current_rp[0]), abs(current_rp[1]), target_xy[0], target_xy[1], target_z, target_yaw)
 
             self.nav_debug_pub_.publish(text)
 
-        if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh and np.linalg.norm(current_vel) < vel_conv_thresh:
+        if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh and np.linalg.norm(current_vel) < vel_conv_thresh and abs(current_rp[0]) < att_conv_thresh and abs(current_rp[0]) < att_conv_thresh:
             return True
         else:
             return False
 
-    def goPosWaitConvergence(self, frame, target_xy, target_z, target_yaw, gps_mode = False, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 30):
+    def goPosWaitConvergence(self, frame, target_xy, target_z, target_yaw, gps_mode = False, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, att_conv_thresh = 0.06, timeout = 30):
         self.goPos(frame, target_xy, target_z, target_yaw, gps_mode)
         start_time = rospy.get_time()
 
-        while not self.isConvergent(frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh):
+        while not self.isConvergent(frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh):
             elapsed_time = rospy.get_time() - start_time
             if elapsed_time > timeout:
                 return False
