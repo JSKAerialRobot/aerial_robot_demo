@@ -20,7 +20,8 @@ global_object_yaw: 3.141
 
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
-grasp_land_mode: False
+grasp_land_mode: true
+reset_realsense_odom: true
 joint_torque_thresh: 5 #[Nm]
 
 global_place_channel_front_pos_gps: [49.9000360144, 8.90000012378]
