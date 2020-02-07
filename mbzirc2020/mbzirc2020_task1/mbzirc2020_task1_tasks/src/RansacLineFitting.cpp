@@ -43,7 +43,7 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
   else
     target_pt_update_time_ = cur_time;
 
-  std::shared_ptr<GRANSAC::AbstractParameter> CandPt2d = std::make_shared<Point2D>(msg->point.x, msg->point.y);
+  std::shared_ptr<GRANSAC::AbstractParameter> CandPt2d = std::make_shared<Point2D>(msg->point.x, msg->point.y, msg->point.z);
   cand_points2d_.push_back(CandPt2d);
   std::shared_ptr<GRANSAC::AbstractParameter> CandPt3d = std::make_shared<Point3D>(msg->point.x, msg->point.y, msg->point.z);
   cand_points3d_.push_back(CandPt3d);
@@ -140,7 +140,7 @@ bool RansacLineFitting::getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d 
     return false;
   }
   else{
-    std::shared_ptr<GRANSAC::AbstractParameter> pos2d = std::make_shared<Point2D>(pos[0], pos[1]);
+    std::shared_ptr<GRANSAC::AbstractParameter> pos2d = std::make_shared<Point2D>(pos[0], pos[1], pos[2]);
     auto waypt2d = std::dynamic_pointer_cast<Point2D>(estimator_2d_.GetBestModel()->ComputeNearestPoint(pos2d));
     waypt = Eigen::Vector3d(waypt2d->m_Point2D[0], waypt2d->m_Point2D[1], lpf_z_);
     return true;
@@ -322,7 +322,7 @@ void RansacLineFitting::visualizeRansacInliers(){
       auto pt_2d = std::dynamic_pointer_cast<Point2D>(cand_points2d_[i]);
       pt.pose.position.x = pt_2d->m_Point2D[0];
       pt.pose.position.y = pt_2d->m_Point2D[1];
-      pt.pose.position.z = lpf_z_; // todo
+      pt.pose.position.z = pt_2d->m_Point2D[2];
       ransac_points.markers.push_back(pt);
       pt.id += 1;
     }
@@ -355,7 +355,7 @@ void RansacLineFitting::visualizeRansacInliers(){
             auto RPt = std::dynamic_pointer_cast<Point2D>(Inlier);
             pt.pose.position.x = RPt->m_Point2D[0];
             pt.pose.position.y = RPt->m_Point2D[1];
-            pt.pose.position.z = lpf_z_; // todo
+            pt.pose.position.z = RPt->m_Point2D[2];
             ransac_points.markers.push_back(pt);
             pt.id += 1;
           }
