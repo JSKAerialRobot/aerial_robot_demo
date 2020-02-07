@@ -278,6 +278,7 @@ class AdjustGraspPosition(Task2State):
                 #reset search state
                 userdata.search_count = 0
                 userdata.search_failed = False
+                self.robot.preshape()
 
                 return 'succeeded' #go to next state
             else:
@@ -426,7 +427,7 @@ class ApproachPlacePosition(Task2State):
 class AdjustPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot,
-                            outcomes=['succeeded', 'failed'],
+                            outcomes=['succeeded', 'failed', 'search_failed'],
                             input_keys=['orig_global_trans', 'search_count', 'search_failed'],
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
@@ -464,7 +465,7 @@ class AdjustPlacePosition(Task2State):
                 userdata.search_count = 0
                 userdata.search_failed = False
 
-                return 'succeeded' #go to next state
+                return 'search_failed' #go to next state
             else:
                 return 'failed'
 
@@ -556,7 +557,7 @@ class SearchMotion(Task2State):
             userdata.search_failed = True
 
             orig_pos = tft.translation_from_matrix(userdata.orig_global_trans)
-            rospy.logwarn(self.__class__.__name__ + "return to original pos")
+            rospy.logwarn(self.__class__.__name__ + ": return to original pos")
             self.robot.goPosWaitConvergence('global', [orig_pos[0], orig_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
 
         return 'succeeded'
