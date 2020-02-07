@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 641
   - Class: rviz/Selection
@@ -534,7 +535,7 @@ Visualization Manager:
       size: 128
       text size: 14
       top: 50
-    - Align Bottom: false
+    - Align Bottom: true
       Background Alpha: 0.200000003
       Background Color: 0; 0; 0
       Class: jsk_rviz_plugin/OverlayText
@@ -551,7 +552,7 @@ Visualization Manager:
       left: 0
       line width: 2
       text size: 12
-      top: 500
+      top: 400
       width: 700
     - Align Bottom: false
       Background Alpha: 0.800000012
@@ -612,10 +613,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.794797063
+      Pitch: 0.959796906
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.90540051
+      Yaw: 2.69540119
     Saved: ~
 Window Geometry:
   Displays:
