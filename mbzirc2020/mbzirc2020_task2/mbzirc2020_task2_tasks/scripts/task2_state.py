@@ -13,6 +13,7 @@ from std_msgs.msg import UInt8, Empty
 from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
 import copy
 import std_srvs.srv
+import subprocess
 
 class Task2State(smach.State):
     def __init__(self, robot, outcomes=[], input_keys=[], output_keys=[], io_keys=[]):
@@ -60,7 +61,7 @@ class Start(Task2State):
         self.robot.startAndTakeoff()
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
-        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2])
+        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2], timeout=10)
 
         self.robot.setCameraJointAngle(np.pi / 2)
         return 'succeeded'
@@ -261,7 +262,7 @@ class AdjustGraspPosition(Task2State):
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
             self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.05, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
 
             #reset search state
             userdata.search_count = 0
@@ -364,12 +365,10 @@ class Grasp(Task2State):
 
             if self.reset_realsense_odom:
                 rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
-                try:
-                    self.reset_realsense_client()
-                    rospy.sleep(1.0)
+                cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
+                subprocess.Popen(cmd.split())
 
-                except rospy.ServiceException, e:
-                    rospy.logerr("Service call failed: %s", e)
+                rospy.sleep(15)
 
             self.robot.startAndTakeoff()
             while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
