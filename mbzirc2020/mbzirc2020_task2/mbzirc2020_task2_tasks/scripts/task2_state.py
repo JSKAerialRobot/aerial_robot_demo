@@ -360,19 +360,18 @@ class Grasp(Task2State):
             rospy.logerr("%s: grasp failed! joint1: %f, joint3: %f, thresh: %f", self.__class__.__name__, joint_torque[0], joint_torque[1], self.joint_torque_thresh)
             result = 'failed'
 
+        if self.reset_realsense_odom:
+            rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
+            cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
+            subprocess.Popen(cmd.split())
+
+            rospy.sleep(10)
+
         if self.grasp_land_mode:
             rospy.logwarn(self.__class__.__name__ + ": land mode, takeoff")
-
-            if self.reset_realsense_odom:
-                rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
-                cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
-                subprocess.Popen(cmd.split())
-
-                rospy.sleep(15)
-
             self.robot.startAndTakeoff()
             while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
-                pass
+                pass #wait until hover
 
         return result
 
