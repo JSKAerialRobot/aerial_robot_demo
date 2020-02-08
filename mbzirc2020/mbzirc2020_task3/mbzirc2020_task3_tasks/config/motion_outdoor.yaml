@@ -2,10 +2,10 @@
 
 control_rate : 1.0
 
-navigation_approach_margin : [0.5, 0.5, 0.5]
+navigation_approach_margin : [1.0, 1.0, 0.5]
 
 search_height : 2.0
-reach_margin : 0.5
+reach_margin : 1.0
 target_timeout : 3.0
 approach_height : 1.8
 descending_height : 1.2
@@ -19,7 +19,7 @@ covering_move_dist : 0.6
 close_pose: [1.56, 1.56] # the joint angles  for closing
 
 nav_mode: 5
-search_type: '4_corner'
+search_type: '4_corner_relative'
 
 # search_type: 'rectangular_grid'
 # nav_mode: 2

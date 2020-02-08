@@ -3,6 +3,7 @@
 import rospy
 import smach
 import smach_ros
+import copy
 
 import tf
 import tf2_ros
@@ -130,7 +131,9 @@ class FourCornerSearchState(smach.State):
             print('relative bias: ', str(self.relative_xy_bias))
             self.is_first_execution = False
 
-        search_pos = self.waypoints[self.waypoint_idx]
+        search_pos = copy.copy(self.waypoints[self.waypoint_idx])
+        search_pos[0] = self.waypoints[self.waypoint_idx][0]
+        search_pos[1] = self.waypoints[self.waypoint_idx][1]
         search_pos[0] += self.relative_xy_bias[0]
         search_pos[1] += self.relative_xy_bias[1]
         self.commander.move_to(search_pos[0], search_pos[1])
