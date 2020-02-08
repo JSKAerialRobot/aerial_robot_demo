@@ -1,0 +1,17 @@
+area_corners:
+- - - 0.0
+    - 0.0
+  - - 6.0
+    - 0.0
+  - - 6.0
+    - 6.0
+  - - 0.0
+    - 6.0
+  - 3
+initial_waypoints:
+- - - 49.90002
+    - 8.9
+    - 2.0
+search_area_number: 1
+search_type: '4_corner_relative'
+
