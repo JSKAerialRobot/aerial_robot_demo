@@ -54,7 +54,17 @@ if __name__ == '__main__':
         waypoint_num = input()
         initial_waypoints.append(recordGpsPoints(waypoint_num, True))
         print('Recording 4 corners...')
-        corners = recordGpsPoints(4)
+        corners = []
+        print('Enter mode {(a)bsolute/(r)elative}')
+        mode = raw_input()
+        if mode in {'r', 'relative'}:
+            for i in range(4):
+                tmp_data = dict()
+                addParamFromInput(tmp_data, str(i+1)+"'th corner_x", '0', float)
+                addParamFromInput(tmp_data, str(i+1)+"'th corner_y", '0', float)
+                corners.append([tmp_data[str(i+1)+"'th corner_x"], tmp_data[str(i+1)+"'th corner_y"]])
+        elif mode in {'a', 'absolute'}:
+            corners = recordGpsPoints(4)
         print('Enter Trip Number')
         trip_num = input()
         corners.append(trip_num)
