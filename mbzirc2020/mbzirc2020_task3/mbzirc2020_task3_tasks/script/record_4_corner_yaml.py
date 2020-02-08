@@ -24,7 +24,7 @@ def recordGpsPoints(point_number, is_height=False):
 
 def getGpsLocation():
     msg = rospy.wait_for_message('/gps' , Gps)
-    return [msg.location[0]*1e-7, msg.location[1]*1e-7]
+    return [msg.location[0], msg.location[1]]
 
 def addParamFromInput(data, private_param_name, default_value, type_cast_function):
     rospy.get_param('~'+private_param_name, default_value)
