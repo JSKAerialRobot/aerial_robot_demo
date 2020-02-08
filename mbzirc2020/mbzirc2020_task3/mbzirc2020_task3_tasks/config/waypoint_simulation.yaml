@@ -13,4 +13,5 @@ initial_waypoints:
     - 8.9
     - 2.0
 search_area_number: 1
+search_type: '4_corner_relative'
 

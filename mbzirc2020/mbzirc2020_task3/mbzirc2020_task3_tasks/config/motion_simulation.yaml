@@ -18,7 +18,6 @@ covering_move_dist : 0.6
 
 close_pose: [1.56, 1.56] # the joint angles  for closing
 
-search_type: '4_corner_relative'
 nav_mode: 5
 # search_area_number: 1
 # initial_waypoints: [[[49.9, 8.9, 2]]]

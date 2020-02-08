@@ -19,7 +19,7 @@ covering_move_dist : 0.6
 close_pose: [1.56, 1.56] # the joint angles  for closing
 
 nav_mode: 5
-search_type: '4_corner_relative'
+# search_type: '4_corner_relative'
 
 # search_type: 'rectangular_grid'
 # nav_mode: 2
