@@ -9,6 +9,7 @@ import tf2_ros
 import numpy as np
 
 from geometry_msgs.msg import Vector3Stamped
+from nav_msgs.msg import Odometry
 
 from hydrus_commander import HydrusCommander
 
@@ -31,14 +32,21 @@ class PlaneFireFightStateMachineCreator():
                                         remapping={'target_pos':'target_pos'})
                 smach.StateMachine.add('covering', CoveringState(params),
                                        transitions={'done':'success'})
-        elif search_method=="4_corner":
+        elif search_method in {"4_corner", "4_corner_relative"}:
             sm = smach.StateMachine(outcomes={'success', 'failure'})
             with sm:
-                smach.StateMachine.add('searching', FourCornerSearchState(params),
-                                        transitions={'found':'approach_on_top',
-                                                     'not_found':'failure',
-                                                     'still_searching':'searching'},
-                                        remapping={'target_pos':'target_pos'})
+                if search_method == "4_corner":
+                    smach.StateMachine.add('searching', FourCornerSearchState(params),
+                                            transitions={'found':'approach_on_top',
+                                                         'not_found':'failure',
+                                                         'still_searching':'searching'},
+                                            remapping={'target_pos':'target_pos'})
+                elif search_method == '4_corner_relative':
+                    smach.StateMachine.add('searching', FourCornerSearchState(params, mode='relative'),
+                                            transitions={'found':'approach_on_top',
+                                                         'not_found':'failure',
+                                                         'still_searching':'searching'},
+                                            remapping={'target_pos':'target_pos'})
                 smach.StateMachine.add('approach_on_top', AproachOnTargetState(params),
                                        transitions={'success':'covering',
                                                     'target_lost':'searching',
@@ -51,10 +59,17 @@ class PlaneFireFightStateMachineCreator():
 
 
 class FourCornerSearchState(smach.State):
-    def __init__(self, params):
+    def __init__(self, params, mode='absolute'):
         smach.State.__init__(self, outcomes=['found', 'not_found', 'still_searching'],
                                    output_keys=['target_pos'])
-        self.commander = HydrusCommander(nav_mode=params['nav_mode'])
+
+        self.relative_xy_bias = [0,0]
+        self.mode = mode
+        if mode == 'absolute':
+            self.commander = HydrusCommander(nav_mode=params['nav_mode'])
+        elif mode == 'relative':
+            self.commander = HydrusCommander(nav_mode=2)
+            self.is_first_execution = True
 
         # retrieve parameters
         self.target_topic_name = params['target_topic_name']
@@ -84,11 +99,15 @@ class FourCornerSearchState(smach.State):
             waypoint_tmp1 = []
             waypoint_tmp1.append((self.area_corners[1][0]-self.area_corners[0][0])/(self.trip_number-1)*i + self.area_corners[0][0])
             waypoint_tmp1.append((self.area_corners[1][1]-self.area_corners[0][1])/(self.trip_number-1)*i + self.area_corners[0][1])
+            waypoint_tmp1[0] += self.relative_xy_bias[0]
+            waypoint_tmp1[1] += self.relative_xy_bias[1]
             waypoints.append(waypoint_tmp1)
 
             waypoint_tmp2 = []
             waypoint_tmp2.append((self.area_corners[2][0]-self.area_corners[3][0])/(self.trip_number-1)*i + self.area_corners[3][0])
             waypoint_tmp2.append((self.area_corners[2][1]-self.area_corners[3][1])/(self.trip_number-1)*i + self.area_corners[3][1])
+            waypoint_tmp2[0] += self.relative_xy_bias[0]
+            waypoint_tmp2[1] += self.relative_xy_bias[1]
             waypoints.append(waypoint_tmp2)
 
         return waypoints
@@ -105,7 +124,15 @@ class FourCornerSearchState(smach.State):
             self.target_pos_flag= False
             return 'found'
 
+        if self.mode == 'relative' and self.is_first_execution==True:
+            msg = rospy.wait_for_message('/uav/cog/odom', Odometry)
+            self.relative_xy_bias = [msg.pose.pose.position.x, msg.pose.pose.position.y]
+            print('relative bias: ', str(self.relative_xy_bias))
+            self.is_first_execution = False
+
         search_pos = self.waypoints[self.waypoint_idx]
+        search_pos[0] += self.relative_xy_bias[0]
+        search_pos[1] += self.relative_xy_bias[1]
         self.commander.move_to(search_pos[0], search_pos[1])
         self.commander.change_height(self.search_height)
 

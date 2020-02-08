@@ -123,9 +123,9 @@ class HydrusCommander():
         self.change_height(covering_pre_height)
         time.sleep(1)
 
-        back = 1.2
-        self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1], override_nav_mode=2)
-        self.change_height(covering_post_height)
+        # back = 1.2
+        # self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1], override_nav_mode=2)
+        # self.change_height(covering_post_height)
         self.land()
 
 if __name__ == "__main__":
