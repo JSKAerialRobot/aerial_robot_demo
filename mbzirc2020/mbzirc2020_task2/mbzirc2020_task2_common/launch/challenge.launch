@@ -2,6 +2,10 @@
   <arg name="do_object_recognition" default="true"/>
   <arg name="do_channel_recognition" default="true"/>
   <arg name="world" default="kashiwa_202002"/>
+  <arg name="debug_look_down" default="false"/>
+  <arg name="debug_adjust_grasp" default="false"/>
+  <arg name="debug_grasp" default="false"/>
+  <arg name="debug_adjust_place" default="false"/>
 
   ### bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
@@ -16,10 +20,10 @@
     <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
     <arg name="do_object_recognition" value="$(arg do_object_recognition)"/>
     <arg name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
-    <arg name="debug_look_down" value="false"/>
-    <arg name="debug_adjust_grasp" value="false"/>
-    <arg name="debug_grasp" value="false"/>
-    <arg name="debug_adjust_place" value="false"/>
+    <arg name="debug_look_down" value="$(arg debug_look_down)"/>
+    <arg name="debug_adjust_grasp" value="$(arg debug_adjust_grasp)"/>
+    <arg name="debug_grasp" value="$(arg debug_grasp)"/>
+    <arg name="debug_adjust_place" value="$(arg debug_adjust_place)"/>
   </include>
 
   ### recognition
