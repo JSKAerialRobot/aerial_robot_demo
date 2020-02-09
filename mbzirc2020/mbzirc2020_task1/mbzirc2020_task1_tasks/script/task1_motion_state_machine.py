@@ -18,7 +18,6 @@ def track_flag_cb(ud, msg):
     return False
 
 def return_initial_flag_cb(ud, msg):
-    StopEstimation()
     return False
 
 def main():
@@ -27,7 +26,7 @@ def main():
 
     sm = smach.StateMachine(outcomes=['DONE', 'FAIL'])
     with sm:
-        nav_control_rate = rospy.get_param('~control_rate', 1.0)
+        nav_control_rate = rospy.get_param('~control_rate', 0.5)
         nav_approach_margin = rospy.get_param('~navigation_approach_margin', [0.5, 0.5, 0.5])
 
         nav_mode = rospy.get_param('~nav_mode', 2)
@@ -49,7 +48,7 @@ def main():
         search_params['covering_move_dist'] = rospy.get_param('~covering_move_dist', 1.0)
 
         smach.StateMachine.add('INITIAL_STATE', smach_ros.MonitorState("~task1_start", Empty, monitor_cb), transitions={'invalid':'TAKEOFF', 'valid':'INITIAL_STATE', 'preempted':'INITIAL_STATE'})
-        smach.StateMachine.add('TAKEOFF', TakeoffState(), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
+        smach.StateMachine.add('TAKEOFF', TakeoffState(15), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
 
         waypoints_list = rospy.get_param('~initial_waypoints', [[[0,0,1]]])
         waypoints_number = len(waypoints_list)
@@ -65,12 +64,13 @@ def main():
                 smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'NAVIGATING'+str(i+1), 'failure':'FAIL'})
             else:
                 smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'TASK1_ENTER_STATE', 'failure':'FAIL'})
+        smach.StateMachine.add('TASK1_ENTER_STATE', PrepareTaskState(), transitions={'success':'TASK1_ENTER_STATE_PREPARED', 'fail':'FAIL'})
 
         task1_waiting_waypoints_list = rospy.get_param('~task1_waiting_waypoint', [[[0,0,1]]])
         task1_waiting_waypoint_nav_creator = GpsWaypointNavigationStateMachineCreator()
         task1_waiting_waypoints = task1_waiting_waypoints_list[0]
         sm_sub_waiting_waypt_nav = task1_waiting_waypoint_nav_creator.create(task1_waiting_waypoints, nav_approach_margin, nav_control_rate, nav_mode)
-        smach.StateMachine.add('TASK1_ENTER_STATE', sm_sub_waiting_waypt_nav, transitions={'success':'TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', 'failure':'FAIL'})
+        smach.StateMachine.add('TASK1_ENTER_STATE_PREPARED', sm_sub_waiting_waypt_nav, transitions={'success':'TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', 'failure':'FAIL'})
 
         smach.StateMachine.add('TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', PrepareEstimation(), transitions={'success':'TASK1_WAITING_STATE', 'fail':'FAIL'})
         smach.StateMachine.add('TASK1_WAITING_STATE', smach_ros.MonitorState("~task1_track_flag", Empty, track_flag_cb), transitions={'invalid':'TASK1_TRACKING_STATE', 'valid':'TASK1_WAITING_STATE', 'preempted':'TASK1_WAITING_STATE'})

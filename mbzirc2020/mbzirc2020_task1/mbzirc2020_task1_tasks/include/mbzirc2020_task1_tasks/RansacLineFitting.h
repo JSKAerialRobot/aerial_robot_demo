@@ -39,6 +39,7 @@ public:
   bool checkEstimationWithYawAng(double yaw);
   void stopEstimation();
   void startEstimation();
+  double estimateTargetArrivalTime(Eigen::Vector3d pos);
 
 private:
   /* basic */
@@ -70,6 +71,7 @@ private:
   double target_pt_update_time_;
   double target_pt_dispear_time_thre_;
   double target_close_dist_thre_;
+  double target_vel_;
   double yaw_diff_thre_;
 
   void targetPointCallback(const geometry_msgs::PointStampedConstPtr & msg);
