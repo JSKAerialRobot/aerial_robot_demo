@@ -17,7 +17,7 @@ object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
 #global_lookdown_pos_gps: [35.89514880, 139.9447680] #lati, long
 #global_lookdown_pos_gps: [35.895179, 139.9448078] #lati, long
-global_lookdown_pos_gps: [35.8951644, 139.9447988] #lati, long 
+global_lookdown_pos_gps: [35.8951644, 139.9447988] #lati, long
 global_object_yaw: 0.0
 recognition_wait: 1.0
 
@@ -33,6 +33,9 @@ global_place_channel_z: 1.7 #[m]
 place_z_margin: 0.8 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center
+
+disable_alt_sensor: True
+alt_sensor_service_name: /estimator/sensor_plugin/alt1/estimate_flag
 
 grid_lookdown: [[0, 2], [0, 1], [0, 0], [0, -1], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2], [2, 2], [2, 1], [2, 0], [2, -1], [2, -2], [3, -2], [3, -1], [3, 0], [3, 1], [3, 2], [4, 2], [4, 1], [4, 0], [4, -1], [4, -2]]
 grid_size_lookdown: 0.7

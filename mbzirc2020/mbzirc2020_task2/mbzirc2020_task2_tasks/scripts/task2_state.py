@@ -78,6 +78,11 @@ class ApproachPickPosition(Task2State):
         self.global_lookdown_pos_gps = rospy.get_param('~global_lookdown_pos_gps')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
+        self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
+        self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
+
+        if self.disable_alt_sensor:
+            self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -87,6 +92,22 @@ class ApproachPickPosition(Task2State):
 
         target_object_pos = self.global_lookdown_pos_gps
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw
+
+        #enable alt sensor
+        if self.disable_alt_sensor:
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = True
+                res = self.alt_sensor_service_client(req)
+
+                if res.success:
+                    rospy.logwarn("Enable alt sensor")
+                else:
+                    rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
@@ -384,6 +405,8 @@ class ApproachPlacePosition(Task2State):
 
         self.simulation = rospy.get_param('/simulation')
         self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
+        self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
+        self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
@@ -395,6 +418,9 @@ class ApproachPlacePosition(Task2State):
         self.place_channel_yaw = np.arctan2(global_place_channel_xy[1], global_place_channel_xy[0]) + np.pi
         self.lat_unit = (self.global_place_channel_back_pos_gps[0] - self.global_place_channel_front_pos_gps[0]) / 5.0
         self.lon_unit = (self.global_place_channel_back_pos_gps[1] - self.global_place_channel_front_pos_gps[1]) / 5.0
+
+        if self.disable_alt_sensor:
+            self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -417,6 +443,21 @@ class ApproachPlacePosition(Task2State):
                 res = client(req)
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
+
+        #enable alt sensor
+        if self.disable_alt_sensor:
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = False
+                res = self.alt_sensor_service_client(req)
+
+                if res.success:
+                    rospy.logwarn("Disable alt sensor")
+                else:
+                    rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
 
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
