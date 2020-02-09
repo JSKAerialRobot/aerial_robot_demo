@@ -15,7 +15,8 @@ RansacLineFitting::RansacLineFitting(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("ransac_visualization_flag", ransac_vis_flag_, true);
   nhp_.param("ransac_3d_mode", ransac_3d_mode_, false);
   nhp_.param("target_point_maximum_disappear_time", target_pt_dispear_time_thre_, 0.8);
-  nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 1.0);
+  nhp_.param("target_close_distance_threshold", target_close_dist_thre_, 2.5);
+  nhp_.param("target_velocity", target_vel_, 5.0);
   nhp_.param("target_end_procedure_distance_threshold", target_end_procedure_dist_thre_, 10.0);
   nhp_.param("lpf_z_gain", lpf_z_gain_, 0.8);
   nhp_.param("yaw_diff_threshold", yaw_diff_thre_, M_PI / 3.0);
@@ -159,13 +160,35 @@ bool RansacLineFitting::isNearTarget(Eigen::Vector3d pos){
     for (int i = 0; i < checked_point_cnt; ++i){
       auto pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_.size() - 1 - i]);
       double dist = sqrt(pow(pos[0] - pt->m_Point2D[0], 2.0) + pow(pos[1] - pt->m_Point2D[1], 2.0));
-      if (dist < 0.7 + target_close_dist_thre_)
+      if (dist < 0.55 + target_close_dist_thre_)
         ++near_point_cnt;
     }
     if (near_point_cnt >= checked_point_cnt / 2 + 1)
       return true;
     else
       return false;
+  }
+}
+
+double RansacLineFitting::estimateTargetArrivalTime(Eigen::Vector3d pos){
+  int checked_point_cnt = 5;
+  if (ransac_3d_mode_){
+    // to develop
+    return 0.5;
+  }
+  else{
+    if (checked_point_cnt > cand_points2d_.size()) checked_point_cnt = cand_points2d_.size();
+    int near_point_cnt = 0;
+    double dist_sum = 0.0;
+    for (int i = 0; i < checked_point_cnt; ++i){
+      auto pt = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_.size() - 1 - i]);
+      double dist = sqrt(pow(pos[0] - pt->m_Point2D[0], 2.0) + pow(pos[1] - pt->m_Point2D[1], 2.0));
+      if (dist < 0.55 + target_close_dist_thre_){
+        ++near_point_cnt;
+        dist_sum += dist - 0.55;
+      }
+    }
+    return dist_sum / near_point_cnt / target_vel_;
   }
 }
 
