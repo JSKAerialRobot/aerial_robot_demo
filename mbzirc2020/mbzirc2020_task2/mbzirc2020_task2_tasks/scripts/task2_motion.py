@@ -40,7 +40,20 @@ def addObjectToModel(robot, action, translation, yaw, mass):
 def main():
     rospy.init_node('mbzirc2020_task2_motion')
     sm_top = smach.StateMachine(outcomes=['succeeded'])
-    sm_top.userdata.object_count = 0
+
+    single_object_mode = rospy.get_param('~single_object_mode', True)
+
+    if single_object_mode:
+        target_object_number = rospy.get_param('~target_object_number')
+        sm_top.userdata.object_count = target_object_number
+        rospy.logerr('SINGLE OBJECT MODE')
+        rospy.logerr('target object number: %d', target_object_number)
+    else:
+        sm_top.userdata.object_count = 0
+        rospy.logerr('MULTI OBJECT MODE')
+        object_num = rospy.get_param("~object_num")
+        rospy.logerr('object num: %d', object_num)
+
     sm_top.userdata.orig_global_trans = None
     sm_top.userdata.search_count = 0
     sm_top.userdata.search_failed = False
@@ -52,6 +65,7 @@ def main():
     object_mass = rospy.get_param('~object_mass')
     do_object_recognition = rospy.get_param('~do_object_recognition')
     do_channel_recognition = rospy.get_param('~do_channel_recognition')
+
     if not do_object_recognition:
         rospy.logerr('WARNING!! NO OBJECT RECOGNITION')
     if not do_channel_recognition:
