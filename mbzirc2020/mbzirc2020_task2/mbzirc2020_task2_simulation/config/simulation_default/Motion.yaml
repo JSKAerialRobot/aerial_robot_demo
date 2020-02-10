@@ -29,6 +29,7 @@ joint_torque_thresh: 5 #[Nm]
 global_place_channel_front_pos_gps: [49.9000360144, 8.90000012378]
 global_place_channel_back_pos_gps: [49.9000708464, 8.90000009041]
 global_place_channel_z: 1.7 #[m]
+global_place_channel_yaw: 0.0
 place_z_margin: 0.6 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center

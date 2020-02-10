@@ -413,9 +413,9 @@ class ApproachPlacePosition(Task2State):
 
         self.global_place_channel_front_pos_gps = rospy.get_param('~global_place_channel_front_pos_gps')
         self.global_place_channel_back_pos_gps = rospy.get_param('~global_place_channel_back_pos_gps')
+        self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
 
         global_place_channel_xy = gps2xy(self.global_place_channel_front_pos_gps, self.global_place_channel_back_pos_gps)
-        self.place_channel_yaw = np.arctan2(global_place_channel_xy[1], global_place_channel_xy[0]) + np.pi
         self.lat_unit = (self.global_place_channel_back_pos_gps[0] - self.global_place_channel_front_pos_gps[0]) / 5.0
         self.lon_unit = (self.global_place_channel_back_pos_gps[1] - self.global_place_channel_front_pos_gps[1]) / 5.0
 
@@ -431,7 +431,7 @@ class ApproachPlacePosition(Task2State):
         #calc place coords in gps
         place_pos_lat = self.global_place_channel_front_pos_gps[0] + self.lat_unit * (userdata.object_count + 1)
         place_pos_lon = self.global_place_channel_front_pos_gps[1] + self.lon_unit * (userdata.object_count + 1)
-        uav_target_yaw = self.place_channel_yaw - self.grasping_yaw
+        uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw + np.pi
 
         if self.simulation:
             client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
@@ -461,7 +461,7 @@ class ApproachPlacePosition(Task2State):
 
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-        userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.place_channel_yaw)
+        userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
         return 'succeeded'
 
@@ -477,10 +477,6 @@ class AdjustPlacePosition(Task2State):
         self.channel_tf_frame_id = rospy.get_param('~channel_tf_frame_id')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.recognition_wait = rospy.get_param('~recognition_wait')
-
-        grasping_point = rospy.get_param('~grasping_point')
-        self.grasping_yaw = rospy.get_param('~grasping_yaw')
-        self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, self.grasping_yaw])
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -510,22 +506,16 @@ class AdjustPlacePosition(Task2State):
             else:
                 return 'failed'
 
-        my_object_global_yaw = self.grasping_yaw + self.robot.getBaselinkRPY()[2]
         channel_pos = tft.translation_from_matrix(channel_trans)
-        channel_center_coords = tft.compose_matrix(translate=channel_pos, angles=[0, 0, my_object_global_yaw])
         rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
 
-        uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
-        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-
-        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #reset search state
         userdata.search_count = 0
         userdata.search_failed = False
 
         return 'succeeded'
-
 
 class Ungrasp(Task2State):
     def __init__(self, robot, remove_object_model_func):
@@ -535,6 +525,7 @@ class Ungrasp(Task2State):
 
         self.remove_object_model_func = remove_object_model_func
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
+        self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
         self.place_z_margin = rospy.get_param('~place_z_margin')
         self.place_z_offset = rospy.get_param('~place_z_offset')
         self.object_num = rospy.get_param('~object_num')
@@ -551,13 +542,16 @@ class Ungrasp(Task2State):
         if self.skip_ungrasp:
             return 'succeeded'
 
-        if not self.do_channel_recognition:
-            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1]])
-            uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
-            uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-            rospy.logwarn(self.__class__.__name__ + ": Directly go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
-            self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        if self.do_channel_recognition:
+            channel_center_coords = tft.compose_matrix(translate=[self.robot.getTargetXY()[0], self.robot.getTargetXY()[1], 0], angles=[0, 0, self.global_place_channel_yaw + np.pi])
+        else:
+            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1] + np.pi])
 
+        uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
+        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+
+        rospy.logwarn(self.__class__.__name__ + ": Go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
+        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #descend
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
