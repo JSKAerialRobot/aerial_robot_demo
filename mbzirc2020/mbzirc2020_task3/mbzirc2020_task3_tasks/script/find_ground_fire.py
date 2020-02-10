@@ -43,6 +43,8 @@ def main():
         search_params['covering_pre_height'] = rospy.get_param('~covering_pre_height', 1.0)
         search_params['covering_post_height'] = rospy.get_param('~covering_post_height', 0.2)
         search_params['covering_move_dist'] = rospy.get_param('~covering_move_dist', 1.0)
+        search_params['search_area_length'] = rospy.get_param('~search_area_length', 2.0)
+        search_params['trip_number'] = rospy.get_param('~trip_number', 5)
 
         smach.StateMachine.add('INITIAL_STATE', smach_ros.MonitorState("~task3_start", Empty, monitor_cb), transitions={'invalid':'TAKEOFF', 'valid':'INITIAL_STATE', 'preempted':'INITIAL_STATE'})
         smach.StateMachine.add('TAKEOFF', TakeoffState(), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})

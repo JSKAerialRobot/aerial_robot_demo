@@ -1,0 +1,10 @@
+search_area_length: 3.0
+
+trip_number: 5
+
+initial_waypoints:
+- - - 49.90002
+    - 8.9
+    - 2.0
+search_area_number: 1
+

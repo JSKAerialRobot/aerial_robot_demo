@@ -33,7 +33,7 @@ class PlaneFireFightStateMachineCreator():
                                         remapping={'target_pos':'target_pos'})
                 smach.StateMachine.add('covering', CoveringState(params),
                                        transitions={'done':'success'})
-        elif search_method in {"4_corner", "4_corner_relative"}:
+        elif search_method in {"4_corner", "4_corner_relative", "vortex"}:
             sm = smach.StateMachine(outcomes={'success', 'failure'})
             with sm:
                 if search_method == "4_corner":
@@ -48,6 +48,17 @@ class PlaneFireFightStateMachineCreator():
                                                          'not_found':'failure',
                                                          'still_searching':'searching'},
                                             remapping={'target_pos':'target_pos'})
+
+
+                elif search_method == 'vortex':
+
+                    smach.StateMachine.add('searching', VortexSearchState(params, mode='relative'),
+                                            transitions={'found':'approach_on_top',
+                                                         'not_found':'failure',
+                                                         'still_searching':'searching'},
+                                            remapping={'target_pos':'target_pos'})
+
+
                 smach.StateMachine.add('approach_on_top', AproachOnTargetState(params),
                                        transitions={'success':'covering',
                                                     'target_lost':'searching',
@@ -57,6 +68,126 @@ class PlaneFireFightStateMachineCreator():
                                        transitions={'done':'success'})
 
             return sm
+
+class VortexSearchState(smach.State):
+    def __init__(self, params, mode='absolute'):
+        smach.State.__init__(self, outcomes=['found', 'not_found', 'still_searching'],
+                                   output_keys=['target_pos'])
+
+        self.relative_xy_bias = [0,0]
+        self.mode = mode
+        if mode == 'absolute':
+            self.commander = HydrusCommander(nav_mode=params['nav_mode'])
+        elif mode == 'relative':
+            self.commander = HydrusCommander(nav_mode=2)
+            self.is_first_execution = True
+
+        rospy.logerr("vortex search start !!!!")
+        # retrieve parameters
+        self.target_topic_name = params['target_topic_name']
+        self.control_rate = params['control_rate']
+        self.search_area_length = params['search_area_length']
+        self.trip_number = params['trip_number']
+        self.reach_margin = params['reach_margin']
+        self.search_height = params['search_height']
+
+        self.target_pos = None # set when target_pos topic recieved
+
+        # define subscriber
+        self.target_pos_sub_ = rospy.Subscriber(self.target_topic_name, Vector3Stamped, self.targetPositionCallback)
+        self.target_pos_flag = False
+        rospy.logerr(self.search_area_length)
+        self.waypoints = self.createWayPointList()
+        self.waypoint_idx = 0
+
+
+
+
+    def createWayPointList(self):
+        waypoints = []
+
+        waypoint_init = []
+        waypoint_init.append(self.search_area_length/2*(1/float(self.trip_number)))
+        waypoint_init.append(0.0)
+        waypoint_init[0] += self.relative_xy_bias[0]
+        waypoint_init[1] += self.relative_xy_bias[1]
+        waypoints.append(waypoint_init)
+
+
+        for i in range(1, self.trip_number+1):
+
+            waypoint_tmp1 = []
+            waypoint_tmp1.append(self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp1.append(self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp1[0] += self.relative_xy_bias[0]
+            waypoint_tmp1[1] += self.relative_xy_bias[1]
+            waypoints.append(waypoint_tmp1)
+
+            waypoint_tmp2 = []
+            waypoint_tmp2.append(-self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp2.append(self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp2[0] += self.relative_xy_bias[0]
+            waypoint_tmp2[1] += self.relative_xy_bias[1]
+            waypoints.append(waypoint_tmp2)
+
+
+            waypoint_tmp3 = []
+            waypoint_tmp3.append(-self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp3.append(-self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp3[0] += self.relative_xy_bias[0]
+            waypoint_tmp3[1] += self.relative_xy_bias[1]
+            waypoints.append(waypoint_tmp3)
+
+
+            waypoint_tmp4 = []
+            waypoint_tmp4.append(self.search_area_length/2*((i+1)/float(self.trip_number)))
+            waypoint_tmp4.append(-self.search_area_length/2*(i/float(self.trip_number)))
+            waypoint_tmp4[0] += self.relative_xy_bias[0]
+            waypoint_tmp4[1] += self.relative_xy_bias[1]
+            waypoints.append(waypoint_tmp4)
+
+        return waypoints
+
+    def targetPositionCallback(self, msg):
+        """set target position if receiving topic"""
+        self.target_pos_flag = True
+        self.target_pos = msg
+
+    def execute(self, userdata):
+        # retrieve cog position from tf
+        if self.target_pos_flag:
+            userdata.target_pos = self.target_pos
+            self.target_pos_flag= False
+            return 'found'
+
+        if self.mode == 'relative' and self.is_first_execution==True:
+            msg = rospy.wait_for_message('/uav/cog/odom', Odometry)
+            self.relative_xy_bias = [msg.pose.pose.position.x, msg.pose.pose.position.y]
+            print('relative bias: ', str(self.relative_xy_bias))
+            self.is_first_execution = False
+
+
+        rospy.logerr(self.waypoints)
+        search_pos = copy.copy(self.waypoints[self.waypoint_idx])
+        search_pos[0] = self.waypoints[self.waypoint_idx][0]
+        search_pos[1] = self.waypoints[self.waypoint_idx][1]
+        search_pos[0] += self.relative_xy_bias[0]
+        search_pos[1] += self.relative_xy_bias[1]
+        self.commander.move_to(search_pos[0], search_pos[1])
+        self.commander.change_height(self.search_height)
+
+        rospy.loginfo("Searching waypoint "+
+                str(self.waypoint_idx+1)+"/"+str(len(self.waypoints))
+                + ", navigating to "+str([search_pos[0],search_pos[1],self.search_height]))
+
+        rospy.sleep(1/self.control_rate)
+
+        target_pos_err = self.commander.target_pos_error()
+        if abs(target_pos_err[0]) < self.reach_margin and abs(target_pos_err[1]) < self.reach_margin and abs(target_pos_err[2]) < self.reach_margin:
+            self.waypoint_idx = self.waypoint_idx + 1
+            if len(self.waypoints) < self.waypoint_idx+1:
+                return 'not_found'
+        return 'still_searching'
 
 
 class FourCornerSearchState(smach.State):
