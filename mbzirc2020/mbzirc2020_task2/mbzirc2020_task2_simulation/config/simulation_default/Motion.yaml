@@ -1,3 +1,7 @@
+global_lookdown_pos_gps: [49.9, 8.90] #lati, long
+global_place_channel_center_pos_gps: [49.9000550316, 8.90000008246]
+global_place_channel_yaw: 0.0
+
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
 preshape_joint_angle: [0.78, 0.78]
@@ -15,8 +19,7 @@ object_yaw_thresh: 0.2
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
 object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
-#global_lookdown_pos_gps: [49.8999868314, 8.90000509811] #lati, long
-global_lookdown_pos_gps: [49.9, 8.90] #lati, long
+
 global_object_yaw: 3.141
 recognition_wait: 1.0
 
@@ -26,10 +29,8 @@ grasp_land_mode: true
 reset_realsense_odom: false
 joint_torque_thresh: 5 #[Nm]
 
-global_place_channel_center_pos_gps: [49.9000550316, 8.90000008246]
 place_channel_length: 4.0
 global_place_channel_z: 1.7 #[m]
-global_place_channel_yaw: 0.0
 place_z_margin: 0.6 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center
@@ -45,6 +46,3 @@ grid_size_adjust_grasp: 0.5
 
 grid_adjust_place: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]
 grid_size_adjust_place: 0.8
-
-
-#GPS origin [49.900000000, 8.900000000]
