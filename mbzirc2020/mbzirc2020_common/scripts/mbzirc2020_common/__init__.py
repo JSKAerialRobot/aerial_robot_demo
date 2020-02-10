@@ -1,1 +1,2 @@
-from .hydrus_interface import HydrusInterface, gps2xy
+from .hydrus_interface import *
+from .gps_utils import *
