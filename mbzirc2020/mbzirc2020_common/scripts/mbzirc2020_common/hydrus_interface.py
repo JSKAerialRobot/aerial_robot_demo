@@ -11,6 +11,7 @@ from aerial_robot_model.srv import AddExtraModule, AddExtraModuleRequest
 from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from spinal.msg import Gps
+from std_srvs.srv import SetBool, SetBoolRequest
 
 def mDegLat(lat):
     lat_rad = lat * np.pi / 180.0
@@ -61,6 +62,7 @@ class HydrusInterface:
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.ros_gps_sub_ = rospy.Subscriber('fix', NavSatFix, self.rosGpsCallback)
         self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
+        self.set_joint_torque_client_ = rospy.ServiceProxy('/hydrusx/joints/torque_enable', SetBool)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -139,6 +141,13 @@ class HydrusInterface:
             self.extra_joint_ctrl_pub_.publish(joint_msg)
             rospy.sleep(1.0 / self.joint_update_freq_)
 
+    def setJointTorque(self, state):
+        req = SetBoolRequest()
+        req.data = state
+        try:
+            self.set_joint_torque_client_(req)
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
 
     def setXYPosOffset(self, xy_pos_offset_):
         self.xy_pos_offset_ = xy_pos_offset_

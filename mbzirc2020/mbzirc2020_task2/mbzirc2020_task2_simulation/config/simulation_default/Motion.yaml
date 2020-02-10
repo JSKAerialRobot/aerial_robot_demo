@@ -23,25 +23,28 @@ recognition_wait: 1.0
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
 grasp_land_mode: true
-reset_realsense_odom: true
+reset_realsense_odom: false
 joint_torque_thresh: 5 #[Nm]
 
 global_place_channel_front_pos_gps: [49.9000360144, 8.90000012378]
 global_place_channel_back_pos_gps: [49.9000708464, 8.90000009041]
 global_place_channel_z: 1.7 #[m]
+global_place_channel_yaw: 0.0
 place_z_margin: 0.6 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center
 
+disable_alt_sensor: True
+alt_sensor_service_name: /estimator/sensor_plugin/alt1/estimate_flag
 
-grid_lookdown: [[0, 1], [1, 1], [1, 0], [1, -1], [2, -1], [2, 0], [2, 1], [3, 1], [3, 0], [3, -1], [4, -1], [4, 0], [4, 1]]
+grid_lookdown: [[0, 2], [0, 1], [0, 0], [0, -1], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2], [2, 2], [2, 1], [2, 0], [2, -1], [2, -2], [3, -2], [3, -1], [3, 0], [3, 1], [3, 2], [4, 2], [4, 1], [4, 0], [4, -1], [4, -2]]
 grid_size_lookdown: 0.7
 
 grid_adjust_grasp: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
-grid_size_adjust_grasp: 0.3
+grid_size_adjust_grasp: 0.5
 
-grid_adjust_place: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
-grid_size_adjust_place: 0.6
+grid_adjust_place: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]
+grid_size_adjust_place: 0.8
 
 
 #GPS origin [49.900000000, 8.900000000]

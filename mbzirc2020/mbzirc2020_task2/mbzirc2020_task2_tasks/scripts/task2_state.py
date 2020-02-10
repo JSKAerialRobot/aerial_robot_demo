@@ -78,6 +78,11 @@ class ApproachPickPosition(Task2State):
         self.global_lookdown_pos_gps = rospy.get_param('~global_lookdown_pos_gps')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
+        self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
+        self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
+
+        if self.disable_alt_sensor:
+            self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -87,6 +92,22 @@ class ApproachPickPosition(Task2State):
 
         target_object_pos = self.global_lookdown_pos_gps
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw
+
+        #enable alt sensor
+        if self.disable_alt_sensor:
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = True
+                res = self.alt_sensor_service_client(req)
+
+                if res is not None:
+                    rospy.logwarn("Enable alt sensor")
+                else:
+                    rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
@@ -162,7 +183,7 @@ class LookDown(Task2State):
 
             rospy.logwarn("%s: succeed to find valid object x: %f, y: %f, yaw: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1], object_global_yaw)
             self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
             userdata.search_count = 0
             userdata.search_failed = False
@@ -179,7 +200,7 @@ class LookDown(Task2State):
                 userdata.search_failed = False
 
                 #go to next state
-                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_approach_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_approach_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
                 return 'succeeded' 
             else:
@@ -262,7 +283,7 @@ class AdjustGraspPosition(Task2State):
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
             self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.05, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
 
             #reset search state
             userdata.search_count = 0
@@ -278,6 +299,7 @@ class AdjustGraspPosition(Task2State):
                 #reset search state
                 userdata.search_count = 0
                 userdata.search_failed = False
+                self.robot.preshape()
 
                 return 'succeeded' #go to next state
             else:
@@ -342,7 +364,7 @@ class Grasp(Task2State):
 
         else:
             #descend
-            self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         self.robot.grasp()
         rospy.sleep(1);
@@ -383,17 +405,22 @@ class ApproachPlacePosition(Task2State):
 
         self.simulation = rospy.get_param('/simulation')
         self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
+        self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
+        self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
 
         self.global_place_channel_front_pos_gps = rospy.get_param('~global_place_channel_front_pos_gps')
         self.global_place_channel_back_pos_gps = rospy.get_param('~global_place_channel_back_pos_gps')
+        self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
 
         global_place_channel_xy = gps2xy(self.global_place_channel_front_pos_gps, self.global_place_channel_back_pos_gps)
-        self.place_channel_yaw = np.arctan2(global_place_channel_xy[1], global_place_channel_xy[0]) + np.pi
         self.lat_unit = (self.global_place_channel_back_pos_gps[0] - self.global_place_channel_front_pos_gps[0]) / 5.0
         self.lon_unit = (self.global_place_channel_back_pos_gps[1] - self.global_place_channel_front_pos_gps[1]) / 5.0
+
+        if self.disable_alt_sensor:
+            self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -404,7 +431,7 @@ class ApproachPlacePosition(Task2State):
         #calc place coords in gps
         place_pos_lat = self.global_place_channel_front_pos_gps[0] + self.lat_unit * (userdata.object_count + 1)
         place_pos_lon = self.global_place_channel_front_pos_gps[1] + self.lon_unit * (userdata.object_count + 1)
-        uav_target_yaw = self.place_channel_yaw - self.grasping_yaw
+        uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw + np.pi
 
         if self.simulation:
             client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
@@ -417,16 +444,31 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
 
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-        userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.place_channel_yaw)
+        #enable alt sensor
+        if self.disable_alt_sensor:
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = False
+                res = self.alt_sensor_service_client(req)
+
+                if res is not None:
+                    rospy.logwarn("Disable alt sensor")
+                else:
+                    rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
         return 'succeeded'
 
 class AdjustPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot,
-                            outcomes=['succeeded', 'failed'],
+                            outcomes=['succeeded', 'failed', 'search_failed'],
                             input_keys=['orig_global_trans', 'search_count', 'search_failed'],
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
@@ -435,10 +477,6 @@ class AdjustPlacePosition(Task2State):
         self.channel_tf_frame_id = rospy.get_param('~channel_tf_frame_id')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.recognition_wait = rospy.get_param('~recognition_wait')
-
-        grasping_point = rospy.get_param('~grasping_point')
-        self.grasping_yaw = rospy.get_param('~grasping_yaw')
-        self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, self.grasping_yaw])
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -464,26 +502,20 @@ class AdjustPlacePosition(Task2State):
                 userdata.search_count = 0
                 userdata.search_failed = False
 
-                return 'succeeded' #go to next state
+                return 'search_failed' #go to next state
             else:
                 return 'failed'
 
-        my_object_global_yaw = self.grasping_yaw + self.robot.getBaselinkRPY()[2]
         channel_pos = tft.translation_from_matrix(channel_trans)
-        channel_center_coords = tft.compose_matrix(translate=channel_pos, angles=[0, 0, my_object_global_yaw])
         rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
 
-        uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
-        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-
-        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #reset search state
         userdata.search_count = 0
         userdata.search_failed = False
 
         return 'succeeded'
-
 
 class Ungrasp(Task2State):
     def __init__(self, robot, remove_object_model_func):
@@ -493,6 +525,7 @@ class Ungrasp(Task2State):
 
         self.remove_object_model_func = remove_object_model_func
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
+        self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
         self.place_z_margin = rospy.get_param('~place_z_margin')
         self.place_z_offset = rospy.get_param('~place_z_offset')
         self.object_num = rospy.get_param('~object_num')
@@ -509,16 +542,19 @@ class Ungrasp(Task2State):
         if self.skip_ungrasp:
             return 'succeeded'
 
-        if not self.do_channel_recognition:
-            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1]])
-            uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
-            uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-            rospy.logwarn(self.__class__.__name__ + ": Directly go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
-            self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        if self.do_channel_recognition:
+            channel_center_coords = tft.compose_matrix(translate=[self.robot.getTargetXY()[0], self.robot.getTargetXY()[1], 0], angles=[0, 0, self.global_place_channel_yaw + np.pi])
+        else:
+            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1] + np.pi])
 
+        uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
+        uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+
+        rospy.logwarn(self.__class__.__name__ + ": Go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
+        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #descend
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         self.robot.ungrasp()
         self.remove_object_model_func(self.robot)
@@ -548,7 +584,7 @@ class SearchMotion(Task2State):
         uav_target_coords = tft.concatenate_matrices(userdata.orig_global_trans, grasp_yaw_rotation_mat, target_pos_from_orig_pos_local_frame)
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
 
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
 
         userdata.search_count += 1
         if userdata.search_count == len(self.grid):
@@ -556,8 +592,8 @@ class SearchMotion(Task2State):
             userdata.search_failed = True
 
             orig_pos = tft.translation_from_matrix(userdata.orig_global_trans)
-            rospy.logwarn(self.__class__.__name__ + "return to original pos")
-            self.robot.goPosWaitConvergence('global', [orig_pos[0], orig_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
+            rospy.logwarn(self.__class__.__name__ + ": return to original pos")
+            self.robot.goPosWaitConvergence('global', [orig_pos[0], orig_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=7)
 
         return 'succeeded'
 
