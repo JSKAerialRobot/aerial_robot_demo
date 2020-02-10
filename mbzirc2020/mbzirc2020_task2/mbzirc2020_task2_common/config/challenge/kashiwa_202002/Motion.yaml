@@ -11,7 +11,6 @@ object_translation: [0.1, 0.5, 0.0] #in link2 frame
 object_yaw: -0.785
 object_mass: 1.0
 
-object_num: 1
 object_lookdown_height: 3.0
 object_approach_height: 1.2
 object_grasping_height: 0.2
