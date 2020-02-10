@@ -1,7 +1,10 @@
 <launch>
+  <arg name="world" default="kashiwa_202002"/>
   <arg name="do_object_recognition" default="true"/>
   <arg name="do_channel_recognition" default="true"/>
-  <arg name="world" default="kashiwa_202002"/>
+  <arg name="single_object_mode" default="true"/>
+  <arg name="target_object_number" default="0"/>
+  <arg name="object_num" default="3"/>
   <arg name="debug_look_down" default="false"/>
   <arg name="debug_adjust_grasp" default="false"/>
   <arg name="debug_grasp" default="false"/>
@@ -24,6 +27,9 @@
     <arg name="debug_adjust_grasp" value="$(arg debug_adjust_grasp)"/>
     <arg name="debug_grasp" value="$(arg debug_grasp)"/>
     <arg name="debug_adjust_place" value="$(arg debug_adjust_place)"/>
+    <arg name="single_object_mode" default="$(arg single_object_mode)"/>
+    <arg name="target_object_number" default="$(arg target_object_number)"/>
+    <arg name="object_num" default="$(arg object_num)"/>
   </include>
 
   ### recognition

@@ -6,6 +6,9 @@
   <arg name="debug_adjust_grasp" default="false"/>
   <arg name="debug_grasp" default="false"/>
   <arg name="debug_adjust_place" default="false"/>
+  <arg name="single_object_mode" default="true"/>
+  <arg name="target_object_number" default="0"/>
+  <arg name="object_num" default="3"/>
 
   <group ns="task2_motion">
     <group if="$(arg debug_look_down)">
@@ -67,6 +70,10 @@
     <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
     <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
     <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
+    <param name="single_object_mode" value="$(arg single_object_mode)"/>
+    <param name="target_object_number" value="$(arg target_object_number)"/>
+    <param name="object_num" value="$(arg object_num)" unless="$(arg single_object_mode)"/>
+    <param name="object_num" value="1" if="$(arg single_object_mode)"/>
   </node>
 
   <node pkg="jsk_rviz_plugins" type="rosconsole_overlay_text.py" respawn="true" name="rosconsole_overlay_text">

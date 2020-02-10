@@ -39,18 +39,9 @@ class Start(Task2State):
 
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.skip_takeoff = rospy.get_param('~skip_takeoff', False)
-        self.do_object_recognition = rospy.get_param('~do_object_recognition')
-        self.do_channel_recognition = rospy.get_param('~do_channel_recognition')
-
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
-
-        if not self.do_object_recognition:
-            rospy.logerr('WARNING!! NO OBJECT RECOGNITION')
-        if not self.do_channel_recognition:
-            rospy.logerr('WARNING!! NO CHANNEL RECOGNITION')
-
 
         self.robot.setXYPosOffset(self.robot.getBaselinkPos()[0:2])
 
@@ -284,7 +275,7 @@ class AdjustGraspPosition(Task2State):
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
             self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.05, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
 
             #reset search state
             userdata.search_count = 0
@@ -531,6 +522,7 @@ class Ungrasp(Task2State):
         self.object_num = rospy.get_param('~object_num')
         self.skip_ungrasp = rospy.get_param('~skip_ungrasp', False)
         self.do_channel_recognition = rospy.get_param('~do_channel_recognition')
+        self.single_object_mode = rospy.get_param('~single_object_mode')
 
         grasping_point = rospy.get_param('~grasping_point')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -562,7 +554,7 @@ class Ungrasp(Task2State):
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.3)
         self.robot.resetPose()
 
-        if userdata.object_count == self.object_num:
+        if (userdata.object_count == self.object_num) or self.single_object_mode:
             rospy.logwarn(self.__class__.__name__ + ": finish task")
             return 'finish'
         else:

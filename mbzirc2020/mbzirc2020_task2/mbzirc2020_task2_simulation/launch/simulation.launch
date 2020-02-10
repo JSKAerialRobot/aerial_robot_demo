@@ -1,5 +1,10 @@
 <launch>
   <arg name="world" default="simulation_default"/>
+  <arg name="do_object_recognition" default="true"/>
+  <arg name="do_channel_recognition" default="true"/>
+  <arg name="single_object_mode" default="true"/>
+  <arg name="target_object_number" default="0"/>
+  <arg name="object_num" default="3"/>
   <arg name="debug_look_down" default="false"/>
   <arg name="debug_adjust_grasp" default="false"/>
   <arg name="debug_grasp" default="false"/>
@@ -14,16 +19,18 @@
     <arg name="rviz_config_path" value="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
   </include>
 
-
   ### motion
   <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
     <arg name="config_dir" value="$(find mbzirc2020_task2_simulation)/config/$(arg world)"/>
-    <arg name="do_object_recognition" value="true"/>
-    <arg name="do_channel_recognition" value="true"/>
+    <arg name="do_object_recognition" value="$(arg do_object_recognition)"/>
+    <arg name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
     <arg name="debug_look_down" value="$(arg debug_look_down)"/>
     <arg name="debug_adjust_grasp" value="$(arg debug_adjust_grasp)"/>
     <arg name="debug_grasp" value="$(arg debug_grasp)"/>
     <arg name="debug_adjust_place" value="$(arg debug_adjust_place)"/>
+    <arg name="single_object_mode" default="$(arg single_object_mode)"/>
+    <arg name="target_object_number" default="$(arg target_object_number)"/>
+    <arg name="object_num" default="$(arg object_num)"/>
   </include>
 
   ### recognition
