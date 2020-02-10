@@ -1,3 +1,7 @@
+global_lookdown_pos_gps: [35.8951106, 139.9447659]
+global_place_channel_front_pos_gps: [35.8951485, 139.9447949]
+global_place_channel_back_pos_gps: [35.8951994, 139.9447815]
+
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
 preshape_joint_angle: [0.7, 0.7]
@@ -15,10 +19,7 @@ object_yaw_thresh: 0.3
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
 object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
-#global_lookdown_pos_gps: [35.89514880, 139.9447680] #lati, long
-#global_lookdown_pos_gps: [35.895179, 139.9448078] #lati, long
-#global_lookdown_pos_gps: [35.8951644, 139.9447988] #lati, long
-global_lookdown_pos_gps: [35.8951106, 139.9447659]
+
 global_object_yaw: 0.0
 recognition_wait: 1.0
 
@@ -28,8 +29,6 @@ grasp_land_mode: true
 reset_realsense_odom: true
 joint_torque_thresh: 5 #[Nm]
 
-global_place_channel_front_pos_gps: [35.8951485, 139.9447949]
-global_place_channel_back_pos_gps: [35.8951994, 139.9447815]
 global_place_channel_z: 2.0 #[m]
 global_place_channel_yaw: 0.0
 place_z_margin: 0.8 #[m]
