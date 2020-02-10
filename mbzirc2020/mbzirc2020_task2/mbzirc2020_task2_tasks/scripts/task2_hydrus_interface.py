@@ -52,11 +52,11 @@ class Task2HydrusInterface(HydrusInterface):
         return trans
 
     def joyCallback(self, msg):
-        if (msg.buttons[4] == 1) and (self.prev_joy_state.buttons[4] == 0): #servo on
+        if (msg.buttons[4] == 1) and (self.prev_joy_state.buttons[4] == 0): #L1 servo on
             self.setJointTorque(True)
             rospy.loginfo('Servo on')
 
-        if (msg.buttons[5] == 1) and (self.prev_joy_state.buttons[5] == 0): #servo off
+        if (msg.buttons[5] == 1) and (self.prev_joy_state.buttons[5] == 0): #R1 servo off
             self.setJointTorque(False)
             rospy.loginfo('Servo off')
 
