@@ -1,6 +1,6 @@
 global_lookdown_pos_gps: [35.8951106, 139.9447659]
-global_place_channel_front_pos_gps: [35.8951485, 139.9447949]
-global_place_channel_back_pos_gps: [35.8951994, 139.9447815]
+global_place_channel_center_pos_gps: [35.8951485, 139.9447949]
+global_place_channel_yaw: 0.0
 
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
