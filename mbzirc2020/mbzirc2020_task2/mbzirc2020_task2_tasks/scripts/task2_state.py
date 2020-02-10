@@ -100,7 +100,7 @@ class ApproachPickPosition(Task2State):
                 req.data = True
                 res = self.alt_sensor_service_client(req)
 
-                if res.success:
+                if res is not None:
                     rospy.logwarn("Enable alt sensor")
                 else:
                     rospy.logerr("Failed to disable alt sensor")
@@ -451,7 +451,7 @@ class ApproachPlacePosition(Task2State):
                 req.data = False
                 res = self.alt_sensor_service_client(req)
 
-                if res.success:
+                if res is not None:
                     rospy.logwarn("Disable alt sensor")
                 else:
                     rospy.logerr("Failed to disable alt sensor")
