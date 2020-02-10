@@ -14,6 +14,7 @@ from gazebo_msgs.srv import ApplyBodyWrench, ApplyBodyWrenchRequest
 import copy
 import std_srvs.srv
 import subprocess
+from mbzirc2020_common.gps_utils import *
 
 class Task2State(smach.State):
     def __init__(self, robot, outcomes=[], input_keys=[], output_keys=[], io_keys=[]):
@@ -410,14 +411,14 @@ class ApproachPlacePosition(Task2State):
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
-
-        self.global_place_channel_front_pos_gps = rospy.get_param('~global_place_channel_front_pos_gps')
-        self.global_place_channel_back_pos_gps = rospy.get_param('~global_place_channel_back_pos_gps')
+        self.global_place_channel_center_pos_gps = rospy.get_param('~global_place_channel_center_pos_gps')
+        self.place_channel_length = rospy.get_param('~place_channel_length')
         self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
 
-        global_place_channel_xy = gps2xy(self.global_place_channel_front_pos_gps, self.global_place_channel_back_pos_gps)
-        self.lat_unit = (self.global_place_channel_back_pos_gps[0] - self.global_place_channel_front_pos_gps[0]) / 5.0
-        self.lon_unit = (self.global_place_channel_back_pos_gps[1] - self.global_place_channel_front_pos_gps[1]) / 5.0
+        self.waypoint_list = []
+        self.waypoint_list.append(self.global_place_channel_center_pos_gps)
+        self.waypoint_list.append(getGpsLocation(self.global_place_channel_center_pos_gps, np.cos(self.global_place_channel_yaw), np.sin(self.global_place_channel_yaw)))
+        self.waypoint_list.append(getGpsLocation(self.global_place_channel_center_pos_gps, -np.cos(self.global_place_channel_yaw), -np.sin(self.global_place_channel_yaw)))
 
         if self.disable_alt_sensor:
             self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
@@ -429,9 +430,8 @@ class ApproachPlacePosition(Task2State):
             return 'succeeded'
 
         #calc place coords in gps
-        place_pos_lat = self.global_place_channel_front_pos_gps[0] + self.lat_unit * (userdata.object_count + 1)
-        place_pos_lon = self.global_place_channel_front_pos_gps[1] + self.lon_unit * (userdata.object_count + 1)
-        uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw + np.pi
+        place_pos_gps = self.waypoint_list[userdata.object_count]
+        uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw
 
         if self.simulation:
             client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
@@ -460,7 +460,7 @@ class ApproachPlacePosition(Task2State):
                 rospy.logerr("Service call failed: %s", e)
 
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', place_pos_gps, self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
         return 'succeeded'
@@ -509,7 +509,7 @@ class AdjustPlacePosition(Task2State):
         channel_pos = tft.translation_from_matrix(channel_trans)
         rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
 
-        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 15)
 
         #reset search state
         userdata.search_count = 0
@@ -543,9 +543,9 @@ class Ungrasp(Task2State):
             return 'succeeded'
 
         if self.do_channel_recognition:
-            channel_center_coords = tft.compose_matrix(translate=[self.robot.getTargetXY()[0], self.robot.getTargetXY()[1], 0], angles=[0, 0, self.global_place_channel_yaw + np.pi])
+            channel_center_coords = tft.compose_matrix(translate=[self.robot.getTargetXY()[0], self.robot.getTargetXY()[1], 0], angles=[0, 0, self.global_place_channel_yaw])
         else:
-            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1] + np.pi])
+            channel_center_coords = tft.compose_matrix(translate=[userdata.orig_channel_xy_yaw[0][0], userdata.orig_channel_xy_yaw[0][1], 0], angles=[0, 0, userdata.orig_channel_xy_yaw[1]])
 
         uav_target_coords = tft.concatenate_matrices(channel_center_coords, tft.inverse_matrix(self.grasping_point_coords))
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
@@ -554,12 +554,12 @@ class Ungrasp(Task2State):
         self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #descend
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
 
         self.robot.ungrasp()
         self.remove_object_model_func(self.robot)
         userdata.object_count += 1
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.3)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.3)
         self.robot.resetPose()
 
         if userdata.object_count == self.object_num:
