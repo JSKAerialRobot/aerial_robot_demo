@@ -2,7 +2,7 @@
 
 import rospy
 from spinal.msg import Gps
-from sensor_msgs.msg import Image, Range
+from sensor_msgs.msg import Image, Range, Joy
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32
 
@@ -28,6 +28,9 @@ class VitalChecker:
         self.leddar_sub_ = rospy.Subscriber('/distance', Range, self.leddarCallback)
         self.leddar_timestamp_ = None
 
+        self.joy_sub_ = rospy.Subscriber('/joy', Joy, self.joyCallback)
+        self.joy_timestamp_ = None
+
     def gpsCallback(self, msg):
         self.gps_timestamp_ = rospy.Time.now()
 
@@ -42,6 +45,9 @@ class VitalChecker:
 
     def leddarCallback(self, msg):
         self.leddar_timestamp_ = rospy.Time.now()
+
+    def joyCallback(self, msg):
+        self.joy_timestamp_ = rospy.Time.now()
 
     def checkDevice(self, name, timestamp):
         now = rospy.Time.now()
@@ -58,6 +64,7 @@ class VitalChecker:
         self.checkDevice("IMAGE", self.img_timestamp_)
         self.checkDevice("ODOM", self.odom_timestamp_)
         self.checkDevice("LEDDAR", self.leddar_timestamp_)
+        self.checkDevice("JOY", self.joy_timestamp_)
 
         print("BATT: " + str(self.batt_vol_))
         print("")
