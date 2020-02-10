@@ -283,7 +283,7 @@ class AdjustGraspPosition(Task2State):
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
             self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.05, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
 
             #reset search state
             userdata.search_count = 0
@@ -459,8 +459,8 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [place_pos_lat, place_pos_lon], self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
         return 'succeeded'
@@ -509,7 +509,7 @@ class AdjustPlacePosition(Task2State):
         channel_pos = tft.translation_from_matrix(channel_trans)
         rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
 
-        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #reset search state
         userdata.search_count = 0
@@ -551,10 +551,10 @@ class Ungrasp(Task2State):
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
 
         rospy.logwarn(self.__class__.__name__ + ": Go to x: %f, y: %f, yaw: %f", uav_target_pos[0], uav_target_pos[1], self.robot.getTargetYaw())
-        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #descend
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         self.robot.ungrasp()
         self.remove_object_model_func(self.robot)
@@ -584,7 +584,7 @@ class SearchMotion(Task2State):
         uav_target_coords = tft.concatenate_matrices(userdata.orig_global_trans, grasp_yaw_rotation_mat, target_pos_from_orig_pos_local_frame)
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
 
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
 
         userdata.search_count += 1
         if userdata.search_count == len(self.grid):
@@ -593,7 +593,7 @@ class SearchMotion(Task2State):
 
             orig_pos = tft.translation_from_matrix(userdata.orig_global_trans)
             rospy.logwarn(self.__class__.__name__ + ": return to original pos")
-            self.robot.goPosWaitConvergence('global', [orig_pos[0], orig_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
+            self.robot.goPosWaitConvergence('global', [orig_pos[0], orig_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=7)
 
         return 'succeeded'
 
