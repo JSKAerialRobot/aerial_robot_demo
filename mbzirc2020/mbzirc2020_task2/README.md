@@ -3,6 +3,11 @@
 
 ![task3](../images/task2.png)
 
+## Manual Installation
+```
+$ sudo pip install pyperclip
+```
+
 ## Bringup
 
 ### real machine
