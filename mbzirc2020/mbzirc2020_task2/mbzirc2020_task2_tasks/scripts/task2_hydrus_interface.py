@@ -1,6 +1,6 @@
 from mbzirc2020_common.hydrus_interface import HydrusInterface
 import rospy
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, Joy
 import tf2_ros
 
 class Task2HydrusInterface(HydrusInterface):
@@ -12,6 +12,8 @@ class Task2HydrusInterface(HydrusInterface):
         self.reset_joint_angle = rospy.get_param('~reset_joint_angle')
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
+        self.joy_sub = rospy.Subscriber('/joy', Joy, self.joyCallback)
+        self.prev_joy_state = Joy()
 
     def grasp(self, time = 3000):
         joint_state = JointState()
@@ -48,3 +50,14 @@ class Task2HydrusInterface(HydrusInterface):
         trans.transform.translation.x -= self.xy_pos_offset_[0]
         trans.transform.translation.y -= self.xy_pos_offset_[1]
         return trans
+
+    def joyCallback(self, msg):
+        if (msg.buttons[4] == 1) and (self.prev_joy_state.buttons[4] == 0): #servo on
+            self.setJointTorque(True)
+            rospy.loginfo('Servo on')
+
+        if (msg.buttons[5] == 1) and (self.prev_joy_state.buttons[5] == 0): #servo off
+            self.setJointTorque(False)
+            rospy.loginfo('Servo off')
+
+        self.prev_joy_state = msg
