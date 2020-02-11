@@ -1,10 +1,14 @@
-global_lookdown_pos_gps: [35.8951106, 139.9447659]
-global_place_channel_center_pos_gps: [35.8951485, 139.9447949]
-global_place_channel_yaw: 0.0
+global_lookdown_pos_gps: [35.895109, 139.9447659]
+global_place_channel_center_pos_gps: [35.8951683, 139.9447855]
+global_place_channel_yaw: 0.0458308458328
+
+#global_lookdown_pos_gps: [35.8951246, 139.9447672]
+#global_place_channel_center_pos_gps: [35.895185, 139.9447696]
+#global_place_channel_yaw: 0.07720796763896942
 
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
-preshape_joint_angle: [0.7, 0.7]
+preshape_joint_angle: [0.75, 0.75]
 reset_joint_angle: [1.5, 1.5]
 
 object_translation: [0.1, 0.5, 0.0] #in link2 frame
@@ -37,11 +41,14 @@ channel_tf_frame_id: channel_center
 disable_alt_sensor: True
 alt_sensor_service_name: /estimator/sensor_plugin/alt1/estimate_flag
 
-grid_lookdown: [[0, 2], [0, 1], [0, 0], [0, -1], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2], [2, 2], [2, 1], [2, 0], [2, -1], [2, -2], [3, -2], [3, -1], [3, 0], [3, 1], [3, 2], [4, 2], [4, 1], [4, 0], [4, -1], [4, -2]]
-grid_size_lookdown: 0.7
+grid_lookdown: [[0, 1], [0, 0], [0, -1], [1, -1], [1, 0], [1, 1], [2, 1], [2, 0], [2, -1], [3, -1], [3, 0], [3, 1], [4, 1], [4, 0], [4, -1]]
+grid_size_lookdown: 1.0
 
-grid_adjust_grasp: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
-grid_size_adjust_grasp: 0.7
+#grid_adjust_grasp: [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [1, 2], [0, 2], [-1, 2], [-2, 2], [-2, 1], [-2, 0], [-2, -1], [-2, -2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2]]
+
+grid_adjust_grasp: [[0, 2], [0, 1], [0, 0], [0, -1], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2], [2, 2], [2, 1], [2, 0], [2, -1], [2, -2], [3, -2], [3, -1], [3, 0], [3, 1], [3, 2], [4, 2], [4, 1], [4, 0], [4, -1], [4, -2]]
+
+grid_size_adjust_grasp: 0.4
 
 grid_adjust_place: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]
 grid_size_adjust_place: 0.8
