@@ -220,7 +220,8 @@ class AdjustGraspPosition(Task2State):
         self.object_pose = PoseArray()
 
     def objectPoseCallback(self, msg):
-        self.object_pose = msg
+        if len(msg.poses) != 0:
+            self.object_pose = msg
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -275,7 +276,7 @@ class AdjustGraspPosition(Task2State):
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
             self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.05, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
 
             #reset search state
             userdata.search_count = 0
