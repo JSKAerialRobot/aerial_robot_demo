@@ -49,6 +49,7 @@ private:
   ros::Publisher task_track_flag_pub_;
 
   void sendControlCmd(Eigen::Vector3d target_pos);
+  void sendControlCmdDirectly(Eigen::Vector3d target_pos);
   bool isTargetPosInSearchRegion();
 
   void controlTimerCallback(const ros::TimerEvent& event);
