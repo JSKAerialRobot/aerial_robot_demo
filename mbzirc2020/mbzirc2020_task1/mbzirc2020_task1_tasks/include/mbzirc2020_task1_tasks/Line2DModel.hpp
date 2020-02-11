@@ -8,21 +8,22 @@
 
 #include <mbzirc2020_task1_tasks/AbstractModel.hpp>
 
-typedef std::array<GRANSAC::VPFloat, 2> Vector2VP;
+typedef std::array<GRANSAC::VPFloat, 3> Vector2VP;
 
 class Point2D
 	: public GRANSAC::AbstractParameter
 {
 public:
-	Point2D(GRANSAC::VPFloat x, GRANSAC::VPFloat y)
+	Point2D(GRANSAC::VPFloat x, GRANSAC::VPFloat y, GRANSAC::VPFloat z)
 	{
 		m_Point2D[0] = x;
 		m_Point2D[1] = y;
+		m_Point2D[2] = z;
 	};
 
   Point2D()
   {
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
       m_Point2D[i] = 0;
   }
 
@@ -31,7 +32,7 @@ public:
   Point2D operator-(Point2D const &pt1)
   {
     Point2D pt;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
       pt.m_Point2D[i] = m_Point2D[i] - pt1.m_Point2D[i];
     return pt;
   }
@@ -39,7 +40,7 @@ public:
   Point2D operator+(Point2D const &pt1)
   {
     Point2D pt;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
       pt.m_Point2D[i] = m_Point2D[i] + pt1.m_Point2D[i];
     return pt;
   }
@@ -47,7 +48,7 @@ public:
   Point2D operator*(GRANSAC::VPFloat const &factor)
   {
     Point2D pt;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
       pt.m_Point2D[i] = m_Point2D[i] * factor;
     return pt;
   }
@@ -153,7 +154,7 @@ public:
                 // abx - aay + ac2 = 0
                 GRANSAC::VPFloat y = (-m_b * m_c + m_a * c2) / (m_a * m_a + m_b * m_b);
 
-                std::shared_ptr<Point2D> pt(new Point2D(x, y));
+                std::shared_ptr<Point2D> pt(new Point2D(x, y, ExtPoint2D->m_Point2D[2]));
 
 		return std::dynamic_pointer_cast<GRANSAC::AbstractParameter>(pt);
 	};

@@ -32,6 +32,19 @@ class StopEstimation(smach.State):
         self.task_commander.stop_estimation()
         return 'success'
 
+class PrepareTaskState(smach.State):
+    def __init__(self, wait_time=20):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.task_commander = TaskCommander()
+        self.hydrus_commander = HydrusCommander()
+
+    def execute(self, userdata):
+        ## 1. estimation stops
+        ## 2. joints open to initial state
+        self.task_commander.stop_estimation()
+        self.hydrus_commander.open_joints()
+        return 'success'
+
 class TakeoffState(smach.State):
     def __init__(self, wait_time=20):
         smach.State.__init__(self, outcomes=['success', 'fail'])

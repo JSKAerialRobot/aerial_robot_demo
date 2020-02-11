@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <aerial_robot_msgs/FlightNav.h>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/JointState.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Empty.h>
 
@@ -43,15 +44,18 @@ private:
   ros::Subscriber cog_odom_sub_;
   ros::Subscriber motion_state_sub_;
   ros::Publisher flight_nav_pub_;
+  ros::Publisher joints_ctrl_pub_;
   ros::Publisher nearest_waypoint_pub_;
   ros::Publisher uav_cog_point_pub_;
   ros::Publisher task_return_initial_waypt_pub_;
   ros::Publisher task_track_flag_pub_;
 
   void sendControlCmd(Eigen::Vector3d target_pos);
+  void sendControlCmdDirectly(Eigen::Vector3d target_pos);
   bool isTargetPosInSearchRegion();
 
   void controlTimerCallback(const ros::TimerEvent& event);
   void cogOdomCallback(const nav_msgs::OdometryConstPtr & msg);
   void reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & msg);
+  void closeJoints();
 };
