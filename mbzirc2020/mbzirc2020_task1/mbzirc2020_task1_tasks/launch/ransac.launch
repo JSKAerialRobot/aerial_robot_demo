@@ -14,7 +14,8 @@
     <param name="ransac_3d_mode" value="False"/>
     <param name="target_point_maximum_disappear_time" value="1.0"/>
     <param name="losing_tracking_period_threshold" value="4.0"/>
-    <param name="target_close_distance_threshold" value="1.0"/>
+    <param name="target_close_distance_threshold" value="2.5"/>
+    <param name="target_velocity" value="5.0"/>
     <param name="target_end_procedure_distance_threshold" value="8.0"/>
     <param name="yaw_diff_threshold" value="1.5"/>
     <param name="experiment_safety_z_offset" value="-0.45"/>

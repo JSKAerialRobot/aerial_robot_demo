@@ -22,6 +22,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   motion_state_sub_ = nh_.subscribe<std_msgs::Int8>("/reactive_motion/state", 1, &ReactiveMotion::reactiveMotionStateCallback, this, ros::TransportHints().tcpNoDelay());
 
   flight_nav_pub_ = nh_.advertise<aerial_robot_msgs::FlightNav>("/uav/nav", 1);
+  joints_ctrl_pub_ = nh_.advertise<sensor_msgs::JointState>("/hydrusx/joints_ctrl", 1);
   // nearest_waypoint_pub_ = nh_.advertise<visualization_msgs::Marker>("/reactive_motion/target", 1);
   nearest_waypoint_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/target", 1);
   uav_cog_point_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/cog_point", 1);
@@ -80,8 +81,11 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
     if (ransac_line_estimator_->isNearTarget(cur_pos_)){ // target is too near
       motion_state_ = STOP_TRACKING;
       stop_tracking_cnt_ = 0;
-      ROS_INFO("[ReactiveMotion] Target is very near, track previous waypoint in open-loop way");
       sendControlCmd(target_pos_);
+      double hit_time = ransac_line_estimator_->estimateTargetArrivalTime(cur_pos_);
+      ROS_INFO("[ReactiveMotion] Target will hit %f sec later, track previous waypoint in open-loop way", hit_time);
+      sleep(hit_time);
+      closeJoints();
       return;
     }
     if (ransac_line_estimator_->getNearestWaypoint(cur_pos_, target_pos_)){
@@ -100,7 +104,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
   else if (motion_state_ == STOP_TRACKING){
     sendControlCmd(target_pos_);
     ++stop_tracking_cnt_;
-    double stop_tracking_period = 3.0;
+    double stop_tracking_period = 5.0;
     if (stop_tracking_cnt_ >= stop_tracking_period * control_freq_){
       motion_state_ = STILL;
       sendControlCmd(cur_pos_);
@@ -206,4 +210,13 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
     motion_state_ = STOP_TRACKING;
     ROS_INFO("[ReactiveMotion] Change motion state: STOP_TRACKING");
   }
+}
+
+void ReactiveMotion::closeJoints(){
+  sensor_msgs::JointState joint_msg;
+  joint_msg.name.push_back("joint1");
+  joint_msg.name.push_back("joint3");
+  joint_msg.position.push_back(1.56);
+  joint_msg.position.push_back(1.56);
+  joints_ctrl_pub_.publish(joint_msg);
 }
