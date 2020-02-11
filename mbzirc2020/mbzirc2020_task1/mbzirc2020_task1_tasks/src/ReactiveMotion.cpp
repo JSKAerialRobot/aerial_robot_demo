@@ -126,11 +126,22 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nearest_waypoint_pub_.publish(target_pt_msg);
 
   Eigen::Vector3d delta_pos = target_pos - cur_pos_;
-  for (int i = 0; i < 3; ++i){
-    if (delta_pos[i] > motion_cmd_thre_vec_[i])
-      delta_pos[i] = motion_cmd_thre_vec_[i];
-    else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
-      delta_pos[i] = -motion_cmd_thre_vec_[i];
+  if (ransac_line_estimator_->isEndProcedureMode()){
+    double speedup_factor = 2.0;
+    for (int i = 0; i < 3; ++i){
+      if (delta_pos[i] > motion_cmd_thre_vec_[i] * speedup_factor)
+        delta_pos[i] = motion_cmd_thre_vec_[i] * speedup_factor;
+      else if (delta_pos[i] < -motion_cmd_thre_vec_[i] * speedup_factor)
+        delta_pos[i] = -motion_cmd_thre_vec_[i] * speedup_factor;
+    }
+  }
+  else{
+    for (int i = 0; i < 3; ++i){
+      if (delta_pos[i] > motion_cmd_thre_vec_[i])
+        delta_pos[i] = motion_cmd_thre_vec_[i];
+      else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
+        delta_pos[i] = -motion_cmd_thre_vec_[i];
+    }
   }
   aerial_robot_msgs::FlightNav nav_msg;
   nav_msg.header.stamp = ros::Time::now();
