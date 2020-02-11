@@ -22,6 +22,8 @@ class HydrusCommander():
         self.nav_control_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
         self.takeoff_pub = rospy.Publisher("/teleop_command/takeoff", Empty,  queue_size=1)
         self.land_pub = rospy.Publisher("/teleop_command/land", Empty,  queue_size=1)
+        self.halt_pub = rospy.Publisher('/teleop_command/halt', Empty, queue_size=1)
+
         self.extra_servos_ctrl_pub = rospy.Publisher("/hydrusx/extra_servos_ctrl", JointState, queue_size=1)
         self.joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
 
@@ -43,6 +45,11 @@ class HydrusCommander():
     def land(self):
         time.sleep(self.WAIT_TIME)
         self.land_pub.publish(Empty())
+        time.sleep(self.WAIT_TIME)
+
+    def halt(self):
+        time.sleep(self.WAIT_TIME)
+        self.halt_pub.publish(Empty())
         time.sleep(self.WAIT_TIME)
 
     def move_to(self, pos_x, pos_y, override_nav_mode=None):
@@ -116,17 +123,20 @@ class HydrusCommander():
     def covering_motion(self,pos_x, pos_y, cog_yaw, covering_pre_height, covering_post_height, covering_move_dist):
         dest_yaw = cog_yaw + 0.785 # correct forward angle of open form
         forward_dir = [-covering_move_dist*math.sin(dest_yaw), covering_move_dist*math.cos(dest_yaw)]
+        self.change_height(covering_pre_height)
         self.move_to(pos_x-forward_dir[0], pos_y-forward_dir[1], override_nav_mode=2)
         time.sleep(5)
         self.open_joints()
-        time.sleep(1)
-        self.change_height(covering_pre_height)
-        time.sleep(1)
+#        time.sleep(1)
+#        self.change_height(covering_pre_height)
+#        time.sleep(1)
 
         # back = 1.2
         # self.move_to(pos_x-back*forward_dir[0], pos_y-back*forward_dir[1], override_nav_mode=2)
         # self.change_height(covering_post_height)
         self.land()
+        time.sleep(10)
+        self.halt()
 
 if __name__ == "__main__":
     rospy.init_node('hydrus_test')
