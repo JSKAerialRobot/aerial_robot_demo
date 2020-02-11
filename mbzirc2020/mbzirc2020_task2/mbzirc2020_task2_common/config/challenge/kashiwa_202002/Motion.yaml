@@ -28,8 +28,8 @@ grasp_land_mode: true
 reset_realsense_odom: true
 joint_torque_thresh: 5 #[Nm]
 
+place_channel_length: 4.0
 global_place_channel_z: 2.0 #[m]
-global_place_channel_yaw: 0.0
 place_z_margin: 0.8 #[m]
 place_z_offset: 1.3 #[m]
 channel_tf_frame_id: channel_center
