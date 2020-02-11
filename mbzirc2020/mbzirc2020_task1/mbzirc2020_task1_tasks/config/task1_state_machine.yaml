@@ -6,3 +6,6 @@ close_pose: [1.56, 1.56]
 
 initial_waypoints: [[[3.0], [4.0]]] ## kashiwa hype playground
 task1_waiting_waypoint: [[[35.8950784, 139.9446144, 5]]] ## kashiwa hype playground
+
+initial_yaw_flag: False
+initial_yaw: 1.57
