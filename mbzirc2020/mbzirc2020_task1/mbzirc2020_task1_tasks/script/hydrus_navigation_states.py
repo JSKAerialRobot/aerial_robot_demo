@@ -13,11 +13,13 @@ from hydrus_commander import HydrusCommander
 from task_commander import TaskCommander
 
 class PrepareEstimation(smach.State):
-    def __init__(self, wait_time=20):
+    def __init__(self, wait_time=0.5):
         smach.State.__init__(self, outcomes=['success', 'fail'])
         self.task_commander = TaskCommander()
+        self.wait_time = wait_time
 
     def execute(self, userdata):
+        rospy.sleep(self.wait_time)
         self.task_commander.prepare_estimation()
         return 'success'
 
@@ -139,6 +141,7 @@ class GpsWaypointNavigationStateMachineCreator():
                     next_state = 'success'
                 else:
                     next_state = 'waypoint'+str(i+1)
+                rospy.sleep(0.1)
                 smach.StateMachine.add('waypoint'+str(i), GoGpsPositionState(waypoint, approach_margin, control_rate, nav_mode),
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
