@@ -17,12 +17,12 @@ opening_hls_color_filter:
   iterations: 2
 
 rectangle_detection_color:
-  debug_view: true
+  debug_view: false
   frame_id: target_object_color
   target_object_area: 0.08 #0.2 * 0.6
   target_object_area_margin: 0.02
   object_height: 0.2
-  lowest_margin: 10
+  lowest_margin: 5
 
 depth_distance_filter:
   min_depth: 0.3
@@ -35,9 +35,9 @@ opening_depth_distance_filter:
   iterations: 4
 
 rectangle_detection_depth:
-  debug_view: true
+  debug_view: false
   frame_id: target_object_depth
   target_object_area: 0.06 #0.2 * 0.6
   target_object_area_margin: 0.02
   object_height: 0.2
-  lowest_margin: 20
+  lowest_margin: 5
