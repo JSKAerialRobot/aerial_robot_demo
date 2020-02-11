@@ -2,7 +2,7 @@ depth_distance_filter_channel:
   min_depth: 0.2
   use_distance_from_ground: true
   use_otsu_binarization: false
-  distance_from_ground: 1.0
+  distance_from_ground: 1.2
 
 closing_hls_color_filter_channel:
   size: 2
