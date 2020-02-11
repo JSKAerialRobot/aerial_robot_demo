@@ -70,11 +70,11 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       ++task_track_flag_pub_cnt_;
       task_track_flag_pub_.publish(std_msgs::Empty());
     }
-    double net_cog_yaw_offset = -M_PI / 4.0;
-    if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
-      ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
-      return;
-    }
+    // double net_cog_yaw_offset = -M_PI / 4.0;
+    // if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
+    //   ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
+    //   return;
+    // }
     if (!ransac_line_estimator_->isEndProcedureMode() && ransac_line_estimator_->isInEndProcedureRegion(cur_pos_)){ // target is in end search region
       ransac_line_estimator_->ransacEndProcedureMode();
     }
