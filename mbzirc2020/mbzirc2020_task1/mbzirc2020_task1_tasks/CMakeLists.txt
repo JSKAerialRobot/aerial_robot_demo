@@ -41,8 +41,10 @@ ENDIF()
 add_message_files(
   FILES
   PrimitiveParams.msg
+  FC2OCSData.msg
+  OCS2FCData.msg
   )
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs nav_msgs)
 
 ###################################
 ## catkin specific configuration ##

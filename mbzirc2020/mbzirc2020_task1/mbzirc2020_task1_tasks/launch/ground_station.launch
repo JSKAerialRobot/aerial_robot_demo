@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="GROUND_STATION_IP" default="$(env ROS_IP)" />
+  <arg name="UAV_IP" default="192.168.1.111" />
+  <arg name="HIGH_PORT1" default="16484" />
+  <arg name="HIGH_PORT2" default="8192" />
+  <arg name="LOW_PORT" default="1024" />
+
+  ### UAV to GroundStation
+  <node pkg="jsk_network_tools" type="silverhammer_highspeed_receiver.py" name="receiver">
+    <param name="message" value="mbzirc2020_task1_tasks/FC2OCSData" />
+    <param name="receive_ip" value="$(arg GROUND_STATION_IP)" />
+    <param name="receive_port" value="$(arg HIGH_PORT1)" />
+    <param name="topic_prefix" value="" />
+  </node>
+
+  ### GroundStation to UAV
+  <node pkg="jsk_network_tools" type="silverhammer_lowspeed_streamer.py" name="lowspeed_streamer">
+    <remap from="~input" to="/task1_motion_state_machine/task1_start" />
+    <param name="message" value="std_msgs/Empty" />
+    <param name="to_ip" value="$(arg UAV_IP)" />
+    <param name="to_port" value="$(arg LOW_PORT)" />
+    <param name="send_rate" value="1" />
+    <param name="event_driven" value="True" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find mbzirc2020_task1_tasks)/config/task1_ground_station.rviz" respawn="true" />
+
+</launch>
