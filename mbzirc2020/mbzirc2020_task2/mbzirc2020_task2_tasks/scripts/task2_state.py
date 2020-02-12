@@ -567,17 +567,19 @@ class SearchMotion(Task2State):
                             input_keys=['orig_global_trans', 'search_count', 'search_failed'],
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
-        self.grid = rospy.get_param('~grid_' + search_state)
-        self.grid_size = rospy.get_param('~grid_size_' + search_state)
+        self.grid = rospy.get_param('~' + search_state + '/grid')
+        self.grid_scale_x = rospy.get_param('~' + search_state + '/grid_scale_x')
+        self.grid_scale_y = rospy.get_param('~' + search_state + '/grid_scale_y')
+        self.grid_search_timeout = rospy.get_param('~' + search_state + '/grid_search_timeout')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
 
     def execute(self, userdata):
-        target_pos_from_orig_pos_local_frame = tft.translation_matrix((self.grid[userdata.search_count][0] * self.grid_size, self.grid[userdata.search_count][1] * self.grid_size, 0.0))
+        target_pos_from_orig_pos_local_frame = tft.translation_matrix((self.grid[userdata.search_count][0] * self.grid_scale_x, self.grid[userdata.search_count][1] * self.grid_scale_y, 0.0))
         grasp_yaw_rotation_mat = tft.euler_matrix(0, 0, self.grasping_yaw)
         uav_target_coords = tft.concatenate_matrices(userdata.orig_global_trans, grasp_yaw_rotation_mat, target_pos_from_orig_pos_local_frame)
         uav_target_pos = tft.translation_from_matrix(uav_target_coords)
 
-        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=10)
+        self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout=self.grid_search_timeout)
 
         userdata.search_count += 1
         if userdata.search_count == len(self.grid):
