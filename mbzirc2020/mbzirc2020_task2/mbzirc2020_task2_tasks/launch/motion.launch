@@ -68,6 +68,7 @@
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
     <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
+    <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
     <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
     <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
     <param name="single_object_mode" value="$(arg single_object_mode)"/>
