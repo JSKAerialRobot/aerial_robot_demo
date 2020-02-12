@@ -54,6 +54,7 @@ namespace edgetpu_roscpp
     protected:
       boost::shared_ptr<coral::DetectionEngine> seperated_model_detection_engine_;
       cv::Mat cropped_img_;
+      double separate_model_detection_score_threshold_;
 
       void onInit() override;
       void subscribe() override;

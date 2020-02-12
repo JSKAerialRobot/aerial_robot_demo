@@ -50,6 +50,7 @@ namespace edgetpu_roscpp
     ColorFilterBallTracking::onInit();
     std::string model_file;
     pnh_->param("separate_model_file", model_file, std::string(""));
+    pnh_->param("separate_model_detection_score_threshold", separate_model_detection_score_threshold_, 0.5);
     seperated_model_detection_engine_ = boost::make_shared<coral::DetectionEngine>(model_file);
   }
 
@@ -66,8 +67,10 @@ namespace edgetpu_roscpp
   void CascadedDeepBallTracking::detection_tracking_process(cv::Mat& src_img)
   {
     /* detect and track the drone */
-
+    double t = ros::Time::now().toSec();
     SingleObjectDeepTrackingDetection::detection_tracking_process(src_img);
+
+    //ROS_INFO("binding_model_detection: %f", ros::Time::now().toSec() - t);
 
     if(!detected_)
       {
@@ -81,6 +84,7 @@ namespace edgetpu_roscpp
 
     /* only use ball radius information */
     ballPositionFromDepth(ball_detection, ball_depth, false, 0);
+    //ROS_WARN("                     total detection: %f", ros::Time::now().toSec() - t);
   }
 
   bool CascadedDeepBallTracking::boundingboxDetection(cv::Mat& src_img, double& ball_depth)
@@ -96,7 +100,7 @@ namespace edgetpu_roscpp
     /* TODO: check the relation between keep_aspect_ratio_in_inference and ball detection */
     bool keep_aspect_ratio_in_inference_temp = keep_aspect_ratio_in_inference_;
     keep_aspect_ratio_in_inference_ = true;
-    auto detection_candidates = deepDetectionCore(seperated_model_detection_engine_, cropped_img_, 0.7, 10);
+    auto detection_candidates = deepDetectionCore(seperated_model_detection_engine_, cropped_img_, separate_model_detection_score_threshold_, 10);
     keep_aspect_ratio_in_inference_ = keep_aspect_ratio_in_inference_temp;
 
     //ROS_INFO("seperated_model_detection: %f", ros::Time::now().toSec() - t);
@@ -146,7 +150,7 @@ namespace edgetpu_roscpp
         else if(ball_candidate.corners.xmin > 0 && ball_candidate.corners.ymin == 0 &&
                 ball_candidate.corners.xmax < cropped_img_.size().width && ball_candidate.corners.ymax < cropped_img_.size().height)
           {
-            ROS_INFO("okokokoko");
+            //ROS_INFO("okokokoko");
             ball_pixel_radius_ = (ball_candidate.corners.xmax - ball_candidate.corners.xmin) / 2;
           }
         else if(ball_candidate.corners.xmin > 0 && ball_candidate.corners.ymin > 0 &&
