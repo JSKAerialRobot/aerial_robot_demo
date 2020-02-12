@@ -128,6 +128,7 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   target_pt_msg.point.y = target_pos(1);
   target_pt_msg.point.z = target_pos(2);
   nearest_waypoint_pub_.publish(target_pt_msg);
+  target_pos(2) += cog_net_offset_ + experiment_safety_z_offset_;
 
   Eigen::Vector3d delta_pos = target_pos - cur_pos_;
   if (ransac_line_estimator_->isEndProcedureMode()){
@@ -157,8 +158,6 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nav_msg.target_pos_y = cur_pos_(1) + delta_pos(1);
   nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
   nav_msg.target_pos_z = cur_pos_(2) + delta_pos(2);
-  nav_msg.target_pos_z += cog_net_offset_;
-  nav_msg.target_pos_z += experiment_safety_z_offset_;
   // todo: add psi
   // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
   // nav_msg.target_psi = -math.pi / 2.0 # 0.0
@@ -219,7 +218,7 @@ void ReactiveMotion::cogOdomCallback(const nav_msgs::OdometryConstPtr & msg){
 void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & msg){
   if (msg->data == 0){
     motion_state_ = STILL;
-    sendControlCmdDirectly(cur_pos_);
+    // sendControlCmdDirectly(cur_pos_);
     ransac_line_estimator_->stopEstimation();
     ROS_INFO("[ReactiveMotion] Change motion state: STILL");
     ROS_INFO("[ReactiveMotion] Estimation stops");
