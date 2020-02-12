@@ -48,6 +48,7 @@ class Start(Task2State):
         if self.skip_takeoff:
             return 'succeeded'
 
+        self.robot.setJointTorque(True)
         rospy.logwarn(self.__class__.__name__ + ': Takeoff')
         rospy.sleep(0.5)
         self.robot.startAndTakeoff()
@@ -100,8 +101,8 @@ class ApproachPickPosition(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
 
         return 'succeeded'
 
@@ -175,7 +176,7 @@ class LookDown(Task2State):
 
             rospy.logwarn("%s: succeed to find valid object x: %f, y: %f, yaw: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1], object_global_yaw)
             self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
 
             userdata.search_count = 0
             userdata.search_failed = False
@@ -352,9 +353,13 @@ class Grasp(Task2State):
         if self.grasp_land_mode:
             rospy.logwarn(self.__class__.__name__ + ": land mode, landing")
             self.robot.land()
+            start_time = rospy.get_time()
             while not (self.robot.getFlightState() == self.robot.ARM_OFF_STATE):
-                pass
-
+                elapsed_time = rospy.get_time() - start_time
+                if elapsed_time > 10.0:
+                    self.robot.halt()
+                    rospy.logwarn(self.__class__.__name__ + ": force halt")
+                    break
         else:
             #descend
             self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
