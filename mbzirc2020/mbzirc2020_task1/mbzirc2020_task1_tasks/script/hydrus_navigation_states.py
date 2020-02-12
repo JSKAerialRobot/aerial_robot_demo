@@ -149,7 +149,8 @@ class GpsWaypointNavigationStateMachineCreator():
                     next_state = 'success'
                 else:
                     next_state = 'waypoint'+str(i+1)
-                    smach.StateMachine.add('waypoint'+str(i), GoGpsPositionState(waypoint, approach_margin, control_rate, nav_mode, initial_yaw_flag, initial_yaw),
+                rospy.sleep(0.1)
+                smach.StateMachine.add('waypoint'+str(i), GoGpsPositionState(waypoint, approach_margin, control_rate, nav_mode, initial_yaw_flag, initial_yaw),
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
         return sm

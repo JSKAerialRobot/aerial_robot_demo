@@ -154,6 +154,7 @@ class HydrusCommander():
     def joint_publish(self, joint_state):
         """publish joint_state list"""
         joint_msg = JointState()
+        joint_msg.name = ['joint1', 'joint3'] ## todo
         joint_msg.position = joint_state
         time.sleep(self.WAIT_TIME)
         self.joints_ctrl_pub.publish(joint_msg)
