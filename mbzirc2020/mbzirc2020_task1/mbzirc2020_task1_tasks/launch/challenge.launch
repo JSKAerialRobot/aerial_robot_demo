@@ -6,6 +6,8 @@
   <arg name="camera_pitch_angle" default="-0.087" />
   <arg name="cascaded_detection" default = "false" />
   <arg name="image_pub_throttle_rate" default="10.0" />
+  <arg name="ground_station" default="false" />
+  <arg name="ground_station_ip" default="192.168.1.122" />
 
   ###########  bring up  ###########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
@@ -41,4 +43,11 @@
     <arg name="from_ground" value="true" />
   </include>
 
+  ### communication to ground station
+  <group if="$(arg ground_station)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/communication2ground_station.launch">
+      <arg name="GROUND_STATION_IP" value="$(arg ground_station_ip)" />
+      <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
+    </include>
+  </group>
 </launch>
