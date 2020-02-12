@@ -1,7 +1,3 @@
-global_lookdown_pos_gps: [49.9, 8.90] #lati, long
-global_place_channel_center_pos_gps: [49.9000550316, 8.90000008246]
-global_place_channel_yaw: 0.0
-
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
 preshape_joint_angle: [0.78, 0.78]
