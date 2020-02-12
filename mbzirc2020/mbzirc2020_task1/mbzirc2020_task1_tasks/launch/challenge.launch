@@ -3,13 +3,15 @@
   <arg name="world" default="kashiwa" />
   <arg name="estimate_mode" default="0" />
   <arg name="monocular_camera" default="true" />
-  <arg name= "cascaded_detection" default = "false" />
+  <arg name="camera_pitch_angle" default="-0.087" />
+  <arg name="cascaded_detection" default = "false" />
   <arg name="image_pub_throttle_rate" default="10.0" />
 
   ###########  bring up  ###########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
     <arg name="estimate_mode" value="$(arg estimate_mode)" />
     <arg name="monocular_camera" value="$(arg monocular_camera)" />
+    <arg name="camera_pitch_angle" value="$(arg camera_pitch_angle)" />
   </include>
 
   ########### perception ###########
@@ -22,8 +24,8 @@
     <arg name="keep_aspect_ratio_in_inference" value="false" />
     <arg name="quick_detection" value="true" />
     <arg name="cascaded_detection" value = "$(arg cascaded_detection)" />
-    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200130_bind_model_509_edgetpu.tflite" />
-    <arg name= "separate_model_file" value = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200203_separate_model_704_edgetpu.tflite" />
+    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200204_624.tflite" />
+    <arg name="separate_model_file" value = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_20200204624_202002030726/20200203_separate_model_726_edgetpu.tflite" />
     <arg name="expanding_bounding_box_rate" value="2.0" />
     <arg name="expanding_bounding_box_aspect_ratio" value="1.0" />
     <arg name="camera_info_topic" value="/usb_cam/camera_info" if="$(arg monocular_camera)"/>
