@@ -5,6 +5,7 @@
   <!-- base kinematics model -->
   <xacro:arg name="monocular_camera" default="true" />
   <xacro:arg name="camera_height" default="0" />
+  <xacro:arg name="camera_pitch_angle" default="0" />
   <xacro:arg name="horizontal_vio" default="false" />
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
   <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"/>
@@ -67,7 +68,7 @@
     <!-- direct mount type -->
     <xacro:unless value="$(arg camera_height)">
       <xacro:extra_module name = "monocular_camera_unit" parent = "link2" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/ELP_SUSB1080P_direct_unit.dae">
-        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 0.05 ${pi * 3/4}"/>
+        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 $(arg camera_pitch_angle) ${pi * 3/4}"/>
         <inertial>
           <mass value = "0.0457" />
           <origin xyz="0.027 0 0.005" rpy="0 0 0"/>
@@ -101,7 +102,7 @@
     <!-- carbon pipe mount type -->
     <xacro:if value="$(arg camera_height)">
       <xacro:extra_module name = "center_bar" parent = "link2" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/single_camera_center_bar.dae">
-        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 0.05 ${pi * 3/4}"/>
+        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 $(arg camera_pitch_angle) ${pi * 3/4}"/>
         <inertial>
           <mass value = "0.0255" />
           <origin xyz="0.014307 0 0.005" rpy="0 0 0"/>
@@ -188,7 +189,7 @@
   </xacro:unless>
 
   <!-- net -->
-  <xacro:property name="net_mass" value=".03" />
+  <xacro:property name="net_mass" value=".06" />
   <xacro:extra_module name = "net_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
     <inertial>

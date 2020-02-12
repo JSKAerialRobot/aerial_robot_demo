@@ -8,6 +8,7 @@
   <arg name="headless" default="True" />
   <arg name="launch_gazebo" default="False" />
   <arg name="monocular_camera" default="True" />
+  <arg name="camera_pitch_angle" default="-0.087" />
   <arg name="camera_height" default="0" />
   <arg name="camera_name" default="elp_1080P_fov60" />
 
@@ -55,9 +56,9 @@
   <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.urdf.xacro" unless="$(arg simulation)" />
   <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro" if="$(arg simulation)" />
 
-  <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
   <group ns="hydrusx" >
-    <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
   </group >
 
 </launch>
