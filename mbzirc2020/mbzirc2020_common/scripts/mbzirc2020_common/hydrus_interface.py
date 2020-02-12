@@ -47,6 +47,7 @@ class HydrusInterface:
         self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
+        self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.add_extra_module_client_ = rospy.ServiceProxy('hydrusx/add_extra_module', AddExtraModule)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.ros_gps_sub_ = rospy.Subscriber('fix', NavSatFix, self.rosGpsCallback)
@@ -160,6 +161,9 @@ class HydrusInterface:
 
     def forceLanding(self):
         self.force_landing_pub_.publish()
+
+    def halt(self):
+        self.halt_pub_.publish()
 
     def getBaselinkOdom(self):
         return self.baselink_odom_
