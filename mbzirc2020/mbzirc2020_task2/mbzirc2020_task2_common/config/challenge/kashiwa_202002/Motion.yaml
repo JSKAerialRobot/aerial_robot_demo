@@ -1,6 +1,6 @@
-global_lookdown_pos_gps: [35.895109, 139.9447659]
-global_place_channel_center_pos_gps: [35.8951683, 139.9447855]
-global_place_channel_yaw: 0.0458308458328
+global_lookdown_pos_gps: [35.8945981, 139.9443221]
+global_place_channel_center_pos_gps: [35.895190, 139.944810]
+global_place_channel_yaw: 0.1
 
 #global_lookdown_pos_gps: [35.8951246, 139.9447672]
 #global_place_channel_center_pos_gps: [35.895185, 139.9447696]
@@ -16,7 +16,7 @@ object_yaw: -0.785
 object_mass: 1.0
 
 object_lookdown_height: 3.0
-object_approach_height: 1.5
+object_approach_height: 1.2
 object_grasping_height: 0.2
 object_yaw_thresh: 0.3
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
@@ -45,13 +45,13 @@ lookdown:
   grid: [[0, 1], [0, 0], [0, -1], [1, -1], [1, 0], [1, 1], [2, 1], [2, 0], [2, -1], [3, -1], [3, 0], [3, 1], [4, 1], [4, 0], [4, -1]]
   grid_scale_x: 1.2
   grid_scale_y: 1.0
-  grid_search_timeout: 10
+  grid_search_timeout: 8
 
 adjust_grasp:
   grid: [[-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [0, -1], [0, 0], [0, 1], [0, 2], [1, 2], [1, 1], [1, 0], [1, -1], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2], [3, 2], [3, 1], [3, 0], [3, -1], [3, -2]]
-  grid_scale_x: 0.45
+  grid_scale_x: 0.5
   grid_scale_y: 0.3
-  grid_search_timeout: 6
+  grid_search_timeout: 5
 
 adjust_place:
   grid: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]

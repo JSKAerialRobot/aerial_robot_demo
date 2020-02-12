@@ -39,5 +39,5 @@ rectangle_detection_depth:
   frame_id: target_object_depth
   target_object_area: 0.06 #0.2 * 0.6
   target_object_area_margin: 0.02
-  object_height: 0.2
+  object_height: 0.12
   lowest_margin: 5
