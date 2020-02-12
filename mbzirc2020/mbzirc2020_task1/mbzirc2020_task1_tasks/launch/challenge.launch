@@ -3,6 +3,7 @@
   <arg name="world" default="kashiwa" />
   <arg name="estimate_mode" default="0" />
   <arg name="monocular_camera" default="true" />
+  <arg name= "cascaded_detection" default = "false" />
   <arg name="image_pub_throttle_rate" default="10.0" />
 
   ###########  bring up  ###########
@@ -18,10 +19,11 @@
     <arg name="coarse_detection_score_threshold" value="0.0" />
     <arg name="refined_detection_score_threshold" value="0.71" />
     <arg name="tracking_score_threshold" value="0.7" />
-    <!-- <arg name="keep_aspect_ratio_in_expanded_bbox" value="true" /> -->
     <arg name="keep_aspect_ratio_in_inference" value="false" />
     <arg name="quick_detection" value="true" />
-    <arg name="model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200130_509.tflite" />
+    <arg name="cascaded_detection" value = "$(arg cascaded_detection)" />
+    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200130_bind_model_509_edgetpu.tflite" />
+    <arg name= "separate_model_file" value = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202001300509_202002030704/20200203_separate_model_704_edgetpu.tflite" />
     <arg name="expanding_bounding_box_rate" value="2.0" />
     <arg name="expanding_bounding_box_aspect_ratio" value="1.0" />
     <arg name="camera_info_topic" value="/usb_cam/camera_info" if="$(arg monocular_camera)"/>
@@ -31,7 +33,7 @@
     <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
   </include>
 
-  ###########   motion   ###########
+  ########### motion ###########
   <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
     <arg name="vision" value="true" />
     <arg name="from_ground" value="true" />

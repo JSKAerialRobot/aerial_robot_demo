@@ -33,11 +33,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <mbzirc2020_task1_tasks/drone_ball_tracking_detection.h>
+#include <mbzirc2020_task1_tasks/vision/color_filter_based_tracking_detection.h>
 
 namespace edgetpu_roscpp
 {
-  void DroneBallTrackingDetection::onInit()
+  void ColorFilterBallTracking::onInit()
   {
     SingleObjectDeepTrackingDetection::onInit();
 
@@ -61,13 +61,13 @@ namespace edgetpu_roscpp
 
 
     color_filter_reconfigure_server_ = boost::make_shared<dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig> >(*pnh_);
-    typename dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig>::CallbackType f = boost::bind(&DroneBallTrackingDetection::colorFilterReconfigureCallback, this, _1, _2);
+    typename dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig>::CallbackType f = boost::bind(&ColorFilterBallTracking::colorFilterReconfigureCallback, this, _1, _2);
     color_filter_reconfigure_server_->setCallback(f);
 
     if(subscribe_depth_image_)
       {
         color_depth_images_sync_ = std::make_unique<message_filters::Synchronizer<ColorDepthSyncPolicy> >(ColorDepthSyncPolicy(2), snyc_color_image_sub_, snyc_depth_image_sub_);
-        color_depth_images_sync_->registerCallback(boost::bind(&DroneBallTrackingDetection::colorDepthSyncCallback, this,  _1, _2));
+        color_depth_images_sync_->registerCallback(boost::bind(&ColorFilterBallTracking::colorDepthSyncCallback, this,  _1, _2));
       }
 
     if (image_view_) debug_image_pub_ = advertiseImage(*pnh_, "color_filtered_image", 1);
@@ -75,7 +75,7 @@ namespace edgetpu_roscpp
     ball_pos_pub_ = advertise<geometry_msgs::PointStamped>(*nh_, "ball_pos", 1);
   }
 
-  void DroneBallTrackingDetection::subscribe()
+  void ColorFilterBallTracking::subscribe()
   {
     if(subscribe_depth_image_)
       {
@@ -87,10 +87,10 @@ namespace edgetpu_roscpp
         SingleObjectDeepTrackingDetection::subscribe();
       }
 
-    cam_info_sub_ = nh_->subscribe("color_camera_info", 1, &DroneBallTrackingDetection::cameraInfoCallback, this);
+    cam_info_sub_ = nh_->subscribe("color_camera_info", 1, &ColorFilterBallTracking::cameraInfoCallback, this);
   }
 
-  void DroneBallTrackingDetection::unsubscribe()
+  void ColorFilterBallTracking::unsubscribe()
   {
     if(subscribe_depth_image_)
       {
@@ -103,7 +103,7 @@ namespace edgetpu_roscpp
       }
   }
 
-  void DroneBallTrackingDetection::colorDepthSyncCallback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg)
+  void ColorFilterBallTracking::colorDepthSyncCallback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg)
   {
     imageCallback(color_msg);
 
@@ -117,7 +117,7 @@ namespace edgetpu_roscpp
 #endif
   }
 
-  void DroneBallTrackingDetection::cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg)
+  void ColorFilterBallTracking::cameraInfoCallback(const sensor_msgs::CameraInfoConstPtr& msg)
   {
     /* the following process is executed once */
     NODELET_DEBUG_STREAM("receive camera info");
@@ -130,7 +130,7 @@ namespace edgetpu_roscpp
     cam_info_sub_.shutdown();
   }
 
-  void DroneBallTrackingDetection::detection_tracking_process(cv::Mat& src_img)
+  void ColorFilterBallTracking::detection_tracking_process(cv::Mat& src_img)
   {
     /* detect and track the drone */
     SingleObjectDeepTrackingDetection::detection_tracking_process(src_img);
@@ -151,6 +151,12 @@ namespace edgetpu_roscpp
     double drone_depth = 0;
     bool drone_width_detection = widthBasedDetection(src_img, drone_depth);
 
+    ballPositionFromDepth(ball_detection, ball_depth, drone_width_detection, drone_depth);
+  }
+
+
+  void ColorFilterBallTracking::ballPositionFromDepth(bool ball_detection, double ball_depth, bool drone_width_detection, double drone_depth)
+  {
     /* decide the depth with overall evaluation */
     if (!ball_detection && !drone_width_detection) return; // can not get confident depth of either drone or ball
 
@@ -217,6 +223,7 @@ namespace edgetpu_roscpp
           }
       }
 
+
     //ROS_WARN("ball detection: %f", ros::Time::now().toSec() - start_t);
     ball_pos_ = camera_K_inv_ * tf2::Vector3(ball_pixel_center_.x, ball_pixel_center_.y, 1.0) * ball_depth_;
 
@@ -226,7 +233,7 @@ namespace edgetpu_roscpp
     //ROS_INFO("drone depth: %f, ball depth: %f, depth_: %f", drone_depth, ball_depth, ball_depth_);
   }
 
-  bool DroneBallTrackingDetection::widthBasedDetection(cv::Mat& src_img, double& drone_depth)
+  bool ColorFilterBallTracking::widthBasedDetection(cv::Mat& src_img, double& drone_depth)
   {
     /* if the bounding box is too close the image bounds, the width is not confident */
     if(best_detection_candidate_.corners.xmin < bbox_valid_bound_margin_ ||
@@ -242,7 +249,7 @@ namespace edgetpu_roscpp
     return true;
   }
 
-  bool DroneBallTrackingDetection::colorFilterBallDetection(cv::Mat& src_img, double& ball_depth)
+  bool ColorFilterBallTracking::colorFilterBallDetection(cv::Mat& src_img, double& ball_depth)
   {
 
     /* further crop from the bonding box to find the ball */
@@ -352,7 +359,7 @@ namespace edgetpu_roscpp
     return true;
   }
 
-  void DroneBallTrackingDetection::colorFilter(const cv::Mat& input_image, cv::Mat& output_image)
+  void ColorFilterBallTracking::colorFilter(const cv::Mat& input_image, cv::Mat& output_image)
   {
     cv::Mat cvt_image;
     cv::cvtColor(input_image, cvt_image, cv::COLOR_RGB2HLS);
@@ -373,7 +380,7 @@ namespace edgetpu_roscpp
       }
   }
 
-  void DroneBallTrackingDetection::colorFilterReconfigureCallback(opencv_apps::HLSColorFilterConfig& config, uint32_t level)
+  void ColorFilterBallTracking::colorFilterReconfigureCallback(opencv_apps::HLSColorFilterConfig& config, uint32_t level)
   {
     color_filter_config_ = config;
     h_max_ = config.h_limit_max;
@@ -391,7 +398,7 @@ namespace edgetpu_roscpp
     upper_color_range_ = cv::Scalar(h_max_ / 2, l_max_, s_max_, 0);
   }
 
-  void DroneBallTrackingDetection::publish(const std_msgs::Header& msg_header, const cv::Mat& src_img)
+  void ColorFilterBallTracking::publish(const std_msgs::Header& msg_header, const cv::Mat& src_img)
   {
     SingleObjectDeepTrackingDetection::publish(msg_header, src_img);
 
@@ -430,4 +437,4 @@ namespace edgetpu_roscpp
 } //namespace edgetpu_roscpp
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS (edgetpu_roscpp::DroneBallTrackingDetection, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS (edgetpu_roscpp::ColorFilterBallTracking, nodelet::Nodelet);
