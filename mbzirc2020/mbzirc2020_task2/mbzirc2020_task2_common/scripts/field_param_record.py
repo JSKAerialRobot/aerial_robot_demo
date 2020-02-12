@@ -2,7 +2,7 @@
 
 import rospy
 from spinal.msg import Gps, Imu
-import pyperclip
+import yaml
 
 class GpsRecord:
     def __init__(self):
@@ -21,20 +21,23 @@ class GpsRecord:
 
     def execute(self):
 
-        clip_string = ""
+        output = {}
         for i in range(2):
             get_key = raw_input()
             if get_key == "": #enter
 
                 if i == 0:
                     print("%lf, %lf" % (self.location[0], self.location[1]))
-                    clip_string = "global_lookdown_pos_gps: [" + str(self.location[0]) + ", " + str(self.location[1]) + "]"
+                    output['global_lookdown_pos_gps'] = list(self.location)
 
                 if i == 1:
                     print("%lf, %lf, %f" % (self.location[0], self.location[1], self.yaw))
-                    clip_string += "\n" + "global_place_channel_center_pos_gps: [" + str(self.location[0]) + ", " + str(self.location[1]) + "]" + "\n" + "global_place_channel_yaw: " + str(self.yaw)
+                    output['global_place_channel_center_pos_gps'] = list(self.location)
+                    output['global_place_channel_yaw'] = self.yaw
 
-        pyperclip.copy(clip_string)
+        with open('Field.yaml', 'w') as file:
+            yaml.dump(output, file) #, default_flow_style=False)
+
         rospy.signal_shutdown("")
 
 if __name__ == '__main__':
