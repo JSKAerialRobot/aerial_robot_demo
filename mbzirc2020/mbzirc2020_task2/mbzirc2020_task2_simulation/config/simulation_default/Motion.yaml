@@ -14,6 +14,7 @@ object_yaw_thresh: 0.2
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
 object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
+adjust_grasp_image_type: 'depth'
 
 global_object_yaw: 3.141
 recognition_wait: 1.0
