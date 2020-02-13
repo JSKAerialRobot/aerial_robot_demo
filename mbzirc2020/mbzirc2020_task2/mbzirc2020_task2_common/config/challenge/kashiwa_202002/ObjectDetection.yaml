@@ -31,13 +31,13 @@ depth_distance_filter:
   distance_from_ground: 0.1
 
 opening_depth_distance_filter:
-  size: 2
+  size: 3
   iterations: 4
 
 rectangle_detection_depth:
   debug_view: false
   frame_id: target_object_depth
   target_object_area: 0.06 #0.2 * 0.6
-  target_object_area_margin: 0.025
-  object_height: 0.12
+  target_object_area_margin: 0.02
+  object_height: 0.2
   lowest_margin: 1
