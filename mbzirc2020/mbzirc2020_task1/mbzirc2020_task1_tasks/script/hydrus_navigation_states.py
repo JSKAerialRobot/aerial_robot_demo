@@ -34,7 +34,7 @@ class StopEstimation(smach.State):
 
 class PrepareTaskState(smach.State):
     def __init__(self, wait_time=20):
-        smach.State.__init__(self, outcomes=['success', 'fail'])
+        smach.State.__init__(self, outcomes=['first_waypoint', 'current_waypoint', 'fail'], input_keys=['first_waypoint_flag_input', 'return_first_waypoint_flag_input'], output_keys=['first_waypoint_flag_output'])
         self.task_commander = TaskCommander()
         self.hydrus_commander = HydrusCommander()
 
@@ -43,7 +43,11 @@ class PrepareTaskState(smach.State):
         ## 2. joints open to initial state
         self.task_commander.stop_estimation()
         self.hydrus_commander.open_joints()
-        return 'success'
+        if userdata.first_waypoint_flag_input or userdata.return_first_waypoint_flag_input:
+            userdata.first_waypoint_flag_output = False
+            return 'first_waypoint'
+        else:
+            return 'current_waypoint'
 
 class TakeoffState(smach.State):
     def __init__(self, wait_time=20):

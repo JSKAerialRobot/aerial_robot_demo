@@ -25,6 +25,8 @@ def main():
     rospy.init_node("task1_motion_state_machine")
 
     sm = smach.StateMachine(outcomes=['DONE', 'FAIL'])
+    sm.userdata.first_waypt_flag = True
+    sm.userdata.return_first_waypt_flag = rospy.get_param('~return_first_waypoint_flag', True)
     with sm:
         nav_control_rate = rospy.get_param('~control_rate', 0.5)
         nav_approach_margin = rospy.get_param('~navigation_approach_margin', [0.5, 0.5, 0.5])
@@ -66,7 +68,10 @@ def main():
                 smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'NAVIGATING'+str(i+1), 'failure':'FAIL'})
             else:
                 smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'TASK1_ENTER_STATE', 'failure':'FAIL'})
-        smach.StateMachine.add('TASK1_ENTER_STATE', PrepareTaskState(), transitions={'success':'TASK1_ENTER_STATE_PREPARED', 'fail':'FAIL'})
+        smach.StateMachine.add('TASK1_ENTER_STATE', PrepareTaskState(), transitions={'first_waypoint':'TASK1_ENTER_STATE_PREPARED', 'current_waypoint':'TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', 'fail':'FAIL'},
+               remapping={'first_waypoint_flag_input':'first_waypt_flag',
+                          'return_first_waypoint_flag_input':'return_first_waypt_flag',
+                          'first_waypoint_flag_output':'first_waypt_flag'})
 
         task1_waiting_waypoints_list = rospy.get_param('~task1_waiting_waypoint', [[[0,0,1]]])
         task1_waiting_waypoint_nav_creator = GpsWaypointNavigationStateMachineCreator()
