@@ -52,6 +52,8 @@ def main():
 
         waypoints_list = rospy.get_param('~initial_waypoints', [[[0,0,1]]])
         waypoints_number = len(waypoints_list)
+        initial_yaw_flag = rospy.get_param('~initial_yaw_flag', False)
+        initial_yaw = rospy.get_param('~initial_yaw', 0.0)
         # smach.StateMachine(outcomes=['NAVIGATING'+str(waypoints_number)])
         # debug
         print ("waypoint: ")
@@ -59,7 +61,7 @@ def main():
         for i in range(waypoints_number):
             waypoint_nav_creator = GpsWaypointNavigationStateMachineCreator()
             waypoints = waypoints_list[i]
-            sm_sub_nav = waypoint_nav_creator.create(waypoints, nav_approach_margin, nav_control_rate, nav_mode)
+            sm_sub_nav = waypoint_nav_creator.create(waypoints, nav_approach_margin, nav_control_rate, nav_mode, initial_yaw_flag, initial_yaw)
             if i < (waypoints_number - 1):
                 smach.StateMachine.add('NAVIGATING'+str(i), sm_sub_nav, transitions={'success':'NAVIGATING'+str(i+1), 'failure':'FAIL'})
             else:

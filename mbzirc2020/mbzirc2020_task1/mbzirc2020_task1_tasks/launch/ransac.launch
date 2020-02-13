@@ -7,18 +7,20 @@
     <param name="target_point_sub_topic_name" value="/treasure/point_detected"/>
     <param name="cand_points2d_initial_size" value="15"/>
     <param name="cand_points3d_initial_size" value="15"/>
-    <param name="cand_points2d_middle_max_size" value="90"/>
-    <param name="cand_points3d_middle_max_size" value="90"/>
+    <param name="cand_points2d_middle_max_size" value="60"/>
+    <param name="cand_points3d_middle_max_size" value="60"/>
     <param name="cand_points2d_end_max_size" value="30"/>
     <param name="cand_points3d_end_max_size" value="30"/>
     <param name="ransac_3d_mode" value="False"/>
-    <param name="target_point_maximum_disappear_time" value="1.0"/>
+    <param name="target_point_maximum_disappear_time" value="2.0"/>
     <param name="losing_tracking_period_threshold" value="4.0"/>
-    <param name="target_close_distance_threshold" value="2.5"/>
+    <param name="target_close_distance_threshold" value="4.0"/>
     <param name="target_velocity" value="5.0"/>
-    <param name="target_end_procedure_distance_threshold" value="8.0"/>
-    <param name="yaw_diff_threshold" value="1.5"/>
-    <param name="experiment_safety_z_offset" value="-0.45"/>
+    <param name="target_end_procedure_distance_threshold" value="10.0"/>
+    <param name="yaw_diff_threshold" value="1.3"/>
+    <param name="cog_net_offset" value="-0.37"/>
+    <param name="experiment_safety_z_offset" value="-0.6"/>
+    <param name="lpf_z_gain" value="0.8"/>
     <rosparam file="$(find mbzirc2020_task1_tasks)/config/reactive_motion.yaml" command="load" />
   </node>
 

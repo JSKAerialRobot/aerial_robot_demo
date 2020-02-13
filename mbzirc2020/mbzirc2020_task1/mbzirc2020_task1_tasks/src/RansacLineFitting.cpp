@@ -39,8 +39,10 @@ void RansacLineFitting::targetPointCallback(const geometry_msgs::PointStampedCon
   double cur_time = msg->header.stamp.toSec();
   if (target_pt_update_time_ < 0.0) // when in initial case
     target_pt_update_time_ = cur_time;
-  else if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_)
+  else if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_){
     initializeEstimatorParam();
+    estimator_state_ = PAUSE_ESTIMATION;
+  }
   else
     target_pt_update_time_ = cur_time;
 
@@ -75,7 +77,6 @@ void RansacLineFitting::initializeEstimatorParam(){
     lpf_z_ = -1;
     cand_points3d_.clear();
     cand_points2d_.clear();
-    estimator_state_ = PAUSE_ESTIMATION;
     estimator_procedure_ = MIDDLE_PROCEUDRE;
     if (ransac_3d_mode_)
       procedure_cand_max_size_ = cand_points3d_middle_max_size_;
@@ -91,6 +92,7 @@ bool RansacLineFitting::isEstimated(){
     double cur_time = ros::Time::now().toSec();
     if (fabs(cur_time - target_pt_update_time_) > target_pt_dispear_time_thre_){
       initializeEstimatorParam();
+      estimator_state_ = PAUSE_ESTIMATION;
       return false;
     }
     else
@@ -234,6 +236,7 @@ void RansacLineFitting::stopEstimation(){
 
 void RansacLineFitting::startEstimation(){
   initializeEstimatorParam();
+  estimator_state_ = PAUSE_ESTIMATION;
 }
 
 void RansacLineFitting::visualizeRansacLine(){

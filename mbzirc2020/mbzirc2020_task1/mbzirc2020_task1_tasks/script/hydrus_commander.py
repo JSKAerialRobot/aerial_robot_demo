@@ -45,6 +45,28 @@ class HydrusCommander():
         self.land_pub.publish(Empty())
         time.sleep(self.WAIT_TIME)
 
+    def move_to_xyz_yaw(self, pos_x, pos_y, pos_z, yaw, override_nav_mode=None):
+        """move to target x, y position"""
+        # send desired position
+        nav_msg = FlightNav()
+
+        if override_nav_mode is None:
+            nav_mode = self.nav_mode
+        else:
+            nav_mode = override_nav_mode
+
+        nav_msg.target = nav_msg.COG
+        nav_msg.pos_xy_nav_mode = nav_mode
+        nav_msg.target_pos_x = pos_x
+        nav_msg.target_pos_y = pos_y
+        nav_msg.pos_z_nav_mode = nav_msg.POS_MODE
+        nav_msg.target_pos_z = pos_z
+        nav_msg.psi_nav_mode = nav_msg.POS_MODE
+        nav_msg.target_psi = yaw
+        time.sleep(self.WAIT_TIME)
+        self.nav_control_pub.publish(nav_msg)
+        time.sleep(self.WAIT_TIME)
+
     def move_to_xyz(self, pos_x, pos_y, pos_z, override_nav_mode=None):
         """move to target x, y position"""
         # send desired position
@@ -90,6 +112,18 @@ class HydrusCommander():
                 controller_debug_msg.roll.pos_err,
                 controller_debug_msg.throttle.pos_err]
 
+    def change_height_yaw(self, pos_z, yaw):
+        """ change height """
+        nav_msg = FlightNav()
+        nav_msg.target = nav_msg.COG
+        nav_msg.pos_z_nav_mode = nav_msg.POS_MODE
+        nav_msg.target_pos_z = pos_z
+        nav_msg.psi_nav_mode = nav_msg.POS_MODE
+        nav_msg.target_psi = yaw
+        time.sleep(self.WAIT_TIME)
+        self.nav_control_pub.publish(nav_msg)
+        time.sleep(self.WAIT_TIME)
+
     def change_height(self, pos_z):
         """ change height """
         nav_msg = FlightNav()
@@ -120,6 +154,7 @@ class HydrusCommander():
     def joint_publish(self, joint_state):
         """publish joint_state list"""
         joint_msg = JointState()
+        joint_msg.name = ['joint1', 'joint3'] ## todo
         joint_msg.position = joint_state
         time.sleep(self.WAIT_TIME)
         self.joints_ctrl_pub.publish(joint_msg)

@@ -63,18 +63,18 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       motion_state_ = LOSING_TRACKING;
       losing_tracking_cnt_ = 0;
       ROS_INFO("[ReactiveMotion] Ransac result is losing, keep waiting");
-      sendControlCmd(cur_pos_);
+      sendControlCmdDirectly(cur_pos_);
       return;
     }
     if (task_track_flag_pub_cnt_ < 10){ // publish multiple times in case message is missed
       ++task_track_flag_pub_cnt_;
       task_track_flag_pub_.publish(std_msgs::Empty());
     }
-    double net_cog_yaw_offset = -M_PI / 4.0;
-    if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
-      ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
-      return;
-    }
+    // double net_cog_yaw_offset = -M_PI / 4.0;
+    // if (!ransac_line_estimator_->checkEstimationWithYawAng(euler_ang_[2] + net_cog_yaw_offset)){
+    //   ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
+    //   return;
+    // }
     if (!ransac_line_estimator_->isEndProcedureMode() && ransac_line_estimator_->isInEndProcedureRegion(cur_pos_)){ // target is in end search region
       ransac_line_estimator_->ransacEndProcedureMode();
     }
@@ -102,12 +102,12 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
     }
   }
   else if (motion_state_ == STOP_TRACKING){
-    sendControlCmd(target_pos_);
+    sendControlCmdDirectly(target_pos_);
     ++stop_tracking_cnt_;
     double stop_tracking_period = 5.0;
     if (stop_tracking_cnt_ >= stop_tracking_period * control_freq_){
       motion_state_ = STILL;
-      sendControlCmd(cur_pos_);
+      sendControlCmdDirectly(cur_pos_);
       ROS_INFO("[ReactiveMotion] After open-loop tracking for %f secs, switch back to STILL mode.", stop_tracking_period);
       ransac_line_estimator_->stopEstimation();
       ROS_INFO("[ReactiveMotion] Estimation stops");
@@ -128,13 +128,25 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   target_pt_msg.point.y = target_pos(1);
   target_pt_msg.point.z = target_pos(2);
   nearest_waypoint_pub_.publish(target_pt_msg);
+  target_pos(2) += cog_net_offset_ + experiment_safety_z_offset_;
 
   Eigen::Vector3d delta_pos = target_pos - cur_pos_;
-  for (int i = 0; i < 3; ++i){
-    if (delta_pos[i] > motion_cmd_thre_vec_[i])
-      delta_pos[i] = motion_cmd_thre_vec_[i];
-    else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
-      delta_pos[i] = -motion_cmd_thre_vec_[i];
+  if (ransac_line_estimator_->isEndProcedureMode()){
+    double speedup_factor = 2.0;
+    for (int i = 0; i < 3; ++i){
+      if (delta_pos[i] > motion_cmd_thre_vec_[i] * speedup_factor)
+        delta_pos[i] = motion_cmd_thre_vec_[i] * speedup_factor;
+      else if (delta_pos[i] < -motion_cmd_thre_vec_[i] * speedup_factor)
+        delta_pos[i] = -motion_cmd_thre_vec_[i] * speedup_factor;
+    }
+  }
+  else{
+    for (int i = 0; i < 3; ++i){
+      if (delta_pos[i] > motion_cmd_thre_vec_[i])
+        delta_pos[i] = motion_cmd_thre_vec_[i];
+      else if (delta_pos[i] < -motion_cmd_thre_vec_[i])
+        delta_pos[i] = -motion_cmd_thre_vec_[i];
+    }
   }
   aerial_robot_msgs::FlightNav nav_msg;
   nav_msg.header.stamp = ros::Time::now();
@@ -146,8 +158,31 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nav_msg.target_pos_y = cur_pos_(1) + delta_pos(1);
   nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
   nav_msg.target_pos_z = cur_pos_(2) + delta_pos(2);
-  nav_msg.target_pos_z += cog_net_offset_;
-  nav_msg.target_pos_z += experiment_safety_z_offset_;
+  // todo: add psi
+  // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
+  // nav_msg.target_psi = -math.pi / 2.0 # 0.0
+  flight_nav_pub_.publish(nav_msg);
+}
+
+void ReactiveMotion::sendControlCmdDirectly(Eigen::Vector3d target_pos){
+  geometry_msgs::PointStamped target_pt_msg;
+  target_pt_msg.header.stamp = ros::Time::now();
+  target_pt_msg.header.frame_id = "world";
+  target_pt_msg.point.x = target_pos(0);
+  target_pt_msg.point.y = target_pos(1);
+  target_pt_msg.point.z = target_pos(2);
+  nearest_waypoint_pub_.publish(target_pt_msg);
+
+  aerial_robot_msgs::FlightNav nav_msg;
+  nav_msg.header.stamp = ros::Time::now();
+  nav_msg.header.frame_id = "world";
+  nav_msg.control_frame = nav_msg.WORLD_FRAME;
+  nav_msg.target = nav_msg.COG;
+  nav_msg.pos_xy_nav_mode = nav_msg.POS_MODE;
+  nav_msg.target_pos_x = target_pos(0);
+  nav_msg.target_pos_y = target_pos(1);
+  nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
+  nav_msg.target_pos_z = target_pos(2);
   // todo: add psi
   // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
   // nav_msg.target_psi = -math.pi / 2.0 # 0.0
@@ -183,7 +218,7 @@ void ReactiveMotion::cogOdomCallback(const nav_msgs::OdometryConstPtr & msg){
 void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & msg){
   if (msg->data == 0){
     motion_state_ = STILL;
-    sendControlCmd(cur_pos_);
+    // sendControlCmdDirectly(cur_pos_);
     ransac_line_estimator_->stopEstimation();
     ROS_INFO("[ReactiveMotion] Change motion state: STILL");
     ROS_INFO("[ReactiveMotion] Estimation stops");

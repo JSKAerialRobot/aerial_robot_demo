@@ -13,11 +13,13 @@ from hydrus_commander import HydrusCommander
 from task_commander import TaskCommander
 
 class PrepareEstimation(smach.State):
-    def __init__(self, wait_time=20):
+    def __init__(self, wait_time=0.5):
         smach.State.__init__(self, outcomes=['success', 'fail'])
         self.task_commander = TaskCommander()
+        self.wait_time = wait_time
 
     def execute(self, userdata):
+        rospy.sleep(self.wait_time)
         self.task_commander.prepare_estimation()
         return 'success'
 
@@ -84,12 +86,14 @@ class GoPositionState(smach.State):
         return 'ongoing'
 
 class GoGpsPositionState(smach.State):
-    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0, nav_mode=5):
+    def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0, nav_mode=5, initial_yaw_flag=False, initial_yaw=0.0):
         smach.State.__init__(self, outcomes=['success', 'ongoing'])
         self.commander = HydrusCommander(nav_mode=nav_mode)
 
         self.control_rate = control_rate
         self.approach_margin = approach_margin
+        self.__initial_yaw_flag = initial_yaw_flag
+        self.__initial_yaw = initial_yaw
 
         self.target_pos = target_pos
         self.cmd_pub_flag = False
@@ -98,9 +102,15 @@ class GoGpsPositionState(smach.State):
         if not self.cmd_pub_flag:
             print(self.target_pos)
             if len(self.target_pos) == 3:
-                self.commander.move_to_xyz(self.target_pos[0], self.target_pos[1], self.target_pos[2], override_nav_mode=5)
+                if self.__initial_yaw_flag:
+                    self.commander.move_to_xyz_yaw(self.target_pos[0], self.target_pos[1], self.target_pos[2], self.__initial_yaw, override_nav_mode=5)
+                else:
+                    self.commander.move_to_xyz(self.target_pos[0], self.target_pos[1], self.target_pos[2], override_nav_mode=5)
             elif len(self.target_pos) == 1:
-                self.commander.change_height(self.target_pos[0])
+                if self.__initial_yaw_flag:
+                    self.commander.change_height_yaw(self.target_pos[0], self.__initial_yaw)
+                else:
+                    self.commander.change_height(self.target_pos[0])
             self.cmd_pub_flag = True
             rospy.loginfo("Navigating to waypoint "+str(self.target_pos))
 
@@ -129,7 +139,7 @@ class WaypointNavigationStateMachineCreator():
         return sm
 
 class GpsWaypointNavigationStateMachineCreator():
-    def create(self, waypoints, approach_margin, control_rate, nav_mode=5):
+    def create(self, waypoints, approach_margin, control_rate, nav_mode=5, initial_yaw_flag=False, initial_yaw=0.0):
         ''' waypoints: nx3 array of 3d poionts
         '''
         sm = smach.StateMachine(outcomes={'success', 'failure'})
@@ -139,7 +149,8 @@ class GpsWaypointNavigationStateMachineCreator():
                     next_state = 'success'
                 else:
                     next_state = 'waypoint'+str(i+1)
-                smach.StateMachine.add('waypoint'+str(i), GoGpsPositionState(waypoint, approach_margin, control_rate, nav_mode),
+                rospy.sleep(0.1)
+                smach.StateMachine.add('waypoint'+str(i), GoGpsPositionState(waypoint, approach_margin, control_rate, nav_mode, initial_yaw_flag, initial_yaw),
                     transitions={'success':next_state,
                                  'ongoing':'waypoint'+str(i)})
         return sm
