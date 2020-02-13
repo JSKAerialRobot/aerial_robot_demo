@@ -1,7 +1,8 @@
 <launch>
   <arg name="model_suffix" default="_ring_gripper"/>
   <arg name="do_recognition" default="true"/>
-  <arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/simulation_default"/>
+  <!--arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/simulation_default"/-->
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/kashiwa_202002"/>
 
   <param name="/use_sim_time" value="true"/>
 
@@ -29,5 +30,10 @@
     <arg name="config_dir" value="$(arg config_dir)"/>
   </include>
 
+  <node pkg="mbzirc2020_task2_common" type="base_footprint_tf_publisher.py" name="base_footprint_tf_publisher"/>
+
   <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
+
+  <param name="rectangle_detection_color/debug_view" value="true"/>
+  <param name="rectangle_detection_depth/debug_view" value="true"/>
 </launch>
