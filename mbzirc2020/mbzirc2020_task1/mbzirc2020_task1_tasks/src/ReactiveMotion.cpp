@@ -9,6 +9,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("target_pos_xy_threshold", target_pos_xy_thre_, 3.0);
   nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
   nhp_.getParam("motion_cmd_threshold_list", motion_cmd_thre_vec_);
+  nhp_.getParam("close_pose", joints_close_pose_);
   nhp_.param("losing_tracking_period_threshold", losing_tracking_period_thre_, 4.0);
   nhp_.param("return_first_waypoint_flag", return_first_waypt_flag_, true);
 
@@ -252,7 +253,14 @@ void ReactiveMotion::closeJoints(){
   sensor_msgs::JointState joint_msg;
   joint_msg.name.push_back("joint1");
   joint_msg.name.push_back("joint3");
-  joint_msg.position.push_back(1.56);
-  joint_msg.position.push_back(1.56);
+  if (joints_close_pose_.size() != 2){
+    ROS_ERROR("joints_close_pose size is %d, manually set close form", joints_close_pose_.size());
+    joint_msg.position.push_back(1.56);
+    joint_msg.position.push_back(1.56);
+  }
+  else{
+    for (int i = 0; i < 2; ++i)
+      joint_msg.position.push_back(joints_close_pose_[i]);
+  }
   joints_ctrl_pub_.publish(joint_msg);
 }
