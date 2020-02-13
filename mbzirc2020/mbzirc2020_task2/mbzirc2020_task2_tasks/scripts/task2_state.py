@@ -212,12 +212,13 @@ class AdjustGraspPosition(Task2State):
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.recognition_wait = rospy.get_param('~recognition_wait')
+        self.adjust_grasp_image_type = rospy.get_param('~adjust_grasp_image_type', 'depth')
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
         self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
 
-        self.object_pose_sub = rospy.Subscriber('rectangle_detection_depth/target_object_depth', PoseArray, self.objectPoseCallback)
+        self.object_pose_sub = rospy.Subscriber('rectangle_detection_' + self.adjust_grasp_image_type + '/target_object_' + self.adjust_grasp_image_type, PoseArray, self.objectPoseCallback)
         self.object_pose = PoseArray()
 
     def objectPoseCallback(self, msg):
