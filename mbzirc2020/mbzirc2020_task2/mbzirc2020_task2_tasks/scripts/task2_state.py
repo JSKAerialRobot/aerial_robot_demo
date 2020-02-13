@@ -552,7 +552,7 @@ class Ungrasp(Task2State):
         self.robot.goPosWaitConvergence('global', uav_target_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
         #descend
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_margin, self.robot.getTargetYaw(), pos_conv_thresh = 0.15, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
 
         self.robot.ungrasp()
         self.remove_object_model_func(self.robot)
