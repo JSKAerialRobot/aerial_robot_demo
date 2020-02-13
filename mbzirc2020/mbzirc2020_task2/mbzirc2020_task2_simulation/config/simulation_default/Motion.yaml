@@ -23,6 +23,7 @@ grasping_yaw: 2.356 #in fc frame
 grasp_land_mode: true
 reset_realsense_odom: false
 joint_torque_thresh: 5 #[Nm]
+stop_if_grasp_failed: true
 
 place_channel_length: 4.0
 global_place_channel_z: 1.7 #[m]

@@ -23,6 +23,7 @@ grasping_yaw: 2.356 #in fc frame
 grasp_land_mode: true
 reset_realsense_odom: true
 joint_torque_thresh: 5 #[Nm]
+stop_if_grasp_failed: true
 
 place_channel_length: 4.0
 global_place_channel_z: 2.0 #[m]
@@ -32,6 +33,8 @@ channel_tf_frame_id: channel_center
 
 disable_alt_sensor: True
 alt_sensor_service_name: /estimator/sensor_plugin/alt1/estimate_flag
+
+#search motion params
 
 lookdown:
   grid: [[0, 1], [0, 0], [0, -1], [1, -1], [1, 0], [1, 1], [2, 1], [2, 0], [2, -1], [3, -1], [3, 0], [3, 1], [4, 1], [4, 0], [4, -1]]

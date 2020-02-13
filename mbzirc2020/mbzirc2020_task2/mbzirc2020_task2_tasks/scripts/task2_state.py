@@ -317,6 +317,7 @@ class Grasp(Task2State):
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
         self.grasp_land_mode = rospy.get_param('~grasp_land_mode')
         self.reset_realsense_odom = rospy.get_param('~reset_realsense_odom')
+        self.stop_if_grasp_failed = rospy.get_param('~stop_if_grasp_failed')
         self.reset_realsense_client = rospy.ServiceProxy('/realsense1/odom/reset', std_srvs.srv.Empty)
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -379,6 +380,9 @@ class Grasp(Task2State):
         else:
             rospy.logerr("%s: grasp failed! joint1: %f, joint3: %f, thresh: %f", self.__class__.__name__, joint_torque[0], joint_torque[1], self.joint_torque_thresh)
             result = 'failed'
+            if self.stop_if_grasp_failed:
+                rospy.signal_shutdown("finish state machine")
+                rospy.sleep(100)
 
         if self.reset_realsense_odom:
             rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
