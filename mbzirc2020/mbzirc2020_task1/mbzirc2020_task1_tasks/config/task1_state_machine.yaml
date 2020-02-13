@@ -1,5 +1,5 @@
 cover_pose: [0.76, 0.76] # to check
-close_pose: [1.4, 1.4]
+close_pose: [1.56, 1.56]
 
 # initial_waypoints: [[[49.9000071927, 8.89999917405, 3.0], [49.9000071927, 8.89999917405, 5.0]]] ## simulation
 # task1_waiting_waypoint: [[[49.9000777386, 8.89999917405, 5.0]]] ## simulation
