@@ -49,4 +49,4 @@ adjust_place:
   grid: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]
   grid_scale_x: 0.8
   grid_scale_y: 0.8
-  grid_search_timeout: 10
+  grid_search_timeout: 7
