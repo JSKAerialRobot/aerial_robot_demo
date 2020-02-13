@@ -62,10 +62,11 @@ def main():
             search_sm_creator = PlaneFireFightStateMachineCreator()
             sm_sub = search_sm_creator.create(search_type, search_params)
             if i==search_area_number-1:
-                next_state = 'FAIL'
+                next_state = 'RESET_LANDING'
             else:
                 next_state = 'NAVIGATING'+str(i+1)
             smach.StateMachine.add('SEARCHING'+str(i), sm_sub, transitions={'success':'DONE', 'failure':next_state})
+        smach.StateMachine.add('RESET_LANDING', LandState(), transitions={'success':'FAIL', 'fail':'FAIL'})
 
     sis = smach_ros.IntrospectionServer('smach_server', sm, '/SM_ROOT')
     sis.start()

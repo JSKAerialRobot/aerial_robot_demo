@@ -22,6 +22,26 @@ class TakeoffState(smach.State):
         rospy.sleep(self.wait_time)
         return 'success'
 
+class LandState(smach.State):
+    def __init__(self, wait_time=20):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.commander = HydrusCommander()
+        self.wait_time = wait_time
+
+    def execute(self, userdata):
+        self.commander.land()
+        rospy.sleep(self.wait_time)
+        return 'success'
+
+class HaltState(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.commander = HydrusCommander()
+
+    def execute(self, userdata):
+        self.commander.halt()
+        return 'success'
+
 class GoPositionState(smach.State):
     def __init__(self, target_pos=[0,0,0], approach_margin=[0.05, 0.05, 0.05], control_rate=5.0, nav_mode=2):
         smach.State.__init__(self, outcomes=['success', 'ongoing'])
