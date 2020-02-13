@@ -1,5 +1,5 @@
 cover_pose: [0.76, 0.76] # to check
-close_pose: [1.4, 1.4]
+close_pose: [1.56, 1.56]
 
 return_first_waypoint_flag: True
 
