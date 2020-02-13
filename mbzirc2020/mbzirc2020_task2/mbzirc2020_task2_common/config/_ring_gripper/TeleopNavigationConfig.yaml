@@ -10,9 +10,9 @@ navigator:
         joy_target_vel_interval: 0.005  # 0.2 / 20 = 0.01, 0.005 ~ 0.01  m/s
         joy_target_alt_interval: 0.02
         max_target_yaw_rate: 0.1 #  0.05
-        cmd_vel_lev2_gain : 2.0
-        nav_vel_limit : 0.4
         alt_convergent_thresh : 0.3
+        nav_vel_limit : 0.8
+        vel_nav_gain: 0.2
 
         gain_tunning_mode: 0
         max_target_tilt_angle: 0.5
