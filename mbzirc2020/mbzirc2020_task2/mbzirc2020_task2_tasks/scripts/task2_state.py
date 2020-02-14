@@ -446,7 +446,9 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
 
-        #enable alt sensor
+        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getBaselinkRPY()[2], pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+
+        #disable alt sensor
         if self.disable_alt_sensor:
             try:
                 req = std_srvs.srv.SetBoolRequest()
