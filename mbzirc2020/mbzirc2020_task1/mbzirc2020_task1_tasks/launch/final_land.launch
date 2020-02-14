@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mbzirc2020_task1_tasks" type="task1_land_state_machine.py" name="task1_motion_state_machine"  output="screen">
+    <rosparam file="$(find mbzirc2020_task1_tasks)/config/task1_land_state_machine.yaml" command="load" />
+  </node>
+
+</launch>

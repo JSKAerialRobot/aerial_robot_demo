@@ -8,6 +8,7 @@
   <arg name="image_pub_throttle_rate" default="10.0" />
   <arg name="ground_station" default="false" />
   <arg name="ground_station_ip" default="192.168.1.122" />
+  <arg name="final_landing" default="false" />
 
   ###########  bring up  ###########
   <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
@@ -38,10 +39,16 @@
   </include>
 
   ########### motion ###########
-  <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
-    <arg name="vision" value="true" />
-    <arg name="from_ground" value="true" />
-  </include>
+  <group unless="$(arg final_landing)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
+      <arg name="vision" value="true" />
+      <arg name="from_ground" value="true" />
+    </include>
+  </group>
+  <group if="$(arg final_landing)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/final_land.launch.launch" >
+    </include>
+  </group>
 
 
   ### communication to ground station
