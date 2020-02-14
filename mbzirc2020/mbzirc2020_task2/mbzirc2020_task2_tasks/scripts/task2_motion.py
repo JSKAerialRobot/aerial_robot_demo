@@ -101,7 +101,8 @@ def main():
 
             smach.StateMachine.add('AdjustGraspPosition', AdjustGraspPosition(robot),
                                    transitions={'succeeded':'Grasp',
-                                                'failed':'SearchAdjustGrasp'},
+                                                'failed':'SearchAdjustGrasp',
+                                                'adjust_again':'AdjustGraspPosition'},
                                    remapping={'orig_global_trans':'orig_global_trans',
                                               'search_count':'search_count',
                                               'search_failed':'search_failed'})
@@ -136,17 +137,9 @@ def main():
                                               'orig_channel_xy_yaw':'orig_channel_xy_yaw'})
 
             smach.StateMachine.add('AdjustPlacePosition', AdjustPlacePosition(robot),
-                                   transitions={'succeeded':'AdjustPlacePositionAgain',
-                                                'failed':'SearchAdjustPlace',
-                                                'search_failed':'Ungrasp'},
-                                   remapping={'orig_global_trans':'orig_global_trans',
-                                              'search_count':'search_count',
-                                              'search_failed':'search_failed'})
-
-            smach.StateMachine.add('AdjustPlacePositionAgain', AdjustPlacePosition(robot),
                                    transitions={'succeeded':'Ungrasp',
                                                 'failed':'SearchAdjustPlace',
-                                                'search_failed':'Ungrasp'},
+                                                'adjust_again':'AdjustPlacePosition'},
                                    remapping={'orig_global_trans':'orig_global_trans',
                                               'search_count':'search_count',
                                               'search_failed':'search_failed'})

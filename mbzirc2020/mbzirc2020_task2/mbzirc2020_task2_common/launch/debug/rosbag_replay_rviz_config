@@ -4,9 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1/Frames1
-        - /PoseArray1
-        - /PoseArray2
+        - /Global Options1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 1373
   - Class: rviz/Selection
@@ -27,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: D435 point cloud
   - Class: rviz/Views
     Expanded:
       - /Current View1
@@ -299,13 +298,184 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-      Marker Scale: 0.5
+        base_footprint:
+          Value: true
+        bat1:
+          Value: true
+        bat2:
+          Value: true
+        bat3:
+          Value: true
+        bat4:
+          Value: true
+        cog:
+          Value: true
+        fc:
+          Value: true
+        fixed_joint_unit:
+          Value: true
+        gps:
+          Value: true
+        leddarone:
+          Value: true
+        leg1:
+          Value: true
+        leg2:
+          Value: true
+        leg3:
+          Value: true
+        leg4:
+          Value: true
+        leg_collision_model1:
+          Value: true
+        leg_collision_model2:
+          Value: true
+        leg_collision_model3:
+          Value: true
+        leg_collision_model4:
+          Value: true
+        leg_collision_model5:
+          Value: true
+        link1:
+          Value: true
+        link2:
+          Value: true
+        link3:
+          Value: true
+        link4:
+          Value: true
+        magnet:
+          Value: true
+        neuron3:
+          Value: true
+        pc:
+          Value: true
+        realsense1_pose_frame:
+          Value: true
+        ring_gripper_left:
+          Value: true
+        ring_gripper_right:
+          Value: true
+        root:
+          Value: true
+        rs_d435_color_frame:
+          Value: true
+        rs_d435_color_optical_frame:
+          Value: true
+        rs_d435_depth_frame:
+          Value: true
+        rs_d435_depth_optical_frame:
+          Value: true
+        rs_d435_left_ir_frame:
+          Value: true
+        rs_d435_left_ir_optical_frame:
+          Value: true
+        rs_d435_link:
+          Value: true
+        rs_d435_mount:
+          Value: true
+        rs_d435_right_ir_frame:
+          Value: true
+        rs_d435_right_ir_optical_frame:
+          Value: true
+        rs_d435_servo:
+          Value: true
+        rs_d435_unit:
+          Value: true
+        target_object_depth00:
+          Value: true
+        target_object_depth01:
+          Value: true
+        target_object_depth02:
+          Value: true
+        target_object_depth03:
+          Value: true
+        target_object_depth04:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        root:
+          cog:
+            world:
+              base_footprint:
+                {}
+          link1:
+            bat1:
+              {}
+            leg1:
+              leg_collision_model1:
+                {}
+            leg2:
+              leg_collision_model2:
+                {}
+            link2:
+              bat2:
+                {}
+              fc:
+                {}
+              gps:
+                magnet:
+                  {}
+              leddarone:
+                {}
+              link3:
+                bat3:
+                  {}
+                fixed_joint_unit:
+                  {}
+                leg_collision_model5:
+                  {}
+                link4:
+                  bat4:
+                    {}
+                  leg3:
+                    leg_collision_model3:
+                      {}
+                  leg4:
+                    leg_collision_model4:
+                      {}
+                  ring_gripper_right:
+                    {}
+                realsense1_pose_frame:
+                  {}
+              neuron3:
+                {}
+              pc:
+                {}
+              rs_d435_mount:
+                {}
+              rs_d435_servo:
+                rs_d435_unit:
+                  rs_d435_link:
+                    rs_d435_depth_frame:
+                      rs_d435_color_frame:
+                        rs_d435_color_optical_frame:
+                          target_object_depth00:
+                            {}
+                          target_object_depth01:
+                            {}
+                          target_object_depth02:
+                            {}
+                          target_object_depth03:
+                            {}
+                          target_object_depth04:
+                            {}
+                      rs_d435_depth_optical_frame:
+                        {}
+                      rs_d435_left_ir_frame:
+                        rs_d435_left_ir_optical_frame:
+                          {}
+                      rs_d435_right_ir_frame:
+                        rs_d435_right_ir_optical_frame:
+                          {}
+            ring_gripper_left:
+              {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -419,11 +589,30 @@ Visualization Manager:
       Topic: /rectangle_detection_depth/target_object_depth_orig
       Unreliable: false
       Value: true
+    - Align Bottom: true
+      Background Alpha: 0.200000003
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000012
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /rosconsole_overlay_text/output
+      Value: true
+      font: DejaVu Sans Mono
+      height: 700
+      left: 0
+      line width: 2
+      text size: 12
+      top: 700
+      width: 700
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: base_footprint
     Frame Rate: 30
   Name: root
   Tools:
@@ -444,25 +633,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 18.2088356
+      Distance: 13.4769125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.487596363
-        Y: 1.26916707
-        Z: -0.199793175
+        X: -1.1089474
+        Y: 3.14625168
+        Z: 0.649455726
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.705203414
+      Pitch: 0.485203505
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.217213005
+      Yaw: 5.43539858
     Saved: ~
 Window Geometry:
   Displays:
