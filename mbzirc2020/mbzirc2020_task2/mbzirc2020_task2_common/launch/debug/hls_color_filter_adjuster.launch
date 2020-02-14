@@ -1,0 +1,16 @@
+<launch>
+  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch"/>
+
+  <include file="$(find opencv_apps)/launch/hls_color_filter.launch">
+    <arg name="image" value="/camera/color/image_rect_color"/>
+    <arg name="h_limit_max" value="37"/>
+    <arg name="h_limit_min" value="325"/>
+    <arg name="l_limit_max" value="251"/>
+    <arg name="l_limit_min" value="1"/>
+    <arg name="s_limit_max" value="255"/>
+    <arg name="s_limit_min" value="72"/>
+    <arg name="debug_view" value="true"/>
+  </include>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
+</launch>
