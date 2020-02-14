@@ -10,7 +10,7 @@ import math
 from std_msgs.msg import Empty
 from sensor_msgs.msg import JointState
 from aerial_robot_msgs.msg import FlightNav, FlatnessPid
-from std_srvs.srv import Trigger
+from std_srvs.srv import Trigger, SetBool, SetBoolRequest
 
 class HydrusCommander():
     def __init__(self, nav_mode=2, name="hydrus_commander"):
@@ -24,6 +24,7 @@ class HydrusCommander():
         self.land_pub = rospy.Publisher("/teleop_command/land", Empty,  queue_size=1)
         self.halt_pub = rospy.Publisher('/teleop_command/halt', Empty, queue_size=1)
 
+        self.set_joint_torque_client = rospy.ServiceProxy('/hydrusx/joints/torque_enable', SetBool)
         self.extra_servos_ctrl_pub = rospy.Publisher("/hydrusx/extra_servos_ctrl", JointState, queue_size=1)
         self.joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
 
@@ -50,6 +51,15 @@ class HydrusCommander():
     def halt(self):
         time.sleep(self.WAIT_TIME)
         self.halt_pub.publish(Empty())
+        time.sleep(self.WAIT_TIME)
+
+    def set_joint_torque(self, state):
+        req = SetBoolRequest()
+        req.data = state
+        try:
+            self.set_joint_torque_client(req)
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
         time.sleep(self.WAIT_TIME)
 
     def move_to(self, pos_x, pos_y, override_nav_mode=None):

@@ -8,7 +8,6 @@ import tf
 import tf2_ros
 import numpy as np
 
-
 from hydrus_commander import HydrusCommander
 
 class TakeoffState(smach.State):
@@ -18,6 +17,7 @@ class TakeoffState(smach.State):
         self.wait_time = wait_time
 
     def execute(self, userdata):
+        self.commander.set_joint_torque(True)
         self.commander.arm_and_takeoff()
         rospy.sleep(self.wait_time)
         return 'success'
