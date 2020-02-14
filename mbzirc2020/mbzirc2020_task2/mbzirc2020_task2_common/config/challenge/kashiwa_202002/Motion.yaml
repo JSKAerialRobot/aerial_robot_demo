@@ -1,4 +1,4 @@
-grasp_joint_angle: [1.4, 1.4]
+grasp_joint_angle: [1.5, 1.5]
 ungrasp_joint_angle: [0.9, 0.9]
 preshape_joint_angle: [0.75, 0.75]
 reset_joint_angle: [1.5, 1.5]
@@ -14,7 +14,7 @@ object_yaw_thresh: 0.3
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
 object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
-adjust_grasp_image_type: 'depth'
+adjust_grasp_image_type: 'depth' #depth or color
 
 global_object_yaw: 0.0
 recognition_wait: 1.0
@@ -28,8 +28,8 @@ stop_if_grasp_failed: true
 
 place_channel_length: 4.0
 global_place_channel_z: 2.0 #[m]
-place_z_margin: 0.8 #[m]
-place_z_offset: 1.3 #[m]
+place_z_margin: 1.2 #[m]
+place_z_offset: 1.6 #[m]
 channel_tf_frame_id: channel_center
 
 disable_alt_sensor: True
@@ -47,10 +47,12 @@ adjust_grasp:
   grid: [[-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [0, -1], [0, 0], [0, 1], [0, 2], [1, 2], [1, 1], [1, 0], [1, -1], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2], [3, 2], [3, 1], [3, 0], [3, -1], [3, -2]]
   grid_scale_x: 0.5
   grid_scale_y: 0.3
+#  grid_scale_x: 0.7
+#  grid_scale_y: 0.5
   grid_search_timeout: 5
 
 adjust_place:
   grid: [[0, -1], [0, 0], [0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2]]
-  grid_scale_x: 0.8
-  grid_scale_y: 0.8
+  grid_scale_x: 1.0
+  grid_scale_y: 1.0
   grid_search_timeout: 7
