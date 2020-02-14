@@ -14,6 +14,7 @@ object_yaw_thresh: 0.3
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
 object_interval: 0.6 #object center to center in a lane
 lane_interval: 0.75 #constant
+object_pos_thresh: 0.15
 adjust_grasp_image_type: 'depth' #depth or color
 
 global_object_yaw: 0.0
@@ -30,6 +31,7 @@ place_channel_length: 4.0
 global_place_channel_z: 2.0 #[m]
 place_z_margin: 1.2 #[m]
 place_z_offset: 1.6 #[m]
+channel_pos_thresh: 0.3
 channel_tf_frame_id: channel_center
 
 disable_alt_sensor: True

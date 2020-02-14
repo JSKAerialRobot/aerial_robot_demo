@@ -202,7 +202,7 @@ class LookDown(Task2State):
 class AdjustGraspPosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot,
-                            outcomes=['succeeded', 'failed'],
+                            outcomes=['succeeded', 'failed', 'adjust_again'],
                             input_keys=['orig_global_trans', 'search_count', 'search_failed'],
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
@@ -213,6 +213,7 @@ class AdjustGraspPosition(Task2State):
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.recognition_wait = rospy.get_param('~recognition_wait')
         self.adjust_grasp_image_type = rospy.get_param('~adjust_grasp_image_type', 'depth')
+        self.object_pos_thresh = rospy.get_param('~object_pos_thresh')
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -267,6 +268,7 @@ class AdjustGraspPosition(Task2State):
         if object_found:
             object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(target_object_pose))
             object_global_pos = tft.translation_from_matrix(object_global_coords)
+            object_pos_local = object_global_pos - self.robot.getBaselinkPos()
             object_global_x_axis = object_global_coords[0:3, 0]
             object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
             rospy.logwarn("%s: succeed to find valid object x: %f, y: %f, yaw: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1], object_global_yaw)
@@ -277,12 +279,18 @@ class AdjustGraspPosition(Task2State):
             uav_target_pos = tft.translation_from_matrix(uav_target_coords)
             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
 
-            self.robot.preshape()
-            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
-
+            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
             #reset search state
             userdata.search_count = 0
             userdata.search_failed = False
+
+            # check object is directly below
+            if np.linalg.norm(object_pos_local[0:2]) > self.object_pos_thresh:
+                rospy.logwarn("%s: succeed to find object, but not directly below. diff: %f", self.__class__.__name__, np.linalg.norm(object_pos_local[0:2]))
+                return 'adjust_again'
+
+            self.robot.preshape()
+            self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1)
             return 'succeeded'
 
         else:
@@ -463,7 +471,6 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getTargetYaw(), pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
         self.robot.goPosWaitConvergence('global', place_pos_gps, self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
@@ -472,7 +479,7 @@ class ApproachPlacePosition(Task2State):
 class AdjustPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, robot,
-                            outcomes=['succeeded', 'failed', 'search_failed'],
+                            outcomes=['succeeded', 'failed', 'adjust_again'],
                             input_keys=['orig_global_trans', 'search_count', 'search_failed'],
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
@@ -481,6 +488,7 @@ class AdjustPlacePosition(Task2State):
         self.channel_tf_frame_id = rospy.get_param('~channel_tf_frame_id')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.recognition_wait = rospy.get_param('~recognition_wait')
+        self.channel_pos_thresh = rospy.get_param('~channel_pos_thresh')
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -506,18 +514,24 @@ class AdjustPlacePosition(Task2State):
                 userdata.search_count = 0
                 userdata.search_failed = False
 
-                return 'search_failed' #go to next state
+                return 'succeeded' #go to next state
             else:
                 return 'failed'
 
         channel_pos = tft.translation_from_matrix(channel_trans)
         rospy.logwarn("%s: succeed to find channel x: %f, y: %f", self.__class__.__name__, channel_pos[0], channel_pos[1])
+        channel_pos_local = channel_pos - self.robot.getBaselinkPos()
 
         self.robot.goPosWaitConvergence('global', channel_pos[0:2], self.robot.getTargetZ(), self.robot.getTargetYaw(), pos_conv_thresh = 0.25, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 15)
 
         #reset search state
         userdata.search_count = 0
         userdata.search_failed = False
+
+        # check channel is directly below
+        if np.linalg.norm(channel_pos_local[0:2]) > self.channel_pos_thresh:
+            rospy.logwarn("%s: succeed to find channel, but not directly below. diff: %f", self.__class__.__name__, np.linalg.norm(channel_pos_local[0:2]))
+            return 'adjust_again'
 
         return 'succeeded'
 
