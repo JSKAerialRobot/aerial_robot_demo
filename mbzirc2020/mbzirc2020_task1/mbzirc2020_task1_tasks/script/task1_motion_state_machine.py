@@ -79,7 +79,13 @@ def main():
         sm_sub_waiting_waypt_nav = task1_waiting_waypoint_nav_creator.create(task1_waiting_waypoints, nav_approach_margin, nav_control_rate, nav_mode)
         smach.StateMachine.add('TASK1_ENTER_STATE_PREPARED', sm_sub_waiting_waypt_nav, transitions={'success':'TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', 'failure':'FAIL'})
 
-        smach.StateMachine.add('TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', PrepareEstimation(), transitions={'success':'TASK1_WAITING_STATE', 'fail':'FAIL'})
+        task1_waiting_height_waypoints_list = rospy.get_param('~task1_waiting_height_waypoint', [[[0,0,1]]])
+        task1_waiting_height_waypoint_nav_creator = GpsWaypointNavigationStateMachineCreator()
+        task1_waiting_height_waypoints = task1_waiting_height_waypoints_list[0]
+        sm_sub_waiting_height_waypt_nav = task1_waiting_height_waypoint_nav_creator.create(task1_waiting_height_waypoints, nav_approach_margin, nav_control_rate, nav_mode)
+        smach.StateMachine.add('TASK1_ARRIVAL_WAITING_WAYPOINT_STATE', sm_sub_waiting_height_waypt_nav, transitions={'success':'TASK1_ARRIVAL_WAITING_HEIGHT_WAYPOINT_STATE', 'failure':'FAIL'})
+
+        smach.StateMachine.add('TASK1_ARRIVAL_WAITING_HEIGHT_WAYPOINT_STATE', PrepareEstimation(), transitions={'success':'TASK1_WAITING_STATE', 'fail':'FAIL'})
         smach.StateMachine.add('TASK1_WAITING_STATE', smach_ros.MonitorState("~task1_track_flag", Empty, track_flag_cb), transitions={'invalid':'TASK1_TRACKING_STATE', 'valid':'TASK1_WAITING_STATE', 'preempted':'TASK1_WAITING_STATE'})
         smach.StateMachine.add('TASK1_TRACKING_STATE', smach_ros.MonitorState("~task1_return_initial_flag", Empty, return_initial_flag_cb), transitions={'invalid':'TASK1_ENTER_STATE', 'valid':'TASK1_TRACKING_STATE', 'preempted':'TASK1_TRACKING_STATE'})
 
