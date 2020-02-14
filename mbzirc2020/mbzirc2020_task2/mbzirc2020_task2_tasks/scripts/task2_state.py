@@ -54,7 +54,7 @@ class Start(Task2State):
         self.robot.startAndTakeoff()
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
-        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2], timeout=10)
+        self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2], timeout=10, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
 
         self.robot.setCameraJointAngle(np.pi / 2)
         return 'succeeded'
