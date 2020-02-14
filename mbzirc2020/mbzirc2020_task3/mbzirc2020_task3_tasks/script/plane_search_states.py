@@ -82,7 +82,6 @@ class VortexSearchState(smach.State):
             self.commander = HydrusCommander(nav_mode=2)
             self.is_first_execution = True
 
-        rospy.logerr("vortex search start !!!!")
         # retrieve parameters
         self.target_topic_name = params['target_topic_name']
         self.control_rate = params['control_rate']
@@ -96,7 +95,6 @@ class VortexSearchState(smach.State):
         # define subscriber
         self.target_pos_sub_ = rospy.Subscriber(self.target_topic_name, Vector3Stamped, self.targetPositionCallback)
         self.target_pos_flag = False
-        rospy.logerr(self.search_area_length)
         self.waypoints = self.createWayPointList()
         self.waypoint_idx = 0
 
@@ -163,11 +161,9 @@ class VortexSearchState(smach.State):
         if self.mode == 'relative' and self.is_first_execution==True:
             msg = rospy.wait_for_message('/uav/cog/odom', Odometry)
             self.relative_xy_bias = [msg.pose.pose.position.x, msg.pose.pose.position.y]
-            print('relative bias: ', str(self.relative_xy_bias))
             self.is_first_execution = False
 
 
-        rospy.logerr(self.waypoints)
         search_pos = copy.copy(self.waypoints[self.waypoint_idx])
         search_pos[0] = self.waypoints[self.waypoint_idx][0]
         search_pos[1] = self.waypoints[self.waypoint_idx][1]
