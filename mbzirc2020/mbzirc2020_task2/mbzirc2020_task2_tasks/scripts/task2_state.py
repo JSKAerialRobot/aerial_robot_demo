@@ -83,7 +83,6 @@ class ApproachPickPosition(Task2State):
         if self.skip_approach_pick_position:
             return 'succeeded'
 
-        target_object_pos = self.global_lookdown_pos_gps
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw
 
         #enable alt sensor
@@ -101,8 +100,8 @@ class ApproachPickPosition(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-        self.robot.goPosWaitConvergence('global', [target_object_pos[0], target_object_pos[1]], self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, self.robot.getTargetZ(), target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
+        self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, self.object_lookdown_height, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.2)
 
         return 'succeeded'
 
@@ -114,11 +113,13 @@ class LookDown(Task2State):
                             output_keys=['orig_global_trans', 'search_count', 'search_failed'])
 
         self.skip_look_down = rospy.get_param('~skip_look_down', False)
+        self.no_lookdown_mode = rospy.get_param('~no_lookdown_mode')
         self.do_object_recognition = rospy.get_param('~do_object_recognition')
         self.object_approach_height = rospy.get_param('~object_approach_height')
         self.object_yaw_thresh = rospy.get_param('~object_yaw_thresh')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.recognition_wait = rospy.get_param('~recognition_wait')
+        self.global_lookdown_pos_gps = rospy.get_param('~global_lookdown_pos_gps')
 
         self.object_pose_sub = rospy.Subscriber('rectangle_detection_color/target_object_color', PoseArray, self.objectPoseCallback)
         self.object_pose = PoseArray()
@@ -135,6 +136,11 @@ class LookDown(Task2State):
 
         if not self.do_object_recognition:
             rospy.logwarn(self.__class__.__name__ + ': no recognition, skip')
+            return 'succeeded'
+
+        if self.no_lookdown_mode:
+            rospy.logwarn(self.__class__.__name__ + ': no lookdown mode')
+            self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, self.object_approach_height, self.robot.getTargetYaw(), gps_mode=True, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
             return 'succeeded'
 
         object_found = True

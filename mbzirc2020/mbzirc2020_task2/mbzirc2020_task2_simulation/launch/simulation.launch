@@ -9,6 +9,7 @@
   <arg name="debug_adjust_grasp" default="false"/>
   <arg name="debug_grasp" default="false"/>
   <arg name="debug_adjust_place" default="false"/>
+  <arg name="no_lookdown_mode" default="false"/>
 
   ### bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
@@ -31,6 +32,7 @@
     <arg name="single_object_mode" default="$(arg single_object_mode)"/>
     <arg name="target_object_number" default="$(arg target_object_number)"/>
     <arg name="object_num" default="$(arg object_num)"/>
+    <arg name="no_lookdown_mode" default="$(arg no_lookdown_mode)"/>
   </include>
 
   ### recognition
