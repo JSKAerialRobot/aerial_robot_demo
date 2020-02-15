@@ -92,7 +92,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       if (isTargetPosInSearchRegion())
         sendControlCmd(target_pos_);
       else{
-        ROS_WARN("[ReactiveMotion] Estimation is out of initial search region, follow previous cmd");
+        ROS_WARN_THROTTLE(0.5, "[ReactiveMotion] Estimation is out of initial search region, follow previous cmd");
         return;
       }
     }
@@ -153,10 +153,12 @@ void ReactiveMotion::sendControlCmd(Eigen::Vector3d target_pos){
   nav_msg.header.frame_id = "world";
   nav_msg.control_frame = nav_msg.WORLD_FRAME;
   nav_msg.target = nav_msg.COG;
-  nav_msg.pos_xy_nav_mode = nav_msg.POS_MODE;
+  // nav_msg.pos_xy_nav_mode = nav_msg.POS_MODE;
+  nav_msg.pos_xy_nav_mode = nav_msg.POS_VEL_MODE;
   nav_msg.target_pos_x = cur_pos_(0) + delta_pos(0);
   nav_msg.target_pos_y = cur_pos_(1) + delta_pos(1);
   nav_msg.pos_z_nav_mode = nav_msg.POS_MODE;
+  // nav_msg.pos_z_nav_mode = nav_msg.POS_VEL_MODE;
   nav_msg.target_pos_z = cur_pos_(2) + delta_pos(2);
   // todo: add psi
   // nav_msg.psi_nav_mode = nav_msg.POS_MODE;
