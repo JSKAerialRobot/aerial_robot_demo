@@ -18,3 +18,4 @@ channel_detection:
   debug_view: true
   frame_id: channel_center
   all_contour: true
+  contour_area_min_thre: 0.05
