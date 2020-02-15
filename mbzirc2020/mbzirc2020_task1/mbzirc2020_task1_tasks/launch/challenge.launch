@@ -50,4 +50,8 @@
       <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
     </include>
   </group>
+
+  ### monitoring GPS and Yaw ###
+  <node pkg="mbzirc2020_task1_tasks" type="gps_yaw_info.py" respawn="true" name="gps_yaw_info" output ="screen" />
+
 </launch>
