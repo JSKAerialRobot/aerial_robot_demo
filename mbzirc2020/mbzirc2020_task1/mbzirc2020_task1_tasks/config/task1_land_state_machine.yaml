@@ -1,8 +1,8 @@
 cover_pose: [0.76, 0.76] # to check
-close_pose: [1.4, 1.4]
+# close_pose: [1.4, 1.4]
+close_pose: [0.76, 0.76]
 
-initial_waypoints: [[[3.0], [5.0], [49.9000777386, 8.89999917405, 5.0]]] ## simulation
-# task1_waiting_waypoint: [[[35.8952459, 139.9446209, 5]]] ## 2020.02.11 line kashiwa hype playground
+initial_waypoints: [[[3.0], [5.0], [35.8952067, 139.9446237, 5.0]]] ## 2020.02.11 line kashiwa hype playground
 
 initial_yaw_flag: False
 initial_yaw: 2.7227574856695784

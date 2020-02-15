@@ -46,7 +46,7 @@
     </include>
   </group>
   <group if="$(arg final_landing)">
-    <include file="$(find mbzirc2020_task1_tasks)/launch/final_land.launch.launch" >
+    <include file="$(find mbzirc2020_task1_tasks)/launch/final_land.launch" >
     </include>
   </group>
 
