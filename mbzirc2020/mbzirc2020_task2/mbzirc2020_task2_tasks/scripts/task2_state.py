@@ -181,8 +181,8 @@ class LookDown(Task2State):
             uav_target_yaw = object_global_yaw - self.grasping_yaw
 
             rospy.logwarn("%s: succeed to find valid object x: %f, y: %f, yaw: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1], object_global_yaw)
-            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
+            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.2, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.1)
+            self.robot.goPosWaitConvergence('global', [object_global_pos[0], object_global_pos[1]], self.object_approach_height, uav_target_yaw, pos_conv_thresh = 0.15, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 10)
 
             userdata.search_count = 0
             userdata.search_failed = False
