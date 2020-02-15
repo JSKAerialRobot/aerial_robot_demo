@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mbzirc2020_task1_tasks)/config/task1_ransac_vis.rviz" />
+  <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find mbzirc2020_task1_tasks)/config/task1_ground_station.rviz" />
 </launch>

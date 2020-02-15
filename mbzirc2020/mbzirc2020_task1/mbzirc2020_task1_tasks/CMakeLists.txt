@@ -4,7 +4,9 @@ project(mbzirc2020_task1_tasks)
 add_definitions(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
+  aerial_robot_msgs
   edgetpu_roscpp
+  geometry_msgs
   message_filters
   message_generation
   message_runtime
@@ -12,9 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
-  aerial_robot_msgs
   tf2_geometry_msgs
   tf2_ros
+  visualization_msgs
   )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -41,8 +43,10 @@ ENDIF()
 add_message_files(
   FILES
   PrimitiveParams.msg
+  FC2OCSData.msg
+  OCS2FCData.msg
   )
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES geometry_msgs nav_msgs sensor_msgs std_msgs visualization_msgs)
 
 ###################################
 ## catkin specific configuration ##
