@@ -188,8 +188,32 @@
     </xacro:extra_module>
   </xacro:unless>
 
+  <!-- upward carbon pipe to avoid upside down crash on the ground -->
+  <xacro:extra_module name = "upward_pipe1" parent = "link2" visible = "0" >
+    <origin xyz="0.04 0.0 0.04" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "upward_pipe2" parent = "link3" visible = "0" >
+    <origin xyz="0.56 0.0 0.04" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+
   <!-- net -->
-  <xacro:property name="net_mass" value=".06" />
+  <xacro:property name="net_mass" value=".075" />
   <xacro:extra_module name = "net_anchor1" parent = "leg1" visible = "0" >
     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
     <inertial>
