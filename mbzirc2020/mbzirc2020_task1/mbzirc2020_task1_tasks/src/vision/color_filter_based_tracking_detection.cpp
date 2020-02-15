@@ -165,13 +165,22 @@ namespace edgetpu_roscpp
         /* low pass filter */
         if(ball_depth_ < 0) ball_depth_ = ball_depth;
         else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * ball_depth;
-
       }
+
     if (!ball_detection && drone_width_detection)
       {
         /* low pass filter */
         if(ball_depth_ < 0) ball_depth_ = drone_depth;
-        else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+        else
+          {
+            if(ball_depth_ < close_depth_)
+              {
+                if(verbose_) ROS_WARN("skip the drone width info");
+                return; // skip this when
+              }
+
+            ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+          }
 
         /* the center point of the lower side of the bounding box */
         ball_pixel_center_.x = (best_detection_candidate_.corners.xmin + best_detection_candidate_.corners.xmax) / 2;

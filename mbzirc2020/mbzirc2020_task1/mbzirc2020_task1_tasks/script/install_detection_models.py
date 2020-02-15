@@ -25,6 +25,14 @@ def main():
 
     download_data(
         pkg_name=PKG,
+        path='models/drone_detection_edgetpu_20200204_576.tflite',
+        url='https://drive.google.com/uc?id=1h3WKLxpjGhcVK4WKSC0dX4ZuU9aCBR4L',
+        md5='e74d46a73d77f08310731b490db96c6e',
+        extract=False,
+    )
+
+    download_data(
+        pkg_name=PKG,
         path='models/drone_detection_edgetpu_20200204_611.tflite',
         url='https://drive.google.com/uc?id=1DAeD4b6Z0Kyusz_vw0pPuWAOKScdzMxV',
         md5='0f9b7cd7adf9530bd6ac4f4e6da61d72',
@@ -40,7 +48,31 @@ def main():
         extract=True,
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='models/cocompile_model_20200204624_202002030726.tar.gz',
+        url='https://drive.google.com/uc?id=1IS0P1ji2gVTlR3CEvmFazmYOfrJWW-Y9',
+        md5='92e412b20f6a973184ffa0cc12e4b2f8',
+        extract=True,
+    )
 
+    '''
+    download_data(
+        pkg_name=PKG,
+        path='models/cocompile_model_202000204576_202002030704.tar.gz',
+        url='https://drive.google.com/uc?id=',
+        md5='',
+        extract=True,
+    )
+
+    download_data(
+        pkg_name=PKG,
+        path='models/cocompile_model_202000204611_202002030704.tar.gz', ## 611 is borken
+        url='https://drive.google.com/uc?id=',
+        md5='',
+        extract=True,
+    )
+    '''
 if __name__ == '__main__':
     main()
 
