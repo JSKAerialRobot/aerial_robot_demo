@@ -1,3 +1,13 @@
+
+
+### command to perform task1:
+```
+$ roslaunch mbzirc2020_task1_tasks challenge.launch
+```
+####options:
+
+- ground_station_ip: the IP address of ground station pc.
+
 ### drone and ball detection
 
 #### parameters
