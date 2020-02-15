@@ -61,4 +61,7 @@
   ### monitoring GPS and Yaw ###
   <node pkg="mbzirc2020_task1_tasks" type="gps_yaw_info.py" respawn="true" name="gps_yaw_info" output ="screen" />
 
+  ### special landing with joints close cmd ###
+  <node pkg="mbzirc2020_task1_tasks" type="task1_special_landing.py" respawn="true" name="task1_special_landing" output ="screen" />
+
 </launch>
