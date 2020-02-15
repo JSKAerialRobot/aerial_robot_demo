@@ -47,8 +47,9 @@
   <run_depend>tf2_geometry_msgs</run_depend>
   <run_depend>tf2_ros</run_depend>
   <run_depend>visualization_msgs</run_depend>
-
+  
   <run_depend>jsk_data</run_depend>
+  <run_depend>jsk_rviz_plugins</run_depend>
   <run_depend>python-gdown-pip</run_depend>
 
   <export>

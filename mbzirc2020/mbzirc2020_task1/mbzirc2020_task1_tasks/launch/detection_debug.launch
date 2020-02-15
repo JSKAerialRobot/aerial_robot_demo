@@ -5,17 +5,10 @@
   <arg name="monocular_camera" default="true" />
   <arg name="camera_pitch_angle" default="-0.087" />
   <arg name="cascaded_detection" default = "false" />
-  <arg name="image_pub_throttle_rate" default="10.0" />
+  <arg name="image_pub_throttle_rate" default="30.0" />
   <arg name="ground_station" default="true" />
   <arg name="ground_station_ip" default="192.168.1.122" />
   <arg name="final_landing" default="false" />
-
-  ###########  bring up  ###########
-  <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
-    <arg name="estimate_mode" value="$(arg estimate_mode)" />
-    <arg name="monocular_camera" value="$(arg monocular_camera)" />
-    <arg name="camera_pitch_angle" value="$(arg camera_pitch_angle)" />
-  </include>
 
   ########### perception ###########
   <include file="$(find mbzirc2020_task1_tasks)/launch/drone_ball_tracking_by_detection.launch" >
@@ -39,36 +32,4 @@
     <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" unless="$(arg monocular_camera)"/>
     <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
   </include>
-
-  ########### motion ###########
-  <group unless="$(arg final_landing)">
-    <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
-      <arg name="vision" value="true" />
-      <arg name="from_ground" value="true" />
-    </include>
-  </group>
-  <group if="$(arg final_landing)">
-    <include file="$(find mbzirc2020_task1_tasks)/launch/final_land.launch" >
-    </include>
-  </group>
-
-  ### communication to ground station
-  <group if="$(arg ground_station)">
-    <include file="$(find mbzirc2020_task1_tasks)/launch/communication2ground_station.launch">
-      <arg name="GROUND_STATION_IP" value="$(arg ground_station_ip)" />
-      <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
-    </include>
-  </group>
-
-  <node pkg="jsk_rviz_plugins" type="rosconsole_overlay_text.py" respawn="true" name="rosconsole_overlay_text">
-    <rosparam>
-      nodes: ["/detection_nodelet", "/drone_ball_detection_and_tracking", "/ransac_line_fitting_node", "/task1_motion_state_machine"]
-      reverse_lines: false
-    </rosparam>
-  </node>
-
-  ### monitoring GPS and Yaw ###
-  <node pkg="mbzirc2020_task1_tasks" type="gps_yaw_info.py" respawn="true" name="gps_yaw_info" output ="screen" />
-  <node pkg="mbzirc2020_task1_tasks" type="task1_special_landing.py" respawn="true" name="task1_special_landing" output ="screen" />
-
 </launch>

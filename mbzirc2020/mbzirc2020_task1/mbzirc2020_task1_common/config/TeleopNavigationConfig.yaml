@@ -12,8 +12,9 @@ navigator:
         max_target_yaw_rate: 1.0 #  0.05
         cmd_vel_lev2_gain : 2.0
         #vel_nav_gain: 0.5 # default: 1.0
-        nav_vel_limit: 1.0
-
+        #nav_vel_limit: 1.0
+        nav_vel_limit: 1.0 # defaut: 1.0
+        
         gain_tunning_mode: 0
         max_target_tilt_angle: 0.3
         cmd_angle_lev2_gain : 1.5

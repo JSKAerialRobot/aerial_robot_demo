@@ -24,6 +24,16 @@
     <param name="event_driven" value="True" />
   </node>
 
+  ### GroundStation to UAV
+  <node pkg="jsk_network_tools" type="silverhammer_lowspeed_streamer.py" name="lowspeed_streamer_special_landing">
+    <remap from="~input" to="/task1_motion_state_machine/task1_special_landing" />
+    <param name="message" value="std_msgs/Empty" />
+    <param name="to_ip" value="$(arg UAV_IP)" />
+    <param name="to_port" value="$(arg LOW_PORT)" />
+    <param name="send_rate" value="1" />
+    <param name="event_driven" value="True" />
+  </node>
+
   <node name="rviz" pkg="rviz" type="rviz"
         args="-d $(find mbzirc2020_task1_tasks)/config/task1_ground_station.rviz" respawn="true" />
 

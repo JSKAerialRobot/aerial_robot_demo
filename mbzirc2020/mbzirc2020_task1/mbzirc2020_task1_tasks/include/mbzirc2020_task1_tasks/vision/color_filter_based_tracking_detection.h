@@ -103,6 +103,7 @@ namespace edgetpu_roscpp
       double ball_close_depth_outlier_threshold_;
       double far_depth_;
       double close_depth_;
+      double very_close_depth_;
 
       /* camera info */
       double f_dash_;

@@ -52,7 +52,11 @@ def main():
         smach.StateMachine.add('INITIAL_STATE', smach_ros.MonitorState("~task1_start", Empty, monitor_cb), transitions={'invalid':'TAKEOFF', 'valid':'INITIAL_STATE', 'preempted':'INITIAL_STATE'})
         smach.StateMachine.add('TAKEOFF', TakeoffState(15), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
 
+        initial_gps_xy = rospy.get_param('~initial_gps_xy', [0,0])
         waypoints_list = rospy.get_param('~initial_waypoints', [[[0,0,1]]])
+        waypoints_list_num = len(waypoints_list[0])
+        waypoints_list[0][waypoints_list_num - 1] = [initial_gps_xy[0], initial_gps_xy[1], waypoints_list[0][waypoints_list_num - 1][0]]
+
         waypoints_number = len(waypoints_list)
         initial_yaw_flag = rospy.get_param('~initial_yaw_flag', False)
         initial_yaw = rospy.get_param('~initial_yaw', 0.0)
@@ -73,7 +77,10 @@ def main():
                           'return_first_waypoint_flag_input':'return_first_waypt_flag',
                           'first_waypoint_flag_output':'first_waypt_flag'})
 
-        task1_waiting_waypoints_list = rospy.get_param('~task1_waiting_waypoint', [[[0,0,1]]])
+        task1_waiting_waypoints_list = rospy.get_param('~task1_waiting_waypoint', [[[1]]])
+        task1_waiting_waypoints_list_num = len(task1_waiting_waypoints_list[0])
+        task1_waiting_waypoints_list[0][task1_waiting_waypoints_list_num - 1] = [initial_gps_xy[0], initial_gps_xy[1], task1_waiting_waypoints_list[0][task1_waiting_waypoints_list_num - 1][0]]
+
         task1_waiting_waypoint_nav_creator = GpsWaypointNavigationStateMachineCreator()
         task1_waiting_waypoints = task1_waiting_waypoints_list[0]
         sm_sub_waiting_waypt_nav = task1_waiting_waypoint_nav_creator.create(task1_waiting_waypoints, nav_approach_margin, nav_control_rate, nav_mode)

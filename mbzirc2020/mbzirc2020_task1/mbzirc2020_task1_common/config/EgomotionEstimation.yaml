@@ -54,7 +54,7 @@ estimator:
                 estimate_mode: 1 # 1<<0
         gps:
                 estimate_mode: 1 # 1<<0
-                delay: -0.45 # normal: -0.4 ~ -0.6 + -0.05: daylight: -0.45, night: -0.5
+                delay: -0.48 # normal: -0.4 ~ -0.6 + -0.05: daylight: -0.45, night: -0.5
         vo:
                 estimate_mode: 1 # 1<<0
         vo1: #downward

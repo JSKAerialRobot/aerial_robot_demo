@@ -58,7 +58,7 @@ namespace edgetpu_roscpp
     pnh_->param("ball_close_depth_outlier_threshold", ball_close_depth_outlier_threshold_, 5.0);
     pnh_->param("far_depth", far_depth_, 30.0);
     pnh_->param("close_depth", close_depth_, 10.0);
-
+    pnh_->param("very_close_depth", very_close_depth_, 6.0);
 
     color_filter_reconfigure_server_ = boost::make_shared<dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig> >(*pnh_);
     typename dynamic_reconfigure::Server<opencv_apps::HLSColorFilterConfig>::CallbackType f = boost::bind(&ColorFilterBallTracking::colorFilterReconfigureCallback, this, _1, _2);
@@ -165,13 +165,22 @@ namespace edgetpu_roscpp
         /* low pass filter */
         if(ball_depth_ < 0) ball_depth_ = ball_depth;
         else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * ball_depth;
-
       }
+
     if (!ball_detection && drone_width_detection)
       {
         /* low pass filter */
         if(ball_depth_ < 0) ball_depth_ = drone_depth;
-        else ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+        else
+          {
+            if(ball_depth_ < close_depth_)
+              {
+                if(verbose_) ROS_WARN("skip the drone width info");
+                return; // skip this when
+              }
+
+            ball_depth_ = (1 - ball_depth_lpf_gain_) * ball_depth_ + ball_depth_lpf_gain_ * drone_depth;
+          }
 
         /* the center point of the lower side of the bounding box */
         ball_pixel_center_.x = (best_detection_candidate_.corners.xmin + best_detection_candidate_.corners.xmax) / 2;
