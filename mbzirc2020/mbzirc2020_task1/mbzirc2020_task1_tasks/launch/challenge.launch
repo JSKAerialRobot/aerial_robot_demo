@@ -43,6 +43,7 @@
     <arg name="from_ground" value="true" />
   </include>
 
+
   ### communication to ground station
   <group if="$(arg ground_station)">
     <include file="$(find mbzirc2020_task1_tasks)/launch/communication2ground_station.launch">
@@ -50,4 +51,9 @@
       <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
     </include>
   </group>
+
+  ### special landing with joints close cmd ###
+  <node pkg="mbzirc2020_task1_tasks" type="task1_special_landing.py" respawn="true" name="task1_special_landing" output ="screen" />
+
+
 </launch>
