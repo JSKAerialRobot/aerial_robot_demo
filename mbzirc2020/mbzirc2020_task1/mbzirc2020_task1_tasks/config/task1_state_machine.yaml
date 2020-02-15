@@ -1,20 +1,16 @@
 cover_pose: [0.76, 0.76] # to check
-close_pose: [1.56, 1.56]
+# close_pose: [1.56, 1.56]
+close_pose: [0.76, 0.76]
 
-return_first_waypoint_flag: True
+return_first_waypoint_flag: False
+initial_yaw_flag: True
 
-# initial_waypoints: [[[49.9000071927, 8.89999917405, 2.0], [49.9000777386, 8.89999917405, 2.0]]] ## simulation
-# task1_waiting_waypoint: [[[49.9000777386, 8.89999917405, 5.0]]] ## simulation
-# task1_waiting_height_waypoint: [[[5.0]]] ## simulation
-
-initial_waypoints: [[[2.5], [35.8952459, 139.9446209, 2.5]]] ## kashiwa hype playground
-#task1_waiting_waypoint: [[[35.8951744, 139.9445376, 5]]] ## 2020.02.04 kashiwa hype playground
-
-#task1_waiting_waypoint: [[[35.8951743, 139.9446169, 5]]] ## 2020.02.07 line kashiwa hype playground
-
-task1_waiting_waypoint: [[[35.8952459, 139.9446209, 5]]] ## 2020.02.11 line kashiwa hype playground
-
+initial_waypoints: [[[2.5], [2.5]]] ## last waypt will rewrite with gps_xy
+task1_waiting_waypoint: [[[5.0]]] ## will rewrite with gps_xy
 task1_waiting_height_waypoint: [[[5.0]]]
 
-initial_yaw_flag: True
-initial_yaw: 2.7227574856695784
+
+
+#### modify following paramters in real chanllenge:
+initial_gps_xy: [35.8951939, 139.9446149]
+initial_yaw: 2.9
