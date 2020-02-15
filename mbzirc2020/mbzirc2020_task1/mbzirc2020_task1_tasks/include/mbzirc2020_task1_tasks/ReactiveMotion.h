@@ -35,6 +35,7 @@ private:
 
   Eigen::Vector3d task_initial_waiting_pos_;
   bool task_initial_waiting_pos_flag_;
+  bool return_first_waypt_flag_;
   double experiment_safety_z_offset_;
   int losing_tracking_cnt_;
   double losing_tracking_period_thre_;

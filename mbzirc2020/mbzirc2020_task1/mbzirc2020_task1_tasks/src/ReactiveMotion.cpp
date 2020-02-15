@@ -10,6 +10,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("experiment_safety_z_offset", experiment_safety_z_offset_, 0.0);
   nhp_.getParam("motion_cmd_threshold_list", motion_cmd_thre_vec_);
   nhp_.param("losing_tracking_period_threshold", losing_tracking_period_thre_, 4.0);
+  nhp_.param("return_first_waypoint_flag", return_first_waypt_flag_, true);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -226,7 +227,7 @@ void ReactiveMotion::reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & 
   else if (msg->data == 1){
     motion_state_ = WAITING;
     ROS_INFO("[ReactiveMotion] Change motion state: WAITING");
-    if (!task_initial_waiting_pos_flag_){
+    if (!task_initial_waiting_pos_flag_ || !return_first_waypt_flag_){
       task_initial_waiting_pos_flag_ = true;
       task_initial_waiting_pos_ = cur_pos_;
       ROS_WARN("[ReactiveMotion] Start waiting pos recorded.");

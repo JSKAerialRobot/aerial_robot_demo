@@ -22,6 +22,7 @@
     <param name="experiment_safety_z_offset" value="-0.6"/>
     <param name="lpf_z_gain" value="0.8"/>
     <rosparam file="$(find mbzirc2020_task1_tasks)/config/reactive_motion.yaml" command="load" />
+    <rosparam file="$(find mbzirc2020_task1_tasks)/config/task1_state_machine.yaml" command="load" />
   </node>
 
   <group if="$(arg vision)">
