@@ -32,7 +32,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   task_return_initial_waypt_pub_ = nh_.advertise<std_msgs::Empty>("/task1_motion_state_machine/task1_return_initial_flag", 1);
   task_track_flag_pub_ = nh_.advertise<std_msgs::Empty>("/task1_motion_state_machine/task1_track_flag", 1);
 
-  sleep(0.1);
+  ros::Duration(0.1).sleep();
 }
 
 void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
@@ -54,9 +54,8 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
         ROS_INFO("[ReactiveMotion] Estimation stops");
         task_return_initial_waypt_pub_.publish(std_msgs::Empty());
         ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
-        sleep(0.5);
+        ros::Duration(0.5).sleep();
         task_return_initial_waypt_pub_.publish(std_msgs::Empty()); // publish two times in case msg is missed
-        sleep(0.5);
       }
     }
   }
@@ -115,9 +114,8 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       ROS_INFO("[ReactiveMotion] Estimation stops");
       task_return_initial_waypt_pub_.publish(std_msgs::Empty());
       ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
-      sleep(0.5);
+      ros::Duration(0.5).sleep();
       task_return_initial_waypt_pub_.publish(std_msgs::Empty());
-      sleep(0.5);
     }
   }
 }
