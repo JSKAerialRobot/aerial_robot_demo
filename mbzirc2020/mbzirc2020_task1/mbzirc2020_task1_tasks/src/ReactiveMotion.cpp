@@ -86,7 +86,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
       sendControlCmd(target_pos_);
       double hit_time = ransac_line_estimator_->estimateTargetArrivalTime(cur_pos_);
       ROS_INFO("[ReactiveMotion] Target will hit %f sec later, track previous waypoint in open-loop way", hit_time);
-      sleep(hit_time);
+      ros::Duration(hit_time).sleep();
       closeJoints();
       return;
     }
@@ -104,7 +104,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
     }
   }
   else if (motion_state_ == STOP_TRACKING){
-    sendControlCmdDirectly(target_pos_);
+    sendControlCmd(target_pos_);
     ++stop_tracking_cnt_;
     double stop_tracking_period = 5.0;
     if (stop_tracking_cnt_ >= stop_tracking_period * control_freq_){
