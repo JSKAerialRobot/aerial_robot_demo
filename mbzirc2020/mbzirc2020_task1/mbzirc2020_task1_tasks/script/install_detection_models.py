@@ -39,6 +39,14 @@ def main():
         extract=False,
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='models/drone_detection_edgetpu_20200204_624.tflite',
+        url='https://drive.google.com/uc?id=17sDYSJXrB7pCBJFkGp23KSOr-gUxFhrt',
+        md5='9b202baf619055ef8172aef050858efd',
+        extract=False,
+    )
+
     ##### cacscaded detection model for separate model in bouding box (drone OR ball)
     download_data(
         pkg_name=PKG,
