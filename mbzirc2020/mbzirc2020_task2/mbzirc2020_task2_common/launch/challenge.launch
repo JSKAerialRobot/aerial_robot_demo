@@ -1,5 +1,5 @@
 <launch>
-  <arg name="world" default="kashiwa_202002"/>
+  <arg name="world" default="abudhabi_202002"/>
   <arg name="do_object_recognition" default="true"/>
   <arg name="do_channel_recognition" default="true"/>
   <arg name="single_object_mode" default="true"/>
