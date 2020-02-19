@@ -5,7 +5,8 @@ reset_joint_angle: [1.5, 1.5]
 
 object_translation: [0.1, 0.5, 0.0] #in link2 frame
 object_yaw: -0.785
-object_mass: 1.0
+object_mass: 0.4744 #red
+#object_mass: 0.6994 #green
 
 object_lookdown_height: 3.0
 object_approach_height: 1.2
