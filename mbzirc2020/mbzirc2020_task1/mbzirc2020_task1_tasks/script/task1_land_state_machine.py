@@ -47,7 +47,9 @@ def main():
         # smach.StateMachine.add('TASK1_ENTER_LAND_STATE', PrepareTaskState(), transitions={'success':'TASK1_ENTER_LAND_STATE_PREPARED', 'fail':'FAIL'})
 
         # smach.StateMachine.add('TASK1_ENTER_LAND_STATE_PREPARED', LandingState(15), transitions={'success':'DONE', 'fail':'INITIAL_STATE'})
-        smach.StateMachine.add('TASK1_ENTER_LAND_STATE', LandingState(15), transitions={'success':'DONE', 'fail':'INITIAL_STATE'})
+
+        # smach.StateMachine.add('TASK1_ENTER_LAND_STATE', LandingState(15), transitions={'success':'DONE', 'fail':'INITIAL_STATE'})
+        smach.StateMachine.add('TASK1_ENTER_LAND_STATE', LandingStateWithOpenJoints(15), transitions={'success':'DONE', 'fail':'INITIAL_STATE'})
         
 
     sis = smach_ros.IntrospectionServer('smach_server', sm, '/SM_ROOT')
