@@ -2,7 +2,8 @@
   <arg name="model_suffix" default="_ring_gripper"/>
   <arg name="do_recognition" default="true"/>
   <!--arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/simulation_default"/-->
-  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/kashiwa_202002"/>
+  <!--arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/kashiwa_202002"/-->
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/abudhabi_202002"/>
 
   <param name="/use_sim_time" value="true"/>
 
