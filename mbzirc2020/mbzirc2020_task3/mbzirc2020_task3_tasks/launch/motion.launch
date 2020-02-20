@@ -15,6 +15,7 @@
   <arg name="dummy_x" default="0"/>
   <arg name="dummy_y" default="0"/>
   <arg name="dummy_z" default="0"/>
+  <arg name="all_contour" default="true"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
@@ -29,6 +30,7 @@
   ########## recognition ###############
   ########### real machine #############
   <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(eval real_machine and not dummy_target)">
+    <arg name="all_contour" value="$(arg all_contour)" />
   </include>
 
   ########### simulation ###############
