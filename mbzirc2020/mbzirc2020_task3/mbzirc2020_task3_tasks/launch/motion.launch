@@ -15,7 +15,7 @@
   <arg name="dummy_x" default="0"/>
   <arg name="dummy_y" default="0"/>
   <arg name="dummy_z" default="0"/>
-  <arg name="all_contour" default="false"/>
+  <arg name="all_contour" default="true"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
