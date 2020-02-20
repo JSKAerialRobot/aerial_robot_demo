@@ -1,10 +1,10 @@
 hls_color_filter:
-  h_limit_max: 37
-  h_limit_min: 325
-  l_limit_max: 251
-  l_limit_min: 1
+  h_limit_max: 25
+  h_limit_min: 341
+  l_limit_max: 124
+  l_limit_min: 84
   s_limit_max: 255
-  s_limit_min: 72
+  s_limit_min: 110
   use_camera_info: false
   queue_size: 10
 
