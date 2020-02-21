@@ -150,6 +150,30 @@ bool RansacLineFitting::getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d 
   }
 }
 
+bool RansacLineFitting::isGettingClose(Eigen::Vector3d pos){
+  int checked_point_cnt = 5;
+  if (ransac_3d_mode_){
+    // to develop
+    return false;
+  }
+  else{
+    if (checked_point_cnt * 2 > cand_points2d_.size()) checked_point_cnt = cand_points2d_.size() / 2;
+    int near_point_cnt = 0;
+    for (int i = 0; i < checked_point_cnt; ++i){
+      auto pt_start = std::dynamic_pointer_cast<Point2D>(cand_points2d_[i]);
+      auto pt_end = std::dynamic_pointer_cast<Point2D>(cand_points2d_[cand_points2d_.size() - checked_point_cnt + i]);
+      double dist_start = sqrt(pow(pos[0] - pt_start->m_Point2D[0], 2.0) + pow(pos[1] - pt_start->m_Point2D[1], 2.0));
+      double dist_end = sqrt(pow(pos[0] - pt_end->m_Point2D[0], 2.0) + pow(pos[1] - pt_end->m_Point2D[1], 2.0));
+      if (dist_start > dist_end)
+        ++near_point_cnt;
+    }
+    if (near_point_cnt >= checked_point_cnt / 2 + 1)
+      return true;
+    else
+      return false;
+  }
+}
+
 bool RansacLineFitting::isNearTarget(Eigen::Vector3d pos){
   int checked_point_cnt = 5;
   if (ransac_3d_mode_){
