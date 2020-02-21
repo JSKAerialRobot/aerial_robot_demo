@@ -66,4 +66,8 @@
     <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg motion_config_filename)" command="load"/>
     <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg waypoint_config_filename)" command="load"/>
   </node>
+
+  ########## rosbag recorder ##############
+  <node pkg="mbzirc2020_task3_tasks" type="rosbag.sh" name="rosbag">
+  </node>
 </launch>
