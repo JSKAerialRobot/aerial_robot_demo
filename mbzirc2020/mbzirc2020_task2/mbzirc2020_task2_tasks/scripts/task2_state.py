@@ -39,7 +39,6 @@ class Start(Task2State):
 
         self.object_lookdown_height = rospy.get_param('~object_lookdown_height')
         self.skip_takeoff = rospy.get_param('~skip_takeoff', False)
-        self.vio_service_client = rospy.ServiceProxy('/estimator/sensor_plugin/vo1/estimate_flag', std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -55,16 +54,6 @@ class Start(Task2State):
         self.robot.startAndTakeoff()
         while not (self.robot.getFlightState() == self.robot.HOVER_STATE):
             pass
-
-        #disable VIO
-        try:
-            rospy.logwarn("Disable VIO")
-            req = std_srvs.srv.SetBoolRequest()
-            req.data = False
-            res = self.vio_service_client(req)
-        except rospy.ServiceException, e:
-            rospy.logerr("Service call failed: %s", e)
-
         self.robot.goPosWaitConvergence('global', self.robot.getBaselinkPos()[0:2], self.object_lookdown_height, self.robot.getBaselinkRPY()[2], timeout=10, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
 
         self.robot.setCameraJointAngle(np.pi / 2)
@@ -212,7 +201,7 @@ class LookDown(Task2State):
                 #go to next state
                 self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_approach_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
-                return 'succeeded'
+                return 'succeeded' 
             else:
                 return 'failed'
 
@@ -439,10 +428,8 @@ class ApproachPlacePosition(Task2State):
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
         self.global_place_channel_center_pos_gps = rospy.get_param('~global_place_channel_center_pos_gps')
-        self.relay_point_gps = rospy.get_param('~relay_point_gps')
         self.place_channel_length = rospy.get_param('~place_channel_length')
         self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
-        self.vio_service_client = rospy.ServiceProxy('/estimator/sensor_plugin/vo1/estimate_flag', std_srvs.srv.SetBool)
 
         self.waypoint_list = []
         self.waypoint_list.append(self.global_place_channel_center_pos_gps)
@@ -473,20 +460,7 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
 
-        #ascend
         self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.global_place_channel_z + self.place_z_offset, self.robot.getBaselinkRPY()[2], pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-
-        #go to relay point
-        self.robot.goPosWaitConvergence('global', self.relay_point_gps, self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
-
-        #enable VIO
-        try:
-            rospy.logwarn("Enable VIO")
-            req = std_srvs.srv.SetBoolRequest()
-            req.data = True
-            res = self.vio_service_client(req)
-        except rospy.ServiceException, e:
-            rospy.logerr("Service call failed: %s", e)
 
         #disable alt sensor
         if self.disable_alt_sensor:
@@ -503,8 +477,7 @@ class ApproachPlacePosition(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        #go to place point
-        self.robot.goPosWaitConvergence('global', place_pos_gps, self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=30, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.goPosWaitConvergence('global', place_pos_gps, self.global_place_channel_z + self.place_z_offset, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
         userdata.orig_channel_xy_yaw = (self.robot.getBaselinkPos()[0:2], self.global_place_channel_yaw)
 
         return 'succeeded'
