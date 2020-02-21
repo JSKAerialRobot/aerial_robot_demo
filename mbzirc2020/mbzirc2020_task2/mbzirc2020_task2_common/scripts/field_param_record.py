@@ -22,7 +22,7 @@ class GpsRecord:
     def execute(self):
 
         output = {}
-        for i in range(3):
+        for i in range(2):
             get_key = raw_input()
             if get_key == "": #enter
 
@@ -31,10 +31,6 @@ class GpsRecord:
                     output['global_lookdown_pos_gps'] = list(self.location)
 
                 if i == 1:
-                    print("%lf, %lf" % (self.location[0], self.location[1]))
-                    output['relay_point_gps'] = list(self.location)
-
-                if i == 2:
                     print("%lf, %lf, %f" % (self.location[0], self.location[1], self.yaw))
                     output['global_place_channel_center_pos_gps'] = list(self.location)
                     output['global_place_channel_yaw'] = self.yaw
