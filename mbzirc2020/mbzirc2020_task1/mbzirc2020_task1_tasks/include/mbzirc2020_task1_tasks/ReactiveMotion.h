@@ -41,7 +41,7 @@ private:
   int losing_tracking_cnt_;
   double losing_tracking_period_thre_;
   int task_track_flag_pub_cnt_;
-  bool check_target_far_away_;
+  bool check_target_far_away_flag_;
 
   ros::Timer control_timer_;
   ros::Subscriber cog_odom_sub_;
