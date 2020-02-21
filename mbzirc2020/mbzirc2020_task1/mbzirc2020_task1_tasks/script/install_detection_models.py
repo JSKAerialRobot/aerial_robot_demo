@@ -64,6 +64,14 @@ def main():
         extract=True,
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='models/drone_detection_edgetpu_20200220_315.tflite',
+        url='https://drive.google.com/uc?id=17WMiXin70RUpUkRqaOBSi-6-Cf7NegGs',
+        md5='d053353414af944a567eff7cd4180650',
+        extract=False,
+    ) 
+
     '''
     download_data(
         pkg_name=PKG,

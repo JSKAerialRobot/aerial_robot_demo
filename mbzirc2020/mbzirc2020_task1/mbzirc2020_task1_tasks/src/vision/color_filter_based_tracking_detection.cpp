@@ -344,8 +344,9 @@ namespace edgetpu_roscpp
 
     cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius_, cv::Scalar(0, 255, 0), 1);
 
-    //ROS_WARN("ball_depth: %f, ball_depth_: %f", ball_depth, ball_depth_);
+    ROS_WARN("ball_depth: %f, ball_depth_: %f", ball_depth, ball_depth_);
     /* check the outlier using the overral depth */
+    /*
     if(ball_depth_ > far_depth_)
       {
         if(fabs(ball_depth - ball_depth_) > ball_far_depth_outlier_threshold_)
@@ -362,7 +363,7 @@ namespace edgetpu_roscpp
             return false;
           }
       }
-
+    */
     cv::circle(src_img, ball_pixel_center_, (int)ball_pixel_radius_, cv::Scalar(255, 0, 0), 2);
 
     return true;

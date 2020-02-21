@@ -11,7 +11,7 @@
   <arg name= "color_image_topic" default = "/camera/image_raw" />
 
   <!-- common parameter for binding model detection -->
-  <arg name= "binding_model_file"  default = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_202000204611_202002030704/20200204_bind_model_611_edgetpu.tflite" />
+  <arg name= "binding_model_file"  default = "$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200220_315.tflite" />
   <arg name= "coarse_detection_score_threshold" default = "0.0" />
   <arg name= "refined_detection_score_threshold" default = "0.71" />
   <arg name= "tracking_score_threshold" default = "0.7" />
@@ -31,8 +31,8 @@
 
 
   <!-- common parameter for ball position/depth estimation -->
-  <arg name= "ball_real_radius" default = "0.075" />
-  <arg name= "drone_real_width" default = "1.1" />
+  <arg name= "ball_real_radius" default = "0.0625" /> <!-- kashiwa: 0.075, mbzirc: 0.0625 -->
+  <arg name= "drone_real_width" default = "0.8" /> <!-- kashiwa: 1.1, mbzirc: ?, 0.8 -->
   <arg name= "ball_depth_lpf_gain" default = "0.2" />
   <arg name= "far_depth" default = "20" />
   <arg name= "close_depth" default = "5" />

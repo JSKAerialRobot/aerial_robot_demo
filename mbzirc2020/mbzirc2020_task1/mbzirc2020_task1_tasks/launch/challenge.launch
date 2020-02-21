@@ -7,7 +7,7 @@
   <arg name="cascaded_detection" default = "false" />
   <arg name="image_pub_throttle_rate" default="10.0" />
   <arg name="ground_station" default="true" />
-  <arg name="ground_station_ip" default="192.168.1.122" />
+  <arg name="ground_station_ip" default="10.205.0.5" />
   <arg name="final_landing" default="false" />
 
   ###########  bring up  ###########
@@ -28,7 +28,7 @@
     <arg name="keep_aspect_ratio_in_inference" value="false" />
     <arg name="quick_detection" value="true" />
     <arg name="cascaded_detection" value = "$(arg cascaded_detection)" />
-    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200204_624.tflite" unless="$(arg cascaded_detection)"/>
+    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200220_315.tflite" unless="$(arg cascaded_detection)"/>
     <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/cocompile_model_20200204624_202002030726/20200204_bind_model_624_edgetpu.tflite" if="$(arg cascaded_detection)"/>
     <arg name="separate_model_file" value = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_20200204624_202002030726/20200203_separate_model_726_edgetpu.tflite" />
     <arg name="expanding_bounding_box_rate" value="2.0" />
