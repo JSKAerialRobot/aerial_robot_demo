@@ -18,7 +18,7 @@ lane_interval: 0.75 #constant
 object_pos_thresh: 0.15
 adjust_grasp_image_type: depth #depth or color
 
-global_object_yaw: -0.1457592397928238
+global_object_yaw: -2.095197947817393
 recognition_wait: 1.0
 
 grasping_point: [-0.445, 0.445, 0.00] #in fc frame
