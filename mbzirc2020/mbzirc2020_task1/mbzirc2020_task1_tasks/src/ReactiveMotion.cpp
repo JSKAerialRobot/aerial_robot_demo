@@ -12,6 +12,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.getParam("close_pose", joints_close_pose_);
   nhp_.param("losing_tracking_period_threshold", losing_tracking_period_thre_, 4.0);
   nhp_.param("return_first_waypoint_flag", return_first_waypt_flag_, true);
+  nhp_.param("check_target_far_away_flag", check_target_far_away_flag_, true);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -76,6 +77,11 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
     //   ROS_WARN("[ReactiveMotion] Bad estimation varies robot orientation, follow previous cmd");
     //   return;
     // }
+
+    if (check_target_far_away_flag_ && (!ransac_line_estimator_->isGettingClose(cur_pos_))){
+      ROS_WARN_THROTTLE(0.5, "[ReactiveMotion] Target is getting far from robot.");
+      return;
+    }
     if (!ransac_line_estimator_->isEndProcedureMode() && ransac_line_estimator_->isInEndProcedureRegion(cur_pos_)){ // target is in end search region
       ransac_line_estimator_->ransacEndProcedureMode();
     }

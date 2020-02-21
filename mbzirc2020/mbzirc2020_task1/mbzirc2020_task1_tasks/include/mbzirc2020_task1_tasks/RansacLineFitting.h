@@ -32,6 +32,7 @@ public:
   void update();
   bool isEstimated();
   bool getNearestWaypoint(Eigen::Vector3d pos, Eigen::Vector3d &waypt);
+  bool isGettingClose(Eigen::Vector3d pos);
   bool isNearTarget(Eigen::Vector3d pos);
   bool isInEndProcedureRegion(Eigen::Vector3d pos);
   bool isEndProcedureMode();
