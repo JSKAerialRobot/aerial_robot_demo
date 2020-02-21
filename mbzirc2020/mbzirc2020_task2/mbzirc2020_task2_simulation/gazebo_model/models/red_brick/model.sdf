@@ -5,7 +5,7 @@
     <static>false</static>
     <link name='object_link'>
       <inertial>
-        <mass>1.0</mass>
+        <mass>0.4744</mass>
         <inertia> <!-- inertias are tricky to compute -->
           <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
           <ixx>0.01079</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
