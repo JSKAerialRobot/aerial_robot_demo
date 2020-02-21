@@ -1,0 +1,34 @@
+# parameters for script/motion.py in outdoor mode
+
+control_rate : 1.0
+
+navigation_approach_margin : [1.0, 1.0, 0.5]
+
+search_height : 2.0
+reach_margin : 1.0
+target_timeout : 6.0
+approach_height : 2.0
+descending_height : 1.2
+approach_margin : 0.15
+height_margin : 0.15
+cover_pose: [0.8, 0.8] # the joint angles for covering
+covering_pre_height : 1.8
+covering_post_height : 1.2
+covering_move_dist : 0.6
+
+close_pose: [1.56, 1.56] # the joint angles  for closing
+
+nav_mode: 5
+search_type: '4_corner_relative'
+search_area_number: 1
+area_corners:
+- - - -5.0
+    - 4.0
+  - - -5.0
+    - -3.0
+  - - 5.0
+    - -3.0
+  - - 5.0
+    - 4.0
+  - 8
+
