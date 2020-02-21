@@ -5,11 +5,7 @@ reset_joint_angle: [1.5, 1.5]
 
 object_translation: [0.1, 0.5, 0.0] #in link2 frame
 object_yaw: -0.785
-object_mass: 0.4744 #red
-#object_mass: 0.6994 #green
 
-object_lookdown_height: 3.0
-object_approach_height: 1.2
 object_grasping_height: 0.2
 object_yaw_thresh: 0.3
 global_first_object_pos: [-1.5, 0.0] #need if no recognition mode
@@ -21,7 +17,6 @@ adjust_grasp_image_type: depth #depth or color
 global_object_yaw: -2.095197947817393
 recognition_wait: 1.0
 
-grasping_point: [-0.445, 0.445, 0.00] #in fc frame
 grasping_yaw: 2.356 #in fc frame
 grasp_land_mode: true
 reset_realsense_odom: true
@@ -49,8 +44,6 @@ lookdown:
 adjust_grasp:
   #grid: [[-1, 2], [-1, 1], [-1, 0], [-1, -1], [-1, -2], [0, -2], [0, -1], [0, 0], [0, 1], [0, 2], [1, 2], [1, 1], [1, 0], [1, -1], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2], [3, 2], [3, 1], [3, 0], [3, -1], [3, -2]]
   grid: [[0, -2], [0, -1], [0, 0], [0, 1], [0, 2], [1, 2], [1, 1], [1, 0], [1, -1], [1, -2], [2, -2], [2, -1], [2, 0], [2, 1], [2, 2], [3, 2], [3, 1], [3, 0], [3, -1], [3, -2]]
-  grid_scale_x: 0.5
-  grid_scale_y: 0.3
 #  grid_scale_x: 0.7
 #  grid_scale_y: 0.5
   grid_search_timeout: 5

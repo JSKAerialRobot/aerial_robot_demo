@@ -10,6 +10,7 @@
   <arg name="target_object_number" default="0"/>
   <arg name="object_num" default="3"/>
   <arg name="no_lookdown_mode" default="false"/>
+  <arg name="object_color"/>
 
   <group ns="task2_motion">
     <group if="$(arg debug_look_down)">
@@ -69,6 +70,7 @@
   <node name="task2_motion" type="task2_motion.py" pkg="mbzirc2020_task2_tasks"
         output="screen">
     <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
+    <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/Motion.yaml"/>
     <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
     <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
     <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>

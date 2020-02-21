@@ -1,0 +1,13 @@
+hls_color_filter:
+  h_limit_max: 171
+  h_limit_min: 127
+  l_limit_max: 212
+  l_limit_min: 31
+  s_limit_max: 256
+  s_limit_min: 73
+  use_camera_info: false
+  queue_size: 10
+
+rectangle_detection_color:
+  target_object_area: 0.13 #0.2 * 0.3
+  target_object_area_margin: 0.03
