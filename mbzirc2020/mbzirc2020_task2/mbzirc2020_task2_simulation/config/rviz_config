@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /TF1/Frames1
-        - /OverlayText2
       Splitter Ratio: 0.5
     Tree Height: 199
   - Class: rviz/Selection
@@ -364,30 +363,6 @@ Visualization Manager:
           Value: true
         rs_d435_unit:
           Value: true
-        target_object_color00:
-          Value: true
-        target_object_color01:
-          Value: true
-        target_object_color02:
-          Value: true
-        target_object_color03:
-          Value: true
-        target_object_depth00:
-          Value: true
-        target_object_depth01:
-          Value: true
-        target_object_depth02:
-          Value: true
-        target_object_depth03:
-          Value: true
-        thrust1:
-          Value: true
-        thrust2:
-          Value: true
-        thrust3:
-          Value: true
-        thrust4:
-          Value: true
         world:
           Value: true
       Marker Scale: 0.5
@@ -396,10 +371,10 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
+        cog:
+          world:
+            {}
         root:
-          cog:
-            world:
-              {}
           link1:
             bat1:
               {}
@@ -437,11 +412,7 @@ Visualization Manager:
                       {}
                   ring_gripper_right:
                     {}
-                  thrust4:
-                    {}
                 realsense1_pose_frame:
-                  {}
-                thrust3:
                   {}
               neuron3:
                 {}
@@ -464,11 +435,7 @@ Visualization Manager:
                       rs_d435_right_ir_frame:
                         rs_d435_right_ir_optical_frame:
                           {}
-              thrust2:
-                {}
             ring_gripper_left:
-              {}
-            thrust1:
               {}
       Update Interval: 0
       Value: true
@@ -564,6 +531,17 @@ Visualization Manager:
       text size: 12
       top: 150
       width: 800
+    - Class: jsk_rviz_plugin/OverlayImage
+      Enabled: true
+      Name: OverlayImage
+      Topic: /hls_color_filter/image
+      Value: true
+      alpha: 0.800000012
+      height: 128
+      keep aspect ratio: true
+      left: 1000
+      top: 0
+      width: 300
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -627,7 +605,7 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1855
-  X: 1985
+  X: 65
   Y: 24
   depth image:
     collapsed: false
