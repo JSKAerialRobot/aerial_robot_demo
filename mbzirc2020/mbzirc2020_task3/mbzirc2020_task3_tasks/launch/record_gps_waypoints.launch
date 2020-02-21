@@ -1,6 +1,7 @@
 <launch>
   <arg name="motion_config_filename" default="motion_outdoor.yaml"/>
   <arg name="output_filename" default="waypoints.yaml"/>
+  <arg name="recorder" default="default"/>
   <param name="recorder" value="$(arg recorder)" />
 
 
