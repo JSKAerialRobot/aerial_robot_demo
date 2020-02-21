@@ -239,7 +239,7 @@ namespace edgetpu_roscpp
     if(verbose_) ROS_INFO("ball position: [%f, %f, %f], depth: %f", ball_pos_.x(),
                           ball_pos_.y(), ball_pos_.z(), ball_depth);
 
-    //ROS_INFO("drone depth: %f, ball depth: %f, depth_: %f", drone_depth, ball_depth, ball_depth_);
+    ROS_INFO("drone depth: %f, ball depth: %f, depth_: %f", drone_depth, ball_depth, ball_depth_);
   }
 
   bool ColorFilterBallTracking::widthBasedDetection(cv::Mat& src_img, double& drone_depth)
