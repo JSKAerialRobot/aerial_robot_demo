@@ -7,7 +7,7 @@ navigation_approach_margin : [1.0, 1.0, 0.5]
 search_height : 2.0
 reach_margin : 1.0
 target_timeout : 6.0
-approach_height : 1.8
+approach_height : 2.0
 descending_height : 1.2
 approach_margin : 0.15
 height_margin : 0.15
