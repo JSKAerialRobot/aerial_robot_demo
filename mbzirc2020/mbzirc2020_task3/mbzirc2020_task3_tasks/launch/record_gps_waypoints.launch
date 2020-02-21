@@ -1,8 +1,10 @@
 <launch>
   <arg name="motion_config_filename" default="motion_outdoor.yaml"/>
   <arg name="output_filename" default="waypoints.yaml"/>
+  <param name="recorder" value="$(arg recorder)" />
 
-  <node pkg="mbzirc2020_task3_tasks" type="record_waypoints.py" name="record_waypoints" output="screen">
+
+  <node pkg="mbzirc2020_task3_tasks" type="record_waypoints.py" name="record_waypoints_$(anon recorder)" output="screen">
     <param name="output_filename" value="$(arg output_filename)"/>
     <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg motion_config_filename)" command="load"/>
   </node>
