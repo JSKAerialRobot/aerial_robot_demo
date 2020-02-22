@@ -96,6 +96,15 @@ def main():
         extract=True,
     )
 
+    ### 20200222_MBZIRC_rehearsal_annotation_data
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/mbzirc-rehearsal-annotation-20200222.tar.gz',
+        url='https://drive.google.com/uc?id=1BtgWtJerdlRCZ6IR5ykGPz4Ruyzv44sa',
+        md5='250a471914eca8669c9ce525ab1a3ff8',
+        extract=True,
+    )
+
 if __name__ == '__main__':
     main()
 
