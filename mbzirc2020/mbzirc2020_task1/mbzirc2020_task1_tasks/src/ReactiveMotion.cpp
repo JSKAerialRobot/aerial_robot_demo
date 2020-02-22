@@ -13,6 +13,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("losing_tracking_period_threshold", losing_tracking_period_thre_, 4.0);
   nhp_.param("return_first_waypoint_flag", return_first_waypt_flag_, true);
   nhp_.param("check_target_far_away_flag", check_target_far_away_flag_, true);
+  nhp_.param("keep_tracking_after_openloop_catch_flag", keep_tracking_after_openloop_catch_flag_, false);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -111,17 +112,24 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
   else if (motion_state_ == STOP_TRACKING){
     sendControlCmd(target_pos_);
     ++stop_tracking_cnt_;
-    double stop_tracking_period = 2.0;
+    double stop_tracking_period = 3.0;
     if (stop_tracking_cnt_ >= stop_tracking_period * control_freq_){
-      motion_state_ = STILL;
-      sendControlCmdDirectly(cur_pos_);
-      ROS_INFO("[ReactiveMotion] After open-loop tracking for %f secs, switch back to STILL mode.", stop_tracking_period);
-      ransac_line_estimator_->stopEstimation();
-      ROS_INFO("[ReactiveMotion] Estimation stops");
-      task_return_initial_waypt_pub_.publish(std_msgs::Empty());
-      ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
-      ros::Duration(0.5).sleep();
-      task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+      if (keep_tracking_after_openloop_catch_flag_){ // not switch to STILL and not return initial waypoint
+        motion_state_ = LOSING_TRACKING;
+        losing_tracking_cnt_ = 0;
+        ROS_INFO("[ReactiveMotion] Change motion state to LOSING_TRACKING after STOP_TRACKING");
+      }
+      else{
+        motion_state_ = STILL;
+        sendControlCmdDirectly(cur_pos_);
+        ROS_INFO("[ReactiveMotion] After open-loop tracking for %f secs, switch back to STILL mode.", stop_tracking_period);
+        ransac_line_estimator_->stopEstimation();
+        ROS_INFO("[ReactiveMotion] Estimation stops");
+        task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+        ROS_INFO("[ReactiveMotion] Return to initial gps waypoint.");
+        ros::Duration(0.5).sleep();
+        task_return_initial_waypt_pub_.publish(std_msgs::Empty());
+      }
     }
   }
 }
