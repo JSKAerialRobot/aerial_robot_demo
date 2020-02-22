@@ -4,13 +4,13 @@ control_rate : 1.0
 
 navigation_approach_margin : [1.0, 1.0, 0.5]
 
-search_height : 2.0
+search_height : 3.0
 reach_margin : 1.0
 target_timeout : 6.0
-approach_height : 2.0
-descending_height : 1.2
-approach_margin : 0.15
-height_margin : 0.15
+approach_height : 3.0
+descending_height : 1.8
+approach_margin : 0.5
+height_margin : 0.5
 cover_pose: [0.8, 0.8] # the joint angles for covering
 covering_pre_height : 1.8
 covering_post_height : 1.2

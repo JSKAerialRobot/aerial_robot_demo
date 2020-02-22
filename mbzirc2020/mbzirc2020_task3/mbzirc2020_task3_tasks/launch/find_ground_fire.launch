@@ -8,7 +8,7 @@
   <arg name="frame_id" default="target_object"/>
   <arg name="all_contour" default="false"/>
 
-  <arg name="temp_thresh" default="65"/>
+  <arg name="temp_thresh" default="55"/>
 
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen" if="$(arg output_screen)"/>
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" unless="$(arg output_screen)"/>
