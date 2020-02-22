@@ -1,3 +1,5 @@
 check_target_far_away_flag: True
+keep_tracking_after_openloop_catch_flag: True
+
 target_pos_xy_threshold : 4.5
 motion_cmd_threshold_list : [0.7, 0.7, 0.7]
