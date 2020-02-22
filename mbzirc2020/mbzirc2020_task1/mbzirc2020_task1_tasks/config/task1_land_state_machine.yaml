@@ -2,7 +2,7 @@ cover_pose: [0.76, 0.76] # to check
 # close_pose: [1.4, 1.4]
 close_pose: [0.76, 0.76]
 
-initial_waypoints: [[[3.0], [5.0], [35.8952067, 139.9446237, 5.0]]] ## 2020.02.11 line kashiwa hype playground
+initial_waypoints: [[[3.5], [35.8952067, 139.9446237, 3.5]]] ## 2020.02.11 line kashiwa hype playground
 
 initial_yaw_flag: False
 initial_yaw: 2.7227574856695784
