@@ -14,6 +14,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   nhp_.param("return_first_waypoint_flag", return_first_waypt_flag_, true);
   nhp_.param("check_target_far_away_flag", check_target_far_away_flag_, true);
   nhp_.param("keep_tracking_after_openloop_catch_flag", keep_tracking_after_openloop_catch_flag_, false);
+  nhp_.param("update_waiting_waypoint_during_losing_tracking_flag", update_waiting_waypoint_during_losing_tracking_flag_, false);
 
   ransac_line_estimator_ = new RansacLineFitting(nh_, nhp_);
   motion_state_ = STILL;
@@ -49,6 +50,14 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
     }
     if (motion_state_ == LOSING_TRACKING){
       ++losing_tracking_cnt_;
+      if (update_waiting_waypoint_during_losing_tracking_flag_ && (losing_tracking_cnt_ == int(3.0 * control_freq_))){ // when losing target for 3.0 sec, update waiting waypoint
+        if (!task_initial_waiting_pos_flag_ || !return_first_waypt_flag_){
+          task_initial_waiting_pos_flag_ = true;
+          task_initial_waiting_pos_ = cur_pos_;
+          ROS_WARN("[ReactiveMotion] Start waiting pos recorded.");
+        }
+      }
+
       if (losing_tracking_cnt_ >= losing_tracking_period_thre_ * control_freq_){
         motion_state_ = STILL;
         ROS_INFO("[ReactiveMotion] Losing tracking for %f secs", losing_tracking_period_thre_);
@@ -59,6 +68,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
         ros::Duration(0.5).sleep();
         task_return_initial_waypt_pub_.publish(std_msgs::Empty()); // publish two times in case msg is missed
       }
+      return;
     }
   }
   if (motion_state_ == TRACKING){
