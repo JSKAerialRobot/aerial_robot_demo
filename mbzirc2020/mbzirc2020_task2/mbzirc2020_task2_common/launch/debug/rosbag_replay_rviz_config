@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 853
   - Class: rviz/Selection
@@ -307,6 +308,8 @@ Visualization Manager:
           Value: true
         bat4:
           Value: true
+        channel_center:
+          Value: true
         cog:
           Value: true
         fc:
@@ -383,6 +386,16 @@ Visualization Manager:
           Value: true
         target_object_depth00:
           Value: true
+        target_object_depth01:
+          Value: true
+        target_object_depth02:
+          Value: true
+        target_object_depth03:
+          Value: true
+        target_object_depth04:
+          Value: true
+        target_object_depth05:
+          Value: true
         thrust1:
           Value: true
         thrust2:
@@ -403,6 +416,8 @@ Visualization Manager:
           cog:
             world:
               base_footprint:
+                {}
+              channel_center:
                 {}
           link1:
             bat1:
@@ -460,6 +475,16 @@ Visualization Manager:
                       rs_d435_color_frame:
                         rs_d435_color_optical_frame:
                           target_object_depth00:
+                            {}
+                          target_object_depth01:
+                            {}
+                          target_object_depth02:
+                            {}
+                          target_object_depth03:
+                            {}
+                          target_object_depth04:
+                            {}
+                          target_object_depth05:
                             {}
                       rs_d435_depth_optical_frame:
                         {}
@@ -601,11 +626,11 @@ Visualization Manager:
       Topic: /rosconsole_overlay_text/output
       Value: true
       font: DejaVu Sans Mono
-      height: 700
+      height: 400
       left: 0
       line width: 2
       text size: 12
-      top: 700
+      top: 400
       width: 700
   Enabled: true
   Global Options:
@@ -650,7 +675,7 @@ Visualization Manager:
       Pitch: 0.485203505
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.43539858
+      Yaw: 5.44039869
     Saved: ~
 Window Geometry:
   Displays:
