@@ -111,7 +111,7 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
   else if (motion_state_ == STOP_TRACKING){
     sendControlCmd(target_pos_);
     ++stop_tracking_cnt_;
-    double stop_tracking_period = 5.0;
+    double stop_tracking_period = 2.0;
     if (stop_tracking_cnt_ >= stop_tracking_period * control_freq_){
       motion_state_ = STILL;
       sendControlCmdDirectly(cur_pos_);
