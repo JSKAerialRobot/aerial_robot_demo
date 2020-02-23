@@ -50,7 +50,7 @@ namespace edgetpu_roscpp
     pnh_->param("bbox_valid_bound_margin", bbox_valid_bound_margin_, 10);
 
     pnh_->param("closing_iteration", closing_iteration_, 5);
-    pnh_->param("closing_iteration", circle_protrude_threshold_, 0.05);
+    pnh_->param("circle_protrude_threshold", circle_protrude_threshold_, 0.05);
     pnh_->param("circle_baseline_margin", circle_baseline_margin_, 0.2);
 
     pnh_->param("ball_depth_lpf_gain", ball_depth_lpf_gain_, 0.2);
@@ -306,7 +306,6 @@ namespace edgetpu_roscpp
         cv::minEnclosingCircle(contour, contour_center, contour_radius);
         contour_center.x += ball_search_area.xmin;
         contour_center.y += ball_search_area.ymin;
-        cv::circle(src_img, contour_center, (int)contour_radius, cv::Scalar(0, 0, 255), 1);
 
         /* filter out the invliad candidate that protrudes the bounding box, or does not reach the baseline of the bbox */
         if (contour_center.x - contour_radius < best_detection_candidate_.corners.xmin - detected_bbox_width * circle_protrude_threshold_ ||
@@ -314,6 +313,8 @@ namespace edgetpu_roscpp
             contour_center.y + contour_radius > best_detection_candidate_.corners.ymax + detected_bbox_height * circle_protrude_threshold_ ||
             contour_center.y + contour_radius < best_detection_candidate_.corners.ymax - detected_bbox_height * circle_baseline_margin_)
           continue;
+
+        cv::circle(src_img, contour_center, (int)contour_radius, cv::Scalar(0, 255, 0), 2);
 
         /* max radius */
         if(contour_radius > target_contour_radius)
