@@ -14,7 +14,7 @@ lane_interval: 0.75 #constant
 object_pos_thresh: 0.15
 adjust_grasp_image_type: color #depth or color
 
-global_object_yaw: -1.8606593608856201
+global_object_yaw: -1.8922609090805054
 recognition_wait: 1.0
 
 grasping_yaw: 2.356 #in fc frame
@@ -28,7 +28,7 @@ force_landing_height: 0.8
 place_channel_length: 4.0
 global_place_channel_z: 2.0 #[m]
 place_z_margin: 1.0 #[m]
-place_z_offset: 1.4 #[m]
+place_z_offset: 1.8 #[m]
 channel_pos_thresh: 0.3
 channel_tf_frame_id: channel_center
 
