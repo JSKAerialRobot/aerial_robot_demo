@@ -380,7 +380,7 @@ class Grasp(Task2State):
                     break
         else:
             if self.grasp_force_landing_mode:
-                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.force_landing_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.15, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.force_landing_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1, timeout=15)
                 rospy.logwarn(self.__class__.__name__ + ": force land mode, force landing")
                 self.robot.forceLanding()
                 start_time = rospy.get_time()
