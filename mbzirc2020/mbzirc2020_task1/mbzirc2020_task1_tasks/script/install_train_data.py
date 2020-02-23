@@ -105,6 +105,15 @@ def main():
         extract=True,
     )
 
+    ### 20200223_MBZIRC_challenge_annotation_data
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/mbzirc-challenge-annotation-20200223.tar.gz',
+        url='https://drive.google.com/uc?id=1lc7GKB_LqaAeeJjRM7XFSBMG3A0oQ9s0',
+        md5='a237d87679855f70fb8457ff42a06689',
+        extract=True,
+    )
+
 if __name__ == '__main__':
     main()
 
