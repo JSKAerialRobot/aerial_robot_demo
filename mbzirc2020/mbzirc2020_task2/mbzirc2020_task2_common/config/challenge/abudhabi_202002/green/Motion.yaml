@@ -3,7 +3,7 @@ object_approach_height: 1.6
 
 object_mass: 0.6994
 
-grasping_point: [-0.48, 0.48, 0.00] #in fc frame #detch up
+grasping_point: [-0.5, 0.5, 0.00] #in fc frame #detch up
 
 adjust_grasp:
   grid_scale_x: 0.6
