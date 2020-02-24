@@ -439,6 +439,7 @@ class ApproachPlacePosition(Task2State):
         self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
         self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
         self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
+        self.vo_service_name = rospy.get_param('~vo_service_name', '/estimator/sensor_plugin/vo1/estimate_flag')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
@@ -453,6 +454,7 @@ class ApproachPlacePosition(Task2State):
 
         if self.disable_alt_sensor:
             self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
+            self.vo_service_client = rospy.ServiceProxy(self.vo_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -488,6 +490,15 @@ class ApproachPlacePosition(Task2State):
                     rospy.logwarn("Disable alt sensor")
                 else:
                     rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
+            try:
+                rospy.logwarn("Enable VO pos")
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = True
+                res = self.vo_service_client(req)
 
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
