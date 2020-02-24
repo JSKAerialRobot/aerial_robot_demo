@@ -394,7 +394,7 @@ class Grasp(Task2State):
             else:
                 #descend
                 self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-
+        self.robot.openJoint()
         self.robot.grasp()
         rospy.sleep(1);
         joint_state = self.robot.getJointState()
