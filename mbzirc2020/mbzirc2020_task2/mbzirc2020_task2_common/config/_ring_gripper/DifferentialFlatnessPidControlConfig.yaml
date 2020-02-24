@@ -8,7 +8,7 @@ controller:
                 p_term_limit: 16.5
                 i_term_limit: 16.5
                 d_term_limit: 16.5
-                landing_alt_err_thresh: -2.0
+                landing_alt_err_thresh: -1.5
                 safe_landing_height: 0.05
 
         # xy [rad]
