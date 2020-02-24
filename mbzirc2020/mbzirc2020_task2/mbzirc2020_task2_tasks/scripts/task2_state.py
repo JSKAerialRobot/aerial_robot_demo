@@ -386,7 +386,7 @@ class Grasp(Task2State):
                 start_time = rospy.get_time()
                 while not (self.robot.getFlightState() == self.robot.ARM_OFF_STATE):
                     elapsed_time = rospy.get_time() - start_time
-                    if elapsed_time > 10.0:
+                    if elapsed_time > 5.0:
                         self.robot.halt()
                         rospy.logwarn(self.__class__.__name__ + ": force halt")
                         break
