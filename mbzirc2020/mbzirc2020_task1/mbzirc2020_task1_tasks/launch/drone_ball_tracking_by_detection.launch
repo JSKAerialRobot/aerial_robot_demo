@@ -48,6 +48,9 @@
   <arg name= "ball_far_depth_outlier_threshold" default = "10" />
   <arg name= "ball_close_depth_outlier_threshold" default = "5" />
 
+  <arg name= "circle_protrude_threshold" default = "0.05" />
+  <arg name= "circle_baseline_margin" default = "0.1" />
+
   <!-- specific parameter for drone width estimation -->
   <arg name= "bbox_valid_bound_margin" default = "10" />
 
@@ -76,11 +79,15 @@
     <param name="lost_target_check_frame_num" value="$(arg lost_target_check_frame_num)"/>
     <param name="redetection_after_lost_target_frame_num" value="$(arg redetection_after_lost_target_frame_num)"/>
 
+    <param name= "circle_protrude_threshold" value = "$(arg circle_protrude_threshold)" />
+    <param name= "circle_baseline_margin" value = "$(arg circle_baseline_margin)" />
+
     <param name= "ball_real_radius" value = "$(arg ball_real_radius)" />
     <param name= "drone_real_width" value = "$(arg drone_real_width)" />
     <param name= "bbox_valid_bound_margin" value = "$(arg bbox_valid_bound_margin)" />
     <param name= "ball_far_depth_outlier_threshold" value = "$(arg ball_far_depth_outlier_threshold)" />
     <param name= "ball_close_depth_outlier_threshold" value = "$(arg ball_close_depth_outlier_threshold)" />
+
     <param name= "far_depth" value = "$(arg far_depth)" />
     <param name= "close_depth" value = "$(arg close_depth)" />
     <param name= "ball_depth_lpf_gain" value = "$(arg ball_depth_lpf_gain)" />
