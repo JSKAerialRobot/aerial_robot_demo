@@ -128,6 +128,8 @@ void ReactiveMotion::controlTimerCallback(const ros::TimerEvent& event){
         motion_state_ = LOSING_TRACKING;
         losing_tracking_cnt_ = 0;
         ROS_INFO("[ReactiveMotion] Change motion state to LOSING_TRACKING after STOP_TRACKING");
+        // todo: hard-coding for challenge usage
+        openJoints();
       }
       else{
         motion_state_ = STILL;
@@ -286,5 +288,14 @@ void ReactiveMotion::closeJoints(){
     for (int i = 0; i < 2; ++i)
       joint_msg.position.push_back(joints_close_pose_[i]);
   }
+  joints_ctrl_pub_.publish(joint_msg);
+}
+
+void ReactiveMotion::openJoints(){
+  sensor_msgs::JointState joint_msg;
+  joint_msg.name.push_back("joint1");
+  joint_msg.name.push_back("joint3");
+  joint_msg.position.push_back(0.76);
+  joint_msg.position.push_back(0.76);
   joints_ctrl_pub_.publish(joint_msg);
 }

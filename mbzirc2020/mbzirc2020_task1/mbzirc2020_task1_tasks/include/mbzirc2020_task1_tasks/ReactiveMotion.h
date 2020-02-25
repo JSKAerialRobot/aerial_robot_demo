@@ -63,4 +63,5 @@ private:
   void cogOdomCallback(const nav_msgs::OdometryConstPtr & msg);
   void reactiveMotionStateCallback(const std_msgs::Int8ConstPtr & msg);
   void closeJoints();
+  void openJoints();
 };
