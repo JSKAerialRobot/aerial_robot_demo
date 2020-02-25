@@ -60,6 +60,19 @@ class TakeoffState(smach.State):
         rospy.sleep(self.wait_time)
         return 'success'
 
+class TakeoffStateWithJointsOpen(smach.State):
+    def __init__(self, wait_time=20):
+        smach.State.__init__(self, outcomes=['success', 'fail'])
+        self.commander = HydrusCommander()
+        self.wait_time = wait_time
+
+    def execute(self, userdata):
+        self.commander.arm_and_takeoff()
+        rospy.sleep(self.wait_time)
+        self.commander.open_joints()
+        rospy.sleep(7)
+        return 'success'
+
 class LandingState(smach.State):
     def __init__(self, wait_time=20):
         smach.State.__init__(self, outcomes=['success', 'fail'])
