@@ -50,7 +50,8 @@ def main():
         search_params['covering_move_dist'] = rospy.get_param('~covering_move_dist', 1.0)
 
         smach.StateMachine.add('INITIAL_STATE', smach_ros.MonitorState("~task1_start", Empty, monitor_cb), transitions={'invalid':'TAKEOFF', 'valid':'INITIAL_STATE', 'preempted':'INITIAL_STATE'})
-        smach.StateMachine.add('TAKEOFF', TakeoffState(15), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
+        # smach.StateMachine.add('TAKEOFF', TakeoffState(15), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
+        smach.StateMachine.add('TAKEOFF', TakeoffStateWithJointsOpen(15), transitions={'success':'NAVIGATING0', 'fail':'INITIAL_STATE'})
 
         initial_gps_xy = rospy.get_param('~initial_gps_xy', [0,0])
         waypoints_list = rospy.get_param('~initial_waypoints', [[[0,0,1]]])
