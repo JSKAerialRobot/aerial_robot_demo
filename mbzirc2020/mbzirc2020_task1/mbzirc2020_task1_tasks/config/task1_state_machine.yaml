@@ -6,8 +6,8 @@ return_first_waypoint_flag: False
 initial_yaw_flag: True
 
 initial_waypoints: [[[3.0], [5.5]]] ## last waypt will rewrite with gps_xy
-task1_waiting_waypoint: [[[6.0]]] ## will rewrite with gps_xy
-task1_waiting_height_waypoint: [[[6.0]]]
+task1_waiting_waypoint: [[[8.5]]] ## will rewrite with gps_xy
+task1_waiting_height_waypoint: [[[8.5]]]
 
 
 # 1.
@@ -43,6 +43,6 @@ task1_waiting_height_waypoint: [[[6.0]]]
 # north-west: no need
 
 #### modify following paramters in real chanllenge:
-initial_gps_xy: [24.4175933, 54.4360905] # south-east
+initial_gps_xy: [24.4175676, 54.4360508] # south-east
 initial_yaw: -1.51413202286
 
