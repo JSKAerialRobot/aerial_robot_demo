@@ -1,0 +1,26 @@
+# https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor
+
+# task1
+- git:
+    local-name: hector_quadrotor
+    uri: https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git
+    version: kinetic-devel
+
+# task2
+- git:
+    local-name: gazebo-pkgs
+    uri: https://github.com/JenniferBuehler/gazebo-pkgs
+    version: baf0f03
+- git:
+    local-name: general-message-pkgs
+    uri: https://github.com/JenniferBuehler/general-message-pkgs
+    version: 1.0.0
+- git:
+    local-name: roboticsgroup_gazebo_plugins
+    uri: https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins.git
+    version: master
+
+- git:
+    local-name: timed_roslaunch
+    uri: https://github.com/MoriKen254/timed_roslaunch.git
+    version: melodic-devel
