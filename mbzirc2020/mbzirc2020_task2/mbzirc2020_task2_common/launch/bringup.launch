@@ -11,7 +11,7 @@
   <arg name="ring_gripper" default="True"/>
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
-  <arg name="rviz_config_path" default=""/>
+  <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
   <arg name="spawn_x" default="0.0"/>
   <arg name="spawn_y" default="0.0"/>
 
