@@ -1,5 +1,5 @@
 <launch>
-  <arg name="world" default="kashiwa_202002"/>
+  <arg name="world" default="abudhabi_202002"/>
   <arg name="do_object_recognition" default="true"/>
   <arg name="do_channel_recognition" default="true"/>
   <arg name="single_object_mode" default="true"/>
@@ -10,6 +10,7 @@
   <arg name="debug_grasp" default="false"/>
   <arg name="debug_adjust_place" default="false"/>
   <arg name="no_lookdown_mode" default="false"/>
+  <arg name="object_color" default="green"/>
 
   ### bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
@@ -32,11 +33,13 @@
     <arg name="target_object_number" default="$(arg target_object_number)"/>
     <arg name="object_num" default="$(arg object_num)"/>
     <arg name="no_lookdown_mode" default="$(arg no_lookdown_mode)"/>
+    <arg name="object_color" value="$(arg object_color)"/>
   </include>
 
   ### recognition
   <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
     <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+    <arg name="object_color" value="$(arg object_color)"/>
     <arg name="external_manager" value="false"/>
   </include>
 

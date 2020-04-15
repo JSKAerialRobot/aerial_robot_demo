@@ -1,13 +1,3 @@
-hls_color_filter:
-  h_limit_max: 37
-  h_limit_min: 325
-  l_limit_max: 251
-  l_limit_min: 1
-  s_limit_max: 255
-  s_limit_min: 72
-  use_camera_info: false
-  queue_size: 10
-
 dilate_hls_color_filter:
   size: 1
   iterations: 1
@@ -19,10 +9,10 @@ opening_hls_color_filter:
 rectangle_detection_color:
   debug_view: true
   frame_id: target_object_color
-  target_object_area: 0.08 #0.2 * 0.6
-  target_object_area_margin: 0.02
+  #target_object_area: 0.08 #0.2 * 0.6 #define in HLSColorFilter*.yaml
+  #target_object_area_margin: 0.02 #define in HLSColorFilter*.yaml
   object_height: 0.2
-  lowest_margin: 10
+  lowest_margin: 3
 
 depth_distance_filter:
   min_depth: 0.3

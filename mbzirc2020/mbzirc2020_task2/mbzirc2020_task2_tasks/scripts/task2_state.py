@@ -337,6 +337,8 @@ class Grasp(Task2State):
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
         self.grasping_point_coords = tft.compose_matrix(translate=[grasping_point[0], grasping_point[1], grasping_point[2]], angles=[0, 0, grasping_yaw])
+        self.grasp_force_landing_mode = rospy.get_param('~grasp_force_landing_mode')
+        self.force_landing_height = rospy.get_param('~force_landing_height')
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -366,7 +368,7 @@ class Grasp(Task2State):
             self.robot.preshape()
             self.robot.goPosWaitConvergence('global', [uav_target_pos[0], uav_target_pos[1]], self.robot.getTargetZ(), uav_target_yaw, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
 
-        if self.grasp_land_mode:
+        if self.grasp_land_mode and (not self.grasp_force_landing_mode):
             rospy.logwarn(self.__class__.__name__ + ": land mode, landing")
             self.robot.land()
             start_time = rospy.get_time()
@@ -377,9 +379,22 @@ class Grasp(Task2State):
                     rospy.logwarn(self.__class__.__name__ + ": force halt")
                     break
         else:
-            #descend
-            self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+            if self.grasp_force_landing_mode:
+                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.force_landing_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.15, yaw_conv_thresh = 0.05, vel_conv_thresh = 0.1, timeout=15)
+                rospy.logwarn(self.__class__.__name__ + ": force land mode, force landing")
+                self.robot.forceLanding()
+                start_time = rospy.get_time()
+                while not (self.robot.getFlightState() == self.robot.ARM_OFF_STATE):
+                    elapsed_time = rospy.get_time() - start_time
+                    if elapsed_time > 5.0:
+                        self.robot.halt()
+                        rospy.logwarn(self.__class__.__name__ + ": force halt")
+                        break
 
+            else:
+                #descend
+                self.robot.goPosWaitConvergence('global', self.robot.getTargetXY(), self.object_grasping_height, self.robot.getTargetYaw(), pos_conv_thresh = 0.2, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+        self.robot.openJoint()
         self.robot.grasp()
         rospy.sleep(1);
         joint_state = self.robot.getJointState()
@@ -424,6 +439,7 @@ class ApproachPlacePosition(Task2State):
         self.skip_approach_place_position = rospy.get_param('~skip_approach_place_position', False)
         self.disable_alt_sensor = rospy.get_param('~disable_alt_sensor', True)
         self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
+        self.vo_service_name = rospy.get_param('~vo_service_name', '/estimator/sensor_plugin/vo1/estimate_flag')
         self.global_place_channel_z = rospy.get_param('~global_place_channel_z')
         self.grasping_yaw = rospy.get_param('~grasping_yaw')
         self.place_z_offset = rospy.get_param('~place_z_offset')
@@ -438,6 +454,7 @@ class ApproachPlacePosition(Task2State):
 
         if self.disable_alt_sensor:
             self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
+            self.vo_service_client = rospy.ServiceProxy(self.vo_service_name, std_srvs.srv.SetBool)
 
     def execute(self, userdata):
         self.waitUntilTaskStart()
@@ -473,6 +490,15 @@ class ApproachPlacePosition(Task2State):
                     rospy.logwarn("Disable alt sensor")
                 else:
                     rospy.logerr("Failed to disable alt sensor")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
+            try:
+                rospy.logwarn("Enable VO pos")
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = True
+                res = self.vo_service_client(req)
 
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
