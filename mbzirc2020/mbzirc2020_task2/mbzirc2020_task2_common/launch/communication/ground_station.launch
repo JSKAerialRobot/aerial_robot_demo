@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="GROUND_STATION_IP" default="$(env ROS_IP)" />
-  <arg name="UAV_IP" default="10.205.0.110" />
+  <arg name="UAV_IP" default="192.168.1.110" />
   <arg name="HIGH_PORT1" default="16484" />
   <arg name="HIGH_PORT2" default="8192" />
   <arg name="LOW_PORT" default="1024" />
