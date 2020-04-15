@@ -1,5 +1,5 @@
 <launch>
-  <arg name="GROUND_STATION_IP" default="10.205.0.10" />
+  <arg name="GROUND_STATION_IP" default="192.168.1.10" />
   <arg name="UAV_IP" default="$(env ROS_IP)" />
   <arg name="HIGH_PORT1" default="16484" />
   <arg name="HIGH_PORT2" default="8192" />
