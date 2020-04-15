@@ -8,7 +8,10 @@
   <arg name="external_manager" default="false"/>
   <arg name="manager" default="task2_recognition_manager"/>
 
+  <arg name="object_color" />
+
   <rosparam command="load" file="$(arg config_dir)/ObjectDetection.yaml"/>
+  <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/ObjectDetection.yaml"/>
   <rosparam command="load" file="$(arg config_dir)/ChannelDetection.yaml"/>
 
   <node unless="$(arg external_manager)"
