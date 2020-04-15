@@ -15,7 +15,7 @@
 
 ```
 cd <catkin_ws>
-wstool merge -t src src/aerial_robot_demo/mbzirc2020/mbzirc.rosinstall
+wstool merge -t src src/aerial_robot_demo/mbzirc2020/mbzirc_${ROS_DISTRO}.rosinstall
 wstool update -t src
 rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 catkin build

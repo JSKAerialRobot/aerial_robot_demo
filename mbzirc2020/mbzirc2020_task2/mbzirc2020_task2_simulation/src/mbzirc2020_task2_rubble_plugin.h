@@ -6,6 +6,11 @@
 #include <gazebo/common/Plugin.hh>
 #include "gazebo/util/system.hh"
 
+#if GAZEBO_MAJOR_VERSION >= 8
+using namespace ignition;
+#endif
+
+
 namespace gazebo
 {
   class GAZEBO_VISIBLE MBZIRC2020Task2RubblePlugin : public WorldPlugin
@@ -21,13 +26,22 @@ namespace gazebo
     /// \brief Initialize the plugin.
   public: virtual void Init();
 
+#if GAZEBO_MAJOR_VERSION >= 8
+  private: void MakeBox(const std::string &_name, math::Pose3d &_pose,
+                        math::Vector3d &_size, math::Vector3d &_color, double _mass);
+#else
   private: void MakeBox(const std::string &_name, math::Pose &_pose,
                         math::Vector3 &_size, math::Vector3 &_color, double _mass);
-
+#endif
   private: class Obj
            {
+#if GAZEBO_MAJOR_VERSION >= 8
+           public: math::Pose3d pose;
+           public: math::Vector3d size;
+#else
            public: math::Pose pose;
-           public: math::Vector3 size;
+           public: math::Vector3 dsize;
+#endif
   };
 
   private: physics::WorldPtr world;
