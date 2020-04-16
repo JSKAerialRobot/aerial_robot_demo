@@ -1,5 +1,5 @@
 <launch>
-  <arg name="world" default="simulation_default"/>
+  <arg name="world" default="default"/>
   <arg name="do_object_recognition" default="true"/>
   <arg name="do_channel_recognition" default="true"/>
   <arg name="single_object_mode" default="true"/>
@@ -19,6 +19,7 @@
     <arg name="ring_gripper" value="true"/>
     <arg name="headless" value="false"/>
     <arg name="rviz_config_path" value="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
+    <arg name="worldtype" value="$(arg world)"/>
   </include>
 
   ### motion
