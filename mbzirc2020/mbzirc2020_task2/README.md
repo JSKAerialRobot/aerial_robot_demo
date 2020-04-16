@@ -21,6 +21,12 @@ Default
 $ roslaunch mbzirc2020_task2_simulation simulation.launch
 ```
 
+Light world
+```
+$ roslaunch mbzirc2020_task2_simulation simulation.launch world:=light
+```
+
+
 ## Ground Vehicle Model
 
 ### real machine
