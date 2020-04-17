@@ -40,7 +40,7 @@ namespace gazebo
            public: math::Vector3d size;
 #else
            public: math::Pose pose;
-           public: math::Vector3 dsize;
+           public: math::Vector3 size;
 #endif
   };
 
