@@ -6,6 +6,7 @@ navigator:
         outdoor_takeoff_height: 2.0
 
         # teleop operation
+        joy_udp: false
         max_target_vel: 0.5
         joy_target_vel_interval: 0.005  # 0.2 / 20 = 0.01, 0.005 ~ 0.01  m/s
         joy_target_alt_interval: 0.02
