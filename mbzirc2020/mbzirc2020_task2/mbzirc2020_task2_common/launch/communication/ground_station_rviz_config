@@ -3,7 +3,9 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Global Options1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 641
   - Class: rviz/Selection
@@ -33,10 +35,17 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 0.5
+      Name: Axes
+      Radius: 0.100000001
+      Reference Frame: <Fixed Frame>
+      Value: true
     - Alpha: 0.5
       Cell Size: 1
       Class: rviz/Grid
-      Color: 160; 160; 164
+      Color: 221; 221; 226
       Enabled: true
       Line Style:
         Line Width: 0.0299999993
@@ -171,6 +180,9 @@ Visualization Manager:
                 cog:
                   world:
                     {}
+              gps:
+                magnet:
+                  {}
               leddarone:
                 {}
               link3:
@@ -450,25 +462,6 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Align Bottom: false
-      Background Alpha: 0.800000012
-      Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/OverlayText
-      Enabled: true
-      Foreground Alpha: 0.800000012
-      Foreground Color: 25; 255; 240
-      Name: nav_debug
-      Overtake Color Properties: false
-      Overtake Position Properties: false
-      Topic: /task2_motion/nav_debug
-      Value: true
-      font: DejaVu Sans Mono
-      height: 128
-      left: 0
-      line width: 2
-      text size: 12
-      top: 0
-      width: 128
     - Class: rviz/Image
       Enabled: true
       Image Topic: /rs_d435/aligned_depth_to_color/image_raw/throttle
@@ -542,9 +535,47 @@ Visualization Manager:
       size: 128
       text size: 14
       top: 50
+    - Align Bottom: true
+      Background Alpha: 0.200000003
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000012
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /rosconsole_overlay_text/output
+      Value: true
+      font: DejaVu Sans Mono
+      height: 500
+      left: 0
+      line width: 2
+      text size: 12
+      top: 400
+      width: 700
+    - Align Bottom: false
+      Background Alpha: 0.800000012
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000012
+      Foreground Color: 25; 255; 240
+      Name: nav_debug
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /task2_motion/nav_debug
+      Value: true
+      font: DejaVu Sans Mono
+      height: 128
+      left: 0
+      line width: 2
+      text size: 12
+      top: 0
+      width: 600
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 158; 158; 158
     Default Light: true
     Fixed Frame: world
     Frame Rate: 30
@@ -567,7 +598,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.69841862
+      Distance: 10
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -577,15 +608,15 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Focal Shape Fixed Size: true
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.765397549
+      Pitch: 0.959796906
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.47540471
+      Yaw: 2.69540119
     Saved: ~
 Window Geometry:
   Displays:

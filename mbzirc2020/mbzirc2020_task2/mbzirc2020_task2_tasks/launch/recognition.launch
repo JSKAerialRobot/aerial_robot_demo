@@ -8,7 +8,10 @@
   <arg name="external_manager" default="false"/>
   <arg name="manager" default="task2_recognition_manager"/>
 
+  <arg name="object_color" />
+
   <rosparam command="load" file="$(arg config_dir)/ObjectDetection.yaml"/>
+  <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/ObjectDetection.yaml"/>
   <rosparam command="load" file="$(arg config_dir)/ChannelDetection.yaml"/>
 
   <node unless="$(arg external_manager)"
@@ -16,6 +19,8 @@
     <remap from="~input" to="$(arg rgb_image_topic)"/>
   </node>
 
+
+  ### object recognition
   <node pkg="nodelet" type="nodelet" name="hls_color_filter" args="load opencv_apps/hls_color_filter $(arg manager)">
     <remap from="image" to="$(arg rgb_image_topic)"/>
     <param name="debug_view" value="false"/>
@@ -49,22 +54,23 @@
     <remap from="~cam_info" to="$(arg depth_camera_info_topic)" />
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="hls_color_filter_channel" args="load opencv_apps/hls_color_filter $(arg manager)">
-    <remap from="image" to="$(arg rgb_image_topic)"/>
-    <param name="debug_view" value="false"/>
+
+  ### channel recognition
+  <node pkg="nodelet" type="nodelet" name="depth_distance_filter_channel" args="load aerial_robot_perception/DepthDistanceFilter $(arg manager)" output="screen">
+    <remap from="~input" to="$(arg depth_image_topic)" />
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="closing_hls_color_filter_channel" args="load jsk_perception/Closing $(arg manager)" output="screen">
-    <remap from="~input" to="/hls_color_filter_channel/image"/>
+  <node pkg="nodelet" type="nodelet" name="closing_depth_distance_filter_channel" args="load jsk_perception/Closing $(arg manager)" output="screen">
+    <remap from="~input" to="/depth_distance_filter_channel/output"/>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="opening_hls_color_filter_channel" args="load jsk_perception/Opening $(arg manager)" output="screen">
-    <remap from="~input" to="/closing_hls_color_filter_channel/output"/>
+  <node pkg="nodelet" type="nodelet" name="opening_depth_distance_filter_channel" args="load jsk_perception/Opening $(arg manager)" output="screen">
+    <remap from="~input" to="/closing_depth_distance_filter_channel/output"/>
   </node>
 
   <node pkg="nodelet" type="nodelet" name="channel_detection"
         args="load aerial_robot_perception/GroundObjectDetection $(arg manager)" output="screen">
-    <remap from="image" to="/opening_hls_color_filter_channel/output" />
+    <remap from="image" to="/opening_depth_distance_filter_channel/output" />
     <remap from="camera_info" to="$(arg rgb_camera_info_topic)"/>
   </node>
 

@@ -51,6 +51,7 @@ estimator:
                 estimate_mode: 6 # 1<<1 + 1<<2
         alt:
                 estimate_mode: 1 # 1<<0
+                max_flight_height: 5 # m
         gps:
                 estimate_mode: 1 # 1<<0
         vo:

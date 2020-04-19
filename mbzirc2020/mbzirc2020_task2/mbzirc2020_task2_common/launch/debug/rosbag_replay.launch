@@ -1,7 +1,10 @@
 <launch>
   <arg name="model_suffix" default="_ring_gripper"/>
   <arg name="do_recognition" default="true"/>
-  <arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/simulation_default"/>
+  <!--arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/simulation_default"/-->
+  <!--arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/kashiwa_202002"/-->
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/abudhabi_202002"/>
+  <arg name="object_color" default="green"/>
 
   <param name="/use_sim_time" value="true"/>
 
@@ -10,10 +13,10 @@
     <arg name="task" value="2"/>
     <arg name="need_joint_state" value="false"/>
     <arg name="model_suffix" value="$(arg model_suffix)"/>
-    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/config/rosbag_replay_rviz_config"/>
+    <arg name="rviz_config_path" value="$(find mbzirc2020_task2_common)/launch/debug/rosbag_replay_rviz_config"/>
   </include>
 
-  <include file="$(find mbzirc2020_task2_common)/launch/image_republish.launch"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/debug/image_republish.launch"/>
 
   <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
         args="standalone depth_image_proc/point_cloud_xyzrgb" >
@@ -23,11 +26,17 @@
     <remap from="depth_registered/points" to="/rs_d435/points"/>
   </node>
 
-  <include file="$(find mbzirc2020_task2_common)/launch/tile_images.launch"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/debug/tile_images.launch"/>
 
   <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
     <arg name="config_dir" value="$(arg config_dir)"/>
+    <arg name="object_color" value="$(arg object_color)"/>
   </include>
 
+  <node pkg="mbzirc2020_task2_common" type="base_footprint_tf_publisher.py" name="base_footprint_tf_publisher"/>
+
   <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
+
+  <param name="rectangle_detection_color/debug_view" value="true"/>
+  <param name="rectangle_detection_depth/debug_view" value="true"/>
 </launch>

@@ -11,18 +11,8 @@ from aerial_robot_model.srv import AddExtraModule, AddExtraModuleRequest
 from std_msgs.msg import UInt8
 from jsk_rviz_plugins.msg import OverlayText
 from spinal.msg import Gps
-
-def mDegLat(lat):
-    lat_rad = lat * np.pi / 180.0
-    return 111132.09 - 566.05 * np.cos(2.0 * lat_rad) + 1.20 * np.cos(4.0 * lat_rad) - 0.002 * np.cos(6.0 * lat_rad)
-
-def mDegLon(lat):
-    lat_rad = lat * np.pi / 180.0
-    return 111415.13 * np.cos(lat_rad) - 94.55 * np.cos(3.0 * lat_rad) - 0.12 * np.cos(5.0 * lat_rad)
-
-def gps2xy(orig_gps, dst_gps):
-    return mDegLat(orig_gps[0]) * (dst_gps[0] - orig_gps[0]), -mDegLon(orig_gps[0]) * (dst_gps[1] - orig_gps[1])
-
+from std_srvs.srv import SetBool, SetBoolRequest
+from gps_utils import *
 
 class HydrusInterface:
     def __init__(self, debug_view = False):
@@ -57,10 +47,12 @@ class HydrusInterface:
         self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
+        self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.add_extra_module_client_ = rospy.ServiceProxy('hydrusx/add_extra_module', AddExtraModule)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.ros_gps_sub_ = rospy.Subscriber('fix', NavSatFix, self.rosGpsCallback)
         self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
+        self.set_joint_torque_client_ = rospy.ServiceProxy('/hydrusx/joints/torque_enable', SetBool)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -139,6 +131,13 @@ class HydrusInterface:
             self.extra_joint_ctrl_pub_.publish(joint_msg)
             rospy.sleep(1.0 / self.joint_update_freq_)
 
+    def setJointTorque(self, state):
+        req = SetBoolRequest()
+        req.data = state
+        try:
+            self.set_joint_torque_client_(req)
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
 
     def setXYPosOffset(self, xy_pos_offset_):
         self.xy_pos_offset_ = xy_pos_offset_
@@ -162,6 +161,9 @@ class HydrusInterface:
 
     def forceLanding(self):
         self.force_landing_pub_.publish()
+
+    def halt(self):
+        self.halt_pub_.publish()
 
     def getBaselinkOdom(self):
         return self.baselink_odom_
@@ -249,11 +251,12 @@ class HydrusInterface:
         self.target_z_ = target_z
         self.target_yaw_ = target_yaw
 
-    def isConvergent(self, frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh):
+    def isConvergent(self, frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh=0.06):
         current_xy = self.getBaselinkPos()[0:2]
         current_z = self.getBaselinkPos()[2]
         current_yaw = self.getBaselinkRPY()[2]
         current_vel = self.getBaselinkLinearVel()
+        current_rp = self.getBaselinkRPY()[0:2]
 
         if gps_mode:
             delta_pos = gps2xy(self.gps_lat_lon_, target_xy)
@@ -281,20 +284,20 @@ class HydrusInterface:
             text.text_size = 12
             text.line_width = 2
             text.font = "DejaVu Sans Mono"
-            text.text = """%f %f %f """ % (np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel))
+            text.text = 'Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n  roll: {:.4g}, pitch: {:.4g}\nSetPoint\n  x: {:.11g} y: {:.11g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), abs(current_rp[0]), abs(current_rp[1]), target_xy[0], target_xy[1], target_z, target_yaw)
 
             self.nav_debug_pub_.publish(text)
 
-        if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh and np.linalg.norm(current_vel) < vel_conv_thresh:
+        if np.linalg.norm(delta_pos) < pos_conv_thresh and abs(delta_yaw) < yaw_conv_thresh and np.linalg.norm(current_vel) < vel_conv_thresh and abs(current_rp[0]) < att_conv_thresh and abs(current_rp[0]) < att_conv_thresh:
             return True
         else:
             return False
 
-    def goPosWaitConvergence(self, frame, target_xy, target_z, target_yaw, gps_mode = False, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, timeout = 30):
+    def goPosWaitConvergence(self, frame, target_xy, target_z, target_yaw, gps_mode = False, pos_conv_thresh = 0.1, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1, att_conv_thresh = 0.06, timeout = 30):
         self.goPos(frame, target_xy, target_z, target_yaw, gps_mode)
         start_time = rospy.get_time()
 
-        while not self.isConvergent(frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh):
+        while not self.isConvergent(frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh):
             elapsed_time = rospy.get_time() - start_time
             if elapsed_time > timeout:
                 return False

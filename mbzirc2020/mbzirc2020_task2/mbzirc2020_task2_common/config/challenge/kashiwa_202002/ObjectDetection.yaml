@@ -1,10 +1,10 @@
 hls_color_filter:
   h_limit_max: 37
-  h_limit_min: 325
-  l_limit_max: 251
-  l_limit_min: 1
-  s_limit_max: 255
-  s_limit_min: 72
+  h_limit_min: 341
+  l_limit_max: 177
+  l_limit_min: 31
+  s_limit_max: 256
+  s_limit_min: 71
   use_camera_info: false
   queue_size: 10
 
@@ -17,12 +17,12 @@ opening_hls_color_filter:
   iterations: 2
 
 rectangle_detection_color:
-  debug_view: true
+  debug_view: false
   frame_id: target_object_color
   target_object_area: 0.08 #0.2 * 0.6
   target_object_area_margin: 0.02
   object_height: 0.2
-  lowest_margin: 10
+  lowest_margin: 5
 
 depth_distance_filter:
   min_depth: 0.3
@@ -31,13 +31,13 @@ depth_distance_filter:
   distance_from_ground: 0.1
 
 opening_depth_distance_filter:
-  size: 2
+  size: 4
   iterations: 4
 
 rectangle_detection_depth:
-  debug_view: true
+  debug_view: false
   frame_id: target_object_depth
   target_object_area: 0.06 #0.2 * 0.6
-  target_object_area_margin: 0.02
+  target_object_area_margin: 0.015
   object_height: 0.2
-  lowest_margin: 20
+  lowest_margin: 1
