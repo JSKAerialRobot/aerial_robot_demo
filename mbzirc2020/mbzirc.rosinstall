@@ -1,6 +1,8 @@
-# https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor
-
 # task1
+- git:
+    local-name: edgetpu_roscpp
+    uri: http://github.com/tongtybj/edgetpu_roscpp.git 
+    version: master
 - git:
     local-name: hector_quadrotor
     uri: https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git

@@ -3,6 +3,9 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
 
   <!-- base kinematics model -->
+  <xacro:arg name="monocular_camera" default="true" />
+  <xacro:arg name="camera_height" default="0" />
+  <xacro:arg name="camera_pitch_angle" default="0" />
   <xacro:arg name="horizontal_vio" default="false" />
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
   <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"/>
@@ -13,7 +16,7 @@
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.4108"/>
+      <mass value="0.411"/>
       <inertia
           ixx="0.0001" iyy="0.0006" izz="0.0006"
           ixy="0.0" ixz="0.0"  iyz="0.0"/>
@@ -24,54 +27,213 @@
     <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.4108"/>
+      <mass value="0.411"/>
       <inertia
           ixx="0.0001" iyy="0.0006" izz="0.0006"
           ixy="0.0" ixz="0.0"  iyz="0.0"/>
     </inertial>
   </xacro:extra_module>
 
-  <!-- processor: intel upboard -->
+  <!-- processor: gygabyte brix i7 -->
   <xacro:extra_module name = "pc" parent = "link2" visible = "1"
-                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/intel_upboard_fixed_joint_unit.dae" >
-    <origin xyz="${link_length / 2 + 0.2845} 0.011 0.016" rpy="0 0 ${pi}"/>
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/gygabyte_brix_fixed_joint_unit.STL" >
+    <origin xyz="${link_length / 2 + 0.27486} 0.02569 0.04" rpy="0 0 0"/>
     <inertial>
-      <mass value = "0.117" />
-      <origin xyz="${21 * 0.001} ${4 * 0.001} ${12 * 0.001}" rpy="0 0 0"/>
+      <mass value = "0.323" /> <!-- plus cable for leddar one-->
+      <origin xyz="${1.5 * 0.001} ${-3.5 * 0.001} ${8.9 * 0.001}" rpy="0 0 0"/>
       <inertia
-          ixx="0.00004" ixy="0.0" ixz="0.0"
-          iyy="0.00008" iyz="0.0"
-          izz="0.00011"/>
+          ixx="0.000351" ixy="0.0" ixz="0.0"
+          iyy="0.000272" iyz="0.0"
+          izz="0.000570"/>
     </inertial>
   </xacro:extra_module>
-  <!-- end: intel upboard -->
+  <!-- end: gygabyte brix i7 -->
 
-  <!-- sensor -->
-  <!-- 1. RGB camera -->
-  <!-- TODO: accurate intertia parameters and position -->
-  <xacro:extra_module name = "rgb_camera_frame" parent = "link2" visible = "0"  >
-    <origin xyz="${link_length / 2 + 0.140} 0.162 0.063" rpy="0 0 ${3 * pi/4}"/>
+  <!-- edge TPU coral -->
+  <xacro:extra_module name = "edgetpu" parent = "link2" visible = "0" >
+    <origin xyz="${link_length / 2 + 0.22} 0.01 0.02" rpy="0 0 0"/>
     <inertial>
-      <mass value = "0.001" /> <!-- temporary -->
+      <mass value = "0.0348" /> <!-- plus usb cable -->
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia
           ixx="0.0" ixy="0.0" ixz="0.0"
           iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
   </xacro:extra_module>
-  <xacro:extra_module name = "rgb_camera_optical_frame" parent = "rgb_camera_frame">
-    <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+  <!-- end: edge TPU coral -->
+
+  <!-- sensor -->
+  <!-- Monocular camera -->
+  <xacro:if value="$(arg monocular_camera)">
+    <!-- direct mount type -->
+    <xacro:unless value="$(arg camera_height)">
+      <xacro:extra_module name = "monocular_camera_unit" parent = "link2" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/ELP_SUSB1080P_direct_unit.dae">
+        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 $(arg camera_pitch_angle) ${pi * 3/4}"/>
+        <inertial>
+          <mass value = "0.0457" />
+          <origin xyz="0.027 0 0.005" rpy="0 0 0"/>
+          <inertia
+              ixx="0.000062" iyy="0.000009" izz="0.000066"
+              ixy="0.0" ixz="0.0" iyz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+
+      <joint name="monocular_camera_unit2color_camera_frame" type="fixed">
+        <origin xyz="0.016 0.0 0.005 " rpy="0 0 0"/>
+        <parent link="monocular_camera_unit" />
+        <child link="color_camera_frame" />
+      </joint>
+      <link name="color_camera_frame"/>
+
+      <xacro:extra_module name = "camera_usb_cable" parent = "monocular_camera_unit" visible = "0" >
+        <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+        <inertial>
+          <mass value = "0.0474" />
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <inertia
+              ixx="0.0" ixy="0.0" ixz="0.0"
+              iyy="0.0" iyz="0.0"
+              izz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+
+    </xacro:unless>
+
+    <!-- carbon pipe mount type -->
+    <xacro:if value="$(arg camera_height)">
+      <xacro:extra_module name = "center_bar" parent = "link2" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/single_camera_center_bar.dae">
+        <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 $(arg camera_pitch_angle) ${pi * 3/4}"/>
+        <inertial>
+          <mass value = "0.0255" />
+          <origin xyz="0.014307 0 0.005" rpy="0 0 0"/>
+          <inertia
+              ixx="0.000058" iyy="0.0" izz="0.000059"
+              ixy="0.0" ixz="0.0" iyz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+      <xacro:extra_module name = "monocular_camera_unit" parent = "center_bar" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/ELP_SUSB1080P_unit.dae">
+        <origin xyz="0.02014 0 $(arg camera_height)" rpy="0 0 0"/>
+        <inertial>
+          <mass value = "0.036" />
+          <origin xyz="-0.003 0 -0.01" rpy="0 0 0"/>
+          <inertia
+              ixx="0.0" iyy="0.0" izz="0.0"
+              ixy="0.0" ixz="0.0" iyz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+
+      <xacro:extra_module name = "camera_usb_cable" parent = "center_bar" visible = "0" >
+        <origin xyz="-0.11 0 0 " rpy="0 0 0"/>
+        <inertial>
+          <mass value = "0.0474" />
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <inertia
+              ixx="0.0" ixy="0.0" ixz="0.0"
+              iyy="0.0" iyz="0.0"
+              izz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+
+      <joint name="monocular_camera_unit2color_camera_frame" type="fixed">
+        <origin xyz="0.0 0.0 0.0 " rpy="${pi} 0 0"/>
+        <parent link="monocular_camera_unit" />
+        <child link="color_camera_frame" />
+      </joint>
+      <link name="color_camera_frame"/>
+    </xacro:if>
+
+    <joint name="color_camera_frame2color_camera_optical_frame" type="fixed">
+      <origin xyz="0.0 0.0 0.0 " rpy="${-pi/2} 0 ${-pi/2}"/>
+      <parent link="color_camera_frame" />
+      <child link="color_camera_optical_frame" />
+    </joint>
+    <link name="color_camera_optical_frame"/>
+
+  </xacro:if>
+
+  <!-- Realsense D435 -->
+  <xacro:unless value="$(arg monocular_camera)">
+    <xacro:extra_module name = "rs_d435_unit" parent = "link2" visible = "1" model_url = "package://mbzirc2020_task1_common/urdf/meshes/sensor/rs_d435_unit3_front_center_bar.dae">
+      <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 0 ${pi * 3/4}"/>
+      <inertial>
+        <mass value = "0.0789" /> <!-- includes sensor and mount -->
+        <origin xyz="0.0315 -0.0247 0.01568" rpy="0 0 0"/>
+        <inertia
+            ixx="0.000111" iyy="0.000016" izz="0.000116"
+            ixy="-0.000008" ixz="0.000004" iyz="-0.00005"/>
+      </inertial>
+    </xacro:extra_module>
+    <xacro:extra_module name = "rs_d435_usb_cable" parent = "rs_d435_unit" visible = "0" >
+      <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+      <inertial>
+        <mass value = "0.033" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia
+            ixx="0.0" ixy="0.0" ixz="0.0"
+            iyy="0.0" iyz="0.0"
+            izz="0.0"/>
+      </inertial>
+    </xacro:extra_module>
+    <!-- rs_d435_link is the parrent of sensors' frame, identical to rs_d435_left_ir_frame -->
+    <xacro:extra_module name = "rs_d435_link" parent = "rs_d435_unit" visible = "0" >
+      <origin xyz="0.03 -0.015 0.019 " rpy="0 0 0"/>
+      <inertial>
+        <mass value = "0.0" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia
+            ixx="0.0" ixy="0.0" ixz="0.0"
+            iyy="0.0" iyz="0.0"
+            izz="0.0"/>
+      </inertial>
+    </xacro:extra_module>
+  </xacro:unless>
+
+  <!-- upward carbon pipe to avoid upside down crash on the ground -->
+  <xacro:extra_module name = "upward_pipe1" parent = "link2" visible = "0" >
+    <origin xyz="0.04 0.0 0.04" rpy="0 0 0"/>
     <inertial>
-      <mass value = "0.0" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
       <inertia
-          ixx="0.0" ixy="0.0" ixz="0.0"
-          iyy="0.0" iyz="0.0"
-          izz="0.0"/>
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "upward_pipe2" parent = "link3" visible = "0" >
+    <origin xyz="0.56 0.0 0.04" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
     </inertial>
   </xacro:extra_module>
 
 
   <!-- net -->
-  <!-- TODO: add net at the ends -->
+  <xacro:property name="net_mass" value=".075" />
+  <xacro:extra_module name = "net_anchor1" parent = "leg1" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${net_mass/2}"/>
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <xacro:extra_module name = "net_anchor2" parent = "leg5" visible = "0" >
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${net_mass/2}"/>
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
 </robot>

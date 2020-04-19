@@ -50,9 +50,10 @@
       <plugin name="mbzirc_gazebo_treasure_plugin_sphere_1" filename="libmbzirc_gazebo_treasure_plugin.so">
         <guardName>hawk</guardName>
         <pirateName>hydrusx</pirateName>
+        <treasurePositionTopicName>/treasure/point_from_gazebo</treasurePositionTopicName>
         <markerTopicName>/treasure/marker</markerTopicName>
         <grabThreshold>0.3</grabThreshold>
-        <guardUavTreasureOffsetZ>0.5</guardUavTreasureOffsetZ>
+        <guardUavTreasureOffsetZ>1.45</guardUavTreasureOffsetZ>
         <pirateUavTreasureOffsetZ>0.03</pirateUavTreasureOffsetZ>
       </plugin>
     </model>

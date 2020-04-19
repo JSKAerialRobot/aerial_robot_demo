@@ -18,19 +18,19 @@
       <collision name="collision">
         <geometry>
           <sphere>
-            <radius>0.04</radius>
+            <radius>0.07</radius>
           </sphere>
         </geometry>
       </collision>
       <visual name="visual">
         <geometry>
           <sphere>
-            <radius>0.075</radius>
+            <radius>0.07</radius>
           </sphere>
         </geometry>
         <material>
-          <ambient>1.00 0.39 0.28 1</ambient> <!-- tomato -->
-          <diffuse>1.00 0.38 0.28 1</diffuse>
+          <ambient>1.00 1.00 0.00 1</ambient> <!-- tomato -->
+          <diffuse>1.00 1.00 0.00 1</diffuse>
           <specular>0.1 0.1 0.1 1</specular>
           <emissive>0 0 0 0</emissive>
         </material>

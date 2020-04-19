@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="world" default="kashiwa" />
+  <arg name="estimate_mode" default="0" />
+  <arg name="monocular_camera" default="true" />
+  <arg name="camera_pitch_angle" default="-0.087" />
+  <arg name="cascaded_detection" default = "false" />
+  <arg name="image_pub_throttle_rate" default="10.0" />
+  <arg name="ground_station" default="true" />
+  <arg name="ground_station_ip" default="10.205.0.5" />
+  <arg name="final_landing" default="false" />
+
+  ###########  bring up  ###########
+  <include file="$(find mbzirc2020_task1_common)/launch/bringup.launch" >
+    <arg name="estimate_mode" value="$(arg estimate_mode)" />
+    <arg name="monocular_camera" value="$(arg monocular_camera)" />
+    <arg name="camera_pitch_angle" value="$(arg camera_pitch_angle)" />
+  </include>
+
+  ########### perception ###########
+  <include file="$(find mbzirc2020_task1_tasks)/launch/drone_ball_tracking_by_detection.launch" >
+    <arg name="standalone" value="true" />
+    <arg name="image_view" value="true" />
+    <arg name="verbose" value="false" />
+    <arg name="coarse_detection_score_threshold" value="0.0" />
+    <arg name="refined_detection_score_threshold" value="0.71" />
+    <arg name="tracking_score_threshold" value="0.7" />
+    <arg name="keep_aspect_ratio_in_inference" value="false" />
+    <arg name="quick_detection" value="true" />
+    <arg name="cascaded_detection" value = "$(arg cascaded_detection)" />
+    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/drone_detection_edgetpu_20200220_315.tflite" unless="$(arg cascaded_detection)"/>
+    <arg name="binding_model_file" value="$(find mbzirc2020_task1_tasks)/models/cocompile_model_20200204624_202002030726/20200204_bind_model_624_edgetpu.tflite" if="$(arg cascaded_detection)"/>
+    <arg name="separate_model_file" value = "$(find mbzirc2020_task1_tasks)/models/cocompile_model_20200204624_202002030726/20200203_separate_model_726_edgetpu.tflite" />
+    <arg name="expanding_bounding_box_rate" value="2.0" />
+    <arg name="expanding_bounding_box_aspect_ratio" value="1.0" />
+    <arg name="camera_info_topic" value="/usb_cam/camera_info" if="$(arg monocular_camera)"/>
+    <arg name="camera_info_topic" value="/rs_d435/color/camera_info" unless="$(arg monocular_camera)"/>
+    <arg name="color_image_topic" value="/usb_cam/image_raw" if="$(arg monocular_camera)"/>
+    <arg name="color_image_topic" value="/rs_d435/color/image_rect_color" unless="$(arg monocular_camera)"/>
+    <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
+  </include>
+
+  ########### motion ###########
+  <group unless="$(arg final_landing)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/ransac.launch" >
+      <arg name="vision" value="true" />
+      <arg name="from_ground" value="true" />
+    </include>
+  </group>
+  <group if="$(arg final_landing)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/final_land.launch" >
+    </include>
+  </group>
+
+
+  ### communication to ground station
+  <group if="$(arg ground_station)">
+    <include file="$(find mbzirc2020_task1_tasks)/launch/communication2ground_station.launch">
+      <arg name="GROUND_STATION_IP" value="$(arg ground_station_ip)" />
+      <arg name="image_pub_throttle_rate" value="$(arg image_pub_throttle_rate)" />
+    </include>
+  </group>
+
+  ### monitoring GPS and Yaw ###
+  <node pkg="mbzirc2020_task1_tasks" type="gps_yaw_info.py" respawn="true" name="gps_yaw_info" output ="screen" />
+
+  ### special landing with joints close cmd ###
+  <node pkg="mbzirc2020_task1_tasks" type="task1_special_landing.py" respawn="true" name="task1_special_landing" output ="screen" />
+
+
+</launch>

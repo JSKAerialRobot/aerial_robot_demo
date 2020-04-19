@@ -1,26 +1,34 @@
 <launch>
   <arg name="fake_vision" default="true" />
+  <arg name="ransac" default="true" />
+  <arg name="mpc" default="false" />
 
-  <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
-    <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
-    <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
-    <param name="replan_timer_period" value="2.0" />
-    <param name="predict_horizon" value="3.0" />
-    <param name="kf_method" value="2" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
-    <param name="primitive_visualize_flag" value="true" />
-    <param name="primitive_candidates_num" value="6" />
-    <param name="noise_flag" value="true" />
-  </node>
+  <group unless="$(arg ransac)">
+    <node pkg="mbzirc2020_task1_tasks" type="trajectory_tracker_node" name="trajectory_tracker_node" output="screen" respawn="false">
+      <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+      <param name="tracked_object_odom_topic_name" value="/vision/object_odom" />
+      <param name="replan_timer_period" value="0.2" />
+      <param name="predict_horizon" value="3.0" />
+      <param name="kf_method" value="2" /> <!-- 0, POS_VEL; 1, POS_IM_VEL; 2, POS_ONLY -->
+      <param name="primitive_visualize_flag" value="true" />
+      <param name="primitive_candidates_num" value="6" />
+      <param name="noise_flag" value="true" />
+    </node>
+  </group>
 
   <group if="$(arg fake_vision)">
     <node pkg="mbzirc2020_task1_tasks" type="fake_visual_detector.py" name="fake_visual_detector" output="screen" respawn="false">
       <rosparam file="$(find mbzirc2020_task1_common)/config/challenge/route.yaml" command="load" />
+    </node>
+    <node pkg="mbzirc2020_task1_tasks" type="fake_treasure_detector_from_gazebo.py" name="fake_treasure_detector_from_gazebo" output="screen" respawn="false">
     </node>
   </group>
 
   <node pkg="mbzirc2020_task1_tasks" type="hydrus_tracking_controller.py" name="hydrus_tracking_controller" output="screen" respawn="false">
     <param name="hydrus_controller_freq" value="100.0" />
     <param name="control_model" value="0" /> <!-- 0, POS_VEL; 1, POS; 2, POS_VEL_PSI -->
+    <param name="mpc" value="$(arg mpc)" />
+    <param name="mpc_horizon" value="1.0" />
   </node>
 
 </launch>

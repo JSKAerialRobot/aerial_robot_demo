@@ -31,6 +31,13 @@
   ###########  Battery Config  ###########
   <rosparam file="$(arg config_path)/Battery.yaml" command="load" />
 
+  ###########  Sensors  ###########
+  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
+  </include >
+
   ###########  Base Platform  ###########
   <node pkg="aerial_robot_base" type="aerial_robot_base_node" name="aerial_robot_base_node" output="screen" >
 
@@ -49,7 +56,7 @@
 
     <param name="simulation" value="$(arg simulation)" />  <!--for sensor plugin-->
     <param name="param_verbose" value="false"/>
-    <param name="main_rate" type="double" value="40"/>
+    <param name="main_rate" type="double" value="40" />
 
     ###########  PID Control  ###########
     <param name="control_plugin_name" value="control_plugin/agile_flatness_pid" />
@@ -63,13 +70,6 @@
     ###########  Teleop  ###########
     <rosparam file="$(arg config_path)/TeleopNavigationConfig.yaml" command="load" />
   </node>
-
-  ###########  Sensors  ###########
-  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
-    <arg name="real_machine" value="$(arg real_machine)" />
-    <arg name="simulation" value="$(arg simulation)" />
-    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
-  </include >
 
   ###########  Robot Model  ###########
   <include file="$(find mbzirc2020_common)/launch/robot_model.launch" >
