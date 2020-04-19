@@ -1,10 +1,17 @@
-# https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor
-
 # task1
+- git:
+    local-name: edgetpu_roscpp
+    uri: http://github.com/tongtybj/edgetpu_roscpp.git 
+    version: master
+## for simulation the target drone, which can be removed in the future
 - git:
     local-name: hector_quadrotor
     uri: https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git
     version: kinetic-devel
+- git:
+    local-name: hector_localization
+    uri: https://github.com/tu-darmstadt-ros-pkg/hector_localization.git
+    version: catkin
 
 # task2
 - git:
