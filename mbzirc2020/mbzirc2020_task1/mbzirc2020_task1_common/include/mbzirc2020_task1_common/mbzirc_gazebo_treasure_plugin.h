@@ -57,6 +57,10 @@
 #include <std_msgs/String.h>
 #include <string>
 
+#if GAZEBO_MAJOR_VERSION >= 8
+using namespace ignition;
+#endif
+
 #define TREASURE_CRUISE 0
 #define TREASURE_CAPTURED 1
 #define TREASURE_FORCE_INIT 2
@@ -115,7 +119,11 @@ private:
   double grab_thre_;
   double guard_uav_treasure_offset_z_;
   double pirate_uav_treasure_offset_z_;
+#if GAZEBO_MAJOR_VERSION >= 8
+  math::Vector3d pirate_linear_acc_;
+#else
   math::Vector3 pirate_linear_acc_;
+#endif
 
   //renew the data of the gazebo objects
   void gazeboCallback(const gazebo_msgs::ModelStates gazebo_model_states)

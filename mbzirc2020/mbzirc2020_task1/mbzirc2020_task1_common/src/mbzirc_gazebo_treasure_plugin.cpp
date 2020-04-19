@@ -41,7 +41,11 @@ namespace gazebo
 
   GazeboTreasure::~GazeboTreasure()
   {
+#if GAZEBO_MAJOR_VERSION >= 8
+    update_connection_.reset();
+#else
     event::Events::DisconnectWorldUpdateBegin(update_connection_);
+#endif
 
     node_handle_->shutdown();
     delete node_handle_;
@@ -59,7 +63,11 @@ namespace gazebo
     model_->SetGravityMode(false);
 
     static_object_ = false;
+#if GAZEBO_MAJOR_VERSION >= 8
+    last_time_ = world_->SimTime();
+#else
     last_time_ = world_->GetSimTime();
+#endif
     terminated_ = false;
 
     treasure_state_ = TREASURE_CRUISE;
@@ -180,7 +188,6 @@ namespace gazebo
       }
     else
       {
-        math::Pose pose_object = link_->GetWorldPose();  //the pose of the object
         int pirate_id = -1, guard_id = -1;
         for(int i = 0; i < this->gazebo_models_.name.size(); i++){
           if (gazebo_models_.name.at(i) == pirate_name_)
@@ -202,9 +209,17 @@ namespace gazebo
           if (pirate_id >= 0){
             // judge whether treasure is grabbed
             geometry_msgs::Pose pose_pirate = gazebo_models_.pose.at(pirate_id);
+#if GAZEBO_MAJOR_VERSION >= 8
+            math::Pose3d pose_object = link_->WorldPose();  //the pose of the object
+            if(fabs(pose_pirate.position.x - pose_object.Pos().X())<grab_thre_&&
+               fabs(pose_pirate.position.y - pose_object.Pos().Y())<grab_thre_&&
+               fabs(pose_pirate.position.z - pose_object.Pos().Z())<grab_thre_ / 2.0){
+#else
+            math::Pose pose_object = link_->GetWorldPose();  //the pose of the object
             if(fabs(pose_pirate.position.x - pose_object.pos.x)<grab_thre_&&
                fabs(pose_pirate.position.y - pose_object.pos.y)<grab_thre_&&
                fabs(pose_pirate.position.z - pose_object.pos.z)<grab_thre_ / 2.0){
+#endif
               treasure_state_ = TREASURE_CAPTURED;
               ROS_ERROR("TREASURE_CAPTURED");
               updateTreasureState(pirate_id, pirate_name_);
@@ -239,7 +254,12 @@ namespace gazebo
 
   void GazeboTreasure::updateTreasureState(int owner_id, std::string robot_name){
     geometry_msgs::Pose treausre_pose = gazebo_models_.pose.at(owner_id);
+#if GAZEBO_MAJOR_VERSION >= 8
+    math::Vector3d offset;
+#else
     math::Vector3 offset;
+#endif
+
     if (robot_name == std::string("hawk")){
       if (treausre_pose.position.z < guard_uav_treasure_offset_z_) // drone is in low height
         offset.Set(0.0, 0.0, treausre_pose.position.z);
@@ -248,20 +268,37 @@ namespace gazebo
     }
     else if (robot_name == std::string("hydrusx"))
       offset.Set(0.0, 0.0, pirate_uav_treasure_offset_z_);
+
+#if GAZEBO_MAJOR_VERSION >= 8
+    model_->SetWorldPose(math::Pose3d(math::Vector3d(treausre_pose.position.x,
+                                                     treausre_pose.position.y,
+                                                     treausre_pose.position.z)
+                                      - offset,
+                                      math::Quaterniond(1, 0, 0, 0)));
+#else
     model_->SetWorldPose(math::Pose(math::Vector3(treausre_pose.position.x,
                                                   treausre_pose.position.y,
                                                   treausre_pose.position.z)
                                     - offset,
-                                    math::Quaternion(0, 0, 0, 1)));
+                                    math::Quaternion(1, 0, 0, 0)));
+#endif
     visualizeTreasure();
   }
 
   void GazeboTreasure::visualizeTreasure(){
-    math::Pose pose_object = link_->GetWorldPose();
+
     geometry_msgs::Pose treausre_pose;
+#if GAZEBO_MAJOR_VERSION >= 8
+    math::Pose3d pose_object = link_->WorldPose();
+    treausre_pose.position.x = pose_object.Pos().X();
+    treausre_pose.position.y = pose_object.Pos().Y();
+    treausre_pose.position.z = pose_object.Pos().Z();
+#else
+    math::Pose pose_object = link_->GetWorldPose();
     treausre_pose.position.x = pose_object.pos.x;
     treausre_pose.position.y = pose_object.pos.y;
     treausre_pose.position.z = pose_object.pos.z;
+#endif
     // publish the treasure marker in the rviz
     visualization_msgs::Marker treasure_marker;
     treasure_marker.ns = "treasure_marker";
@@ -283,9 +320,9 @@ namespace gazebo
 
     geometry_msgs::PointStamped treasure_point;
     treasure_point.header = treasure_marker.header;
-    treasure_point.point.x = pose_object.pos.x;
-    treasure_point.point.y = pose_object.pos.y;
-    treasure_point.point.z = pose_object.pos.z;
+    treasure_point.point.x = treausre_pose.position.x;
+    treasure_point.point.y = treausre_pose.position.y;
+    treasure_point.point.z = treausre_pose.position.z;
     treasure_point_pub_.publish(treasure_point);
   }
 
