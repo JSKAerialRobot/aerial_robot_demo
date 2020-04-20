@@ -39,6 +39,8 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>std_srvs</depend>
+  <depend>smach</depend>
+  <depend>smach_ros</depend>
   <exec_depend>mbzirc2020_task3_common</exec_depend>
 
 </package>
