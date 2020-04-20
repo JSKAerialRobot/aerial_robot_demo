@@ -8,10 +8,12 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="headless" default="True" />
   <arg name="use_rsd435" default="False" />
-  <arg name="rviz_config_path" default="$(find mbzirc2020_task3_tasks)/rviz/task3_simulation.rviz"/>
+  <arg name="use_model_suffix" default="False" />
+  <arg name="model_suffix" default="" />
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
   <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/virtual_fire_fighting.world" if="$(arg cheating_fire)"/>
   <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/real_fire_fighting.world" unless="$(arg cheating_fire)"/>
+  <arg name="rviz_config_path" default="$(find mbzirc2020_task3_tasks)/rviz/task3_simulation.rviz"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
@@ -23,6 +25,7 @@
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="worldtype" value="$(arg gazebo_world)" />
     <arg name="task" value="3" />
+    <arg name="model_suffix" value="$(arg model_suffix)" if="$(arg use_model_suffix)"/>
     <arg name="model_suffix" value="_rsd435" if="$(arg use_rsd435)"/>
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
   </include>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<launch>
+  ###########  launch config  ###########
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="estimate_mode"  default= "0" />
+  <arg name="horizontal_vio" default="False" />
+  <arg name="headless" default="True" />
+  <arg name="target_tf_name" default="target_object"/>
+  <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
+  <arg name="motion_config_filename" default="motion_simulation.yaml"/>
+  <arg name="waypoint_config_filename" default="waypoint_simulation.yaml"/>
+  <arg name="all_contour" default="true"/>
+  <arg name="contour_area_min_thre"  default= "0.1" />
+  <arg name="skip_search" default="false"/>
+
+  <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/tower.world" />
+  <arg name="laser_throttle" default="10" />
+
+  ##########  basic bringup file ########
+  <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
+    <arg name="gazebo_world" value="$(arg gazebo_world)" />
+    <arg name="use_model_suffix" value="True"/>
+    <arg name="model_suffix" value="_hokuyo"/>
+  </include>
+
+  ########## recognition ###############
+  ########## laser detection ###########
+  <!-- TODO add urg launch for real sensor -->
+  <include file="$(find mbzirc2020_task3_perception)/launch/laser_window_detection.launch">
+    <arg name="laser_throttle" value="$(arg laser_throttle)"/>
+  </include>
+
+  ########### real machine #############
+  <include file="$(find mbzirc2020_task3_tasks)/launch/find_ground_fire.launch"  if="$(arg real_machine)">
+    <arg name="all_contour" value="$(arg all_contour)" />
+  </include>
+
+  ########### simulation ###############
+  <include file="$(find aerial_robot_perception)/launch/single_color_ground_object_detection.launch" if="$(arg simulation)">
+    <arg name="image_topic" value="/flir/image_raw"/>
+    <arg name="camera_info_topic" value="/flir/camera_info"/>
+    <arg name="output_screen" value="true"/>
+
+    <!-- TODO: please set following paramters in yaml file -->
+    <!-- object property -->
+    <arg name="object_height" value="0.02"/>
+
+    <!-- red color object -->
+    <arg name="contour_area_size" value="0.0"/>
+    <arg name="contour_area_min_thre" value="$(arg contour_area_min_thre)"/>
+    <arg name="s_limit_max" value="255" />
+    <arg name="s_limit_min" value="60" />
+    <arg name="v_limit_max" value="255" />
+    <arg name="v_limit_min" value="60" />
+  </include>
+
+  ########## motion planner ###############
+  <node pkg="mbzirc2020_task3_tasks" type="find_ground_fire.py" name="task3_motion_planner" output="screen">
+    <param name="target_tf_name" value="$(arg target_tf_name)"/>
+    <param name="is_bypass" value="$(arg skip_search)"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg motion_config_filename)" command="load"/>
+    <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg waypoint_config_filename)" command="load"/>
+  </node>
+
+</launch>

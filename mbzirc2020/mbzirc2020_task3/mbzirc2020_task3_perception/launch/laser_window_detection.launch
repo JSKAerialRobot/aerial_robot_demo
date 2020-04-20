@@ -1,0 +1,21 @@
+<launch>
+  <arg name="laser_input" default="scan"/>
+  <arg name="laser_throttle" default="10"/>
+  <arg name="max_assemble_scans" default="400"/>
+
+  <node pkg="topic_tools" type="throttle" name="laser_throttle"
+        args="messages $(arg laser_input) $(arg laser_throttle) $(arg laser_input)/throttled" />
+
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_fliter">
+    <rosparam command="load" file="$(find mbzirc2020_task3_perception)/config/laser_filter.yaml"/>
+    <remap from="scan" to="$(arg laser_input)/throttled"/>
+    <remap from="scan_filtered" to="$(arg laser_input)/filtered"/>
+  </node>
+
+  <node pkg="laser_assembler" type="laser_scan_assembler" name="laser_assembler">
+    <remap from="scan" to="$(arg laser_input)/filtered" />
+    <param name="max_scans" type="int" value="$(arg max_assemble_scans)" />
+    <param name="fixed_frame" type="string" value="world"/>
+  </node>
+
+</launch>

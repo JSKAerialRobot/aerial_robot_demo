@@ -1,6 +1,6 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 78
+    Help Height: 70
     Name: Displays
     Property Tree Widget:
       Expanded:
@@ -13,8 +13,9 @@ Panels:
         - /MarkerArray1
         - /Image1
         - /Image2
+        - /LaserScan1
       Splitter Ratio: 0.5
-    Tree Height: 199
+    Tree Height: 207
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -97,6 +98,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        laser0_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         leddarone:
           Alpha: 1
           Show Axes: false
@@ -170,14 +176,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         root:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        sheet_anchor1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        sheet_anchor2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -224,6 +222,8 @@ Visualization Manager:
           Value: true
         gps:
           Value: true
+        laser0_frame:
+          Value: true
         leddarone:
           Value: true
         leg1:
@@ -256,12 +256,6 @@ Visualization Manager:
           Value: true
         root:
           Value: true
-        sheet_anchor1:
-          Value: true
-        sheet_anchor2:
-          Value: true
-        target_object:
-          Value: true
         thrust1:
           Value: true
         thrust2:
@@ -280,13 +274,11 @@ Visualization Manager:
       Tree:
         cog:
           world:
-            target_object:
-              {}
+            {}
         root:
           link1:
             leg1:
-              sheet_anchor1:
-                {}
+              {}
             link2:
               bat1:
                 {}
@@ -295,13 +287,14 @@ Visualization Manager:
               gps:
                 magnet:
                   {}
+              laser0_frame:
+                lepton_camera:
+                  lepton_camera_optical:
+                    {}
               leddarone:
                 {}
               leg2:
                 {}
-              lepton_camera:
-                lepton_camera_optical:
-                  {}
               link3:
                 bat2:
                   {}
@@ -311,8 +304,7 @@ Visualization Manager:
                   leg4:
                     {}
                   leg5:
-                    sheet_anchor2:
-                      {}
+                    {}
                   thrust4:
                     {}
                 thrust3:
@@ -369,6 +361,36 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.019999999552965164
+      Style: Flat Squares
+      Topic: /scan/filtered
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -397,25 +419,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 15.263347625732422
+      Distance: 21.837196350097656
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 3.449763298034668
-        Y: 3.263842821121216
-        Z: -1.753493070602417
+        X: 0.6611531972885132
+        Y: 3.5945892333984375
+        Z: 2.3968889713287354
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6747957468032837
+      Pitch: 0.5847961902618408
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.6072527766227722
+      Yaw: 5.735437870025635
     Saved: ~
 Window Geometry:
   Displays:
