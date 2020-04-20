@@ -1,0 +1,20 @@
+initial_waypoints:
+- - - 24.4174355
+    - 54.4366058
+    - 3.0
+  - - 24.4175556
+    - 54.4365425
+    - 3.0
+
+search_type: '4_corner_relative'
+search_area_number: 1
+area_corners:
+- - - -5.0
+    - -4.0
+  - - -5.0
+    - 2.5
+  - - 5.0
+    - 2.5
+  - - 5.0
+    - -4.0
+  - 8

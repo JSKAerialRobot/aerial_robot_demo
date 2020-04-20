@@ -16,6 +16,7 @@
   <arg name="dummy_y" default="0"/>
   <arg name="dummy_z" default="0"/>
   <arg name="all_contour" default="true"/>
+  <arg name="skip_search" default="false"/>
 
   ##########  basic bringup file ########
   <include file="$(find mbzirc2020_task3_common)/launch/bringup.launch" >
@@ -63,7 +64,12 @@
   <!-- <node pkg="mbzirc2020_task3_tasks" type="motion.py" name="task3_motion_planner" output="screen"> -->
   <node pkg="mbzirc2020_task3_tasks" type="find_ground_fire.py" name="task3_motion_planner" output="screen">
     <param name="target_tf_name" value="$(arg target_tf_name)"/>
+    <param name="is_bypass" value="$(arg skip_search)"/>
     <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg motion_config_filename)" command="load"/>
     <rosparam file="$(find mbzirc2020_task3_tasks)/config/$(arg waypoint_config_filename)" command="load"/>
+  </node>
+
+  ########## rosbag recorder ##############
+  <node pkg="mbzirc2020_task3_tasks" type="rosbag.sh" name="rosbag">
   </node>
 </launch>

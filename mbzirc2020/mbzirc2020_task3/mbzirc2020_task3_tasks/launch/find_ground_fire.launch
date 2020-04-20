@@ -8,7 +8,7 @@
   <arg name="frame_id" default="target_object"/>
   <arg name="all_contour" default="false"/>
 
-  <arg name="temp_thresh" default="100"/>
+  <arg name="temp_thresh" default="55"/>
 
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" output="screen" if="$(arg output_screen)"/>
   <node pkg="nodelet" type="nodelet" name="object_detection_nodelet" args="manager" unless="$(arg output_screen)"/>
@@ -44,7 +44,7 @@
     <param name="object_height" value="0.0"/>
     <param name="contour_area_size" value="0.0"/>
     <param name="contour_area_margin" value="0.0"/>
-    <param name="contour_area_min_thre" value="0.01"/>
+    <param name="contour_area_min_thre" value="0.0"/>
     <param name="all_contour" value="$(arg all_contour)"/>
     <param name="debug_view" value="false"/>
     </node>

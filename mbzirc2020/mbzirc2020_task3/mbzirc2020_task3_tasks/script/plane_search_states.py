@@ -89,6 +89,7 @@ class VortexSearchState(smach.State):
         self.trip_number = params['trip_number']
         self.reach_margin = params['reach_margin']
         self.search_height = params['search_height']
+        self.is_bypass = params['is_bypass']
 
         self.target_pos = None # set when target_pos topic recieved
 
@@ -153,9 +154,10 @@ class VortexSearchState(smach.State):
 
     def execute(self, userdata):
         # retrieve cog position from tf
-        if self.target_pos_flag:
+        if self.target_pos_flag or self.is_bypass:
             userdata.target_pos = self.target_pos
             self.target_pos_flag= False
+            self.target_pos = None
             return 'found'
 
         if self.mode == 'relative' and self.is_first_execution==True:
@@ -206,6 +208,7 @@ class FourCornerSearchState(smach.State):
         self.trip_number = params['area_corners'][4]
         self.reach_margin = params['reach_margin']
         self.search_height = params['search_height']
+        self.is_bypass = params['is_bypass']
 
         self.target_pos = None # set when target_pos topic recieved
 
@@ -247,9 +250,10 @@ class FourCornerSearchState(smach.State):
 
     def execute(self, userdata):
         # retrieve cog position from tf
-        if self.target_pos_flag:
+        if self.target_pos_flag or self.is_bypass:
             userdata.target_pos = self.target_pos
             self.target_pos_flag= False
+            self.target_pos = None
             return 'found'
 
         if self.mode == 'relative' and self.is_first_execution==True:
@@ -293,6 +297,7 @@ class RectangularGridSearchState(smach.State):
         self.search_grid_size = [params['search_grid_size'], params['search_grid_size']]
         self.reach_margin = params['reach_margin']
         self.search_height = params['search_height']
+        self.is_bypass = params['is_bypass']
 
         self.target_pos = None # set when target_pos topic recieved
 
@@ -370,7 +375,7 @@ class RectangularGridSearchState(smach.State):
 
     def execute(self, userdata):
         # retrieve cog position from tf
-        if self.target_pos_flag:
+        if self.target_pos_flag or self.is_bypass:
             userdata.target_pos = self.target_pos
             self.target_pos_flag= False
             return 'found'
@@ -414,6 +419,7 @@ class AproachOnTargetState(smach.State):
         self.descending_height = params['descending_height']
         self.approach_margin = params['approach_margin']
         self.height_margin = params['height_margin']
+        self.is_bypass = params['is_bypass']
 
         # tf Buffer
         self.tfBuffer = tf2_ros.Buffer()
@@ -430,6 +436,9 @@ class AproachOnTargetState(smach.State):
         self.target_pos = msg
 
     def execute(self, userdata):
+        if self.is_bypass:
+            return 'success'
+
         if self.is_userdata_input_retrieved is False:
             self.is_userdata_input_retrieved = True
             self.target_pos = userdata.target_pos

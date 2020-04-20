@@ -1,0 +1,13 @@
+initial_waypoints:
+- - - 24.4174355
+    - 54.4366058
+    - 3.0
+  - - 24.4174883
+    - 54.4366730
+    - 3.0
+
+
+search_type: 'vortex'
+search_area_number: 1
+trip_number: 10
+search_area_length: 10
