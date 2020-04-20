@@ -47,7 +47,6 @@ def main():
         extract=False,
     )
 
-
     download_data(
         pkg_name=PKG,
         path='models/drone_detection_edgetpu_20200220_315.tflite',
@@ -55,7 +54,7 @@ def main():
         md5='d053353414af944a567eff7cd4180650',
         extract=False,
     )
-     
+
     ##### cacscaded detection model for separate model in bouding box (drone OR ball)
     download_data(
         pkg_name=PKG,
@@ -73,31 +72,6 @@ def main():
         extract=True,
     )
 
-    download_data(
-        pkg_name=PKG,
-        path='models/drone_detection_edgetpu_20200220_315.tflite',
-        url='https://drive.google.com/uc?id=17WMiXin70RUpUkRqaOBSi-6-Cf7NegGs',
-        md5='d053353414af944a567eff7cd4180650',
-        extract=False,
-    ) 
-
-    '''
-    download_data(
-        pkg_name=PKG,
-        path='models/cocompile_model_202000204576_202002030704.tar.gz',
-        url='https://drive.google.com/uc?id=',
-        md5='',
-        extract=True,
-    )
-
-    download_data(
-        pkg_name=PKG,
-        path='models/cocompile_model_202000204611_202002030704.tar.gz', ## 611 is borken
-        url='https://drive.google.com/uc?id=',
-        md5='',
-        extract=True,
-    )
-    '''
 if __name__ == '__main__':
     main()
 

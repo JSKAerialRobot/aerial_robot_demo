@@ -4,10 +4,10 @@
 
 - aeiral_robot:
    - url: https://github.com/tongtybj/aerial_robot
-   - version: `master` or `tag >= 1.1.0`
+   - version: `tag = 1.1.1`
 
 - aeiral_robot_recognition:
-   - url: https://github.com/tongtybj/aerial_robot
+   - url: https://github.com/tongtybj/aerial_robot_recognition
    - version: `master`
    
 
