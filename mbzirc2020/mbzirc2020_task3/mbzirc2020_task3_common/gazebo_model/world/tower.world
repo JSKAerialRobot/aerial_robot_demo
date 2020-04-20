@@ -79,6 +79,7 @@
 
    <!-- fire location 1 -->
     <model name="fire1" >
+      <static>true</static>
       <pose>5 5 0 0 0 0</pose>
       <include>
         <uri>model://real_fire</uri>
@@ -86,21 +87,24 @@
     </model>
 
     <model name="fire2" >
-      <pose>-4 5.5 0 0 0 0</pose>
+      <static>true</static>
+      <pose>-1.48 24.95 6.16 1.5708 0 0</pose>
       <include>
         <uri>model://real_fire</uri>
       </include>
     </model>
 
     <model name="fire3" >
-      <pose>3 -3 0 0 0 0</pose>
+      <static>true</static>
+      <pose>-4.8 19.62 4.13 0 1.5708 0</pose>
       <include>
         <uri>model://real_fire</uri>
       </include>
     </model>
 
     <model name="fire4" >
-      <pose>-4 -4 0 0 0 0</pose>
+      <static>true</static>
+      <pose>4.85 21.35 1 0 1.5708 0</pose>
       <include>
         <uri>model://real_fire</uri>
       </include>
