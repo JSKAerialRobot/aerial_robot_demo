@@ -132,6 +132,6 @@
   </node>
 
   ########## rosbag recorder ##############
-  <node pkg="mbzirc2020_task3_tasks" type="rosbag.sh" name="rosbag">
+  <node pkg="mbzirc2020_task3_tasks" type="rosbag.sh" name="rosbag" unless="$(arg simulation)">
   </node>
 </launch>

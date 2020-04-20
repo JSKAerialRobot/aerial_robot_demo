@@ -1,0 +1,441 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Status1
+        - /Grid1
+        - /RobotModel1
+        - /TF1/Frames1
+        - /Marker1
+        - /MarkerArray1
+        - /Image1
+        - /Image2
+      Splitter Ratio: 0.5
+    Tree Height: 199
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded:
+      - /2D Pose Estimate1
+      - /2D Nav Goal1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: Image
+  - Class: jsk_rviz_plugin/PublishTopic
+    Name: PublishTopic
+    Topic: /task3_motion_planner/task3_start
+Preferences:
+  PromptSaveOnExit: true
+Toolbars:
+  toolButtonStyle: 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        bat1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        bat2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fc:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fixed_joint_unit:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        gps:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leddarone:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        lepton_camera:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        lepton_camera_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        magnet:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        neuron3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        pc:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        realsense1_pose_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        root:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        sheet_anchor1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        sheet_anchor2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        thrust1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        thrust2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        thrust3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        thrust4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: robot_description
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        bat1:
+          Value: true
+        bat2:
+          Value: true
+        cog:
+          Value: true
+        fc:
+          Value: true
+        fixed_joint_unit:
+          Value: true
+        gps:
+          Value: true
+        leddarone:
+          Value: true
+        leg1:
+          Value: true
+        leg2:
+          Value: true
+        leg4:
+          Value: true
+        leg5:
+          Value: true
+        lepton_camera:
+          Value: true
+        lepton_camera_optical:
+          Value: true
+        link1:
+          Value: true
+        link2:
+          Value: true
+        link3:
+          Value: true
+        link4:
+          Value: true
+        magnet:
+          Value: true
+        neuron3:
+          Value: true
+        pc:
+          Value: true
+        realsense1_pose_frame:
+          Value: true
+        root:
+          Value: true
+        sheet_anchor1:
+          Value: true
+        sheet_anchor2:
+          Value: true
+        target_object:
+          Value: true
+        thrust1:
+          Value: true
+        thrust2:
+          Value: true
+        thrust3:
+          Value: true
+        thrust4:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 0.5
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        cog:
+          world:
+            target_object:
+              {}
+        root:
+          link1:
+            leg1:
+              sheet_anchor1:
+                {}
+            link2:
+              bat1:
+                {}
+              fc:
+                {}
+              gps:
+                magnet:
+                  {}
+              leddarone:
+                {}
+              leg2:
+                {}
+              lepton_camera:
+                lepton_camera_optical:
+                  {}
+              link3:
+                bat2:
+                  {}
+                fixed_joint_unit:
+                  {}
+                link4:
+                  leg4:
+                    {}
+                  leg5:
+                    sheet_anchor2:
+                      {}
+                  thrust4:
+                    {}
+                thrust3:
+                  {}
+              neuron3:
+                {}
+              pc:
+                {}
+              realsense1_pose_frame:
+                {}
+              thrust2:
+                {}
+            thrust1:
+              {}
+      Update Interval: 0
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /target_object
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /env_collision
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /flir/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /hsv_color_filter/image
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Default Light: true
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: rviz/SetInitialPose
+      Theta std deviation: 0.2617993950843811
+      Topic: /initialpose
+      X std deviation: 0.5
+      Y std deviation: 0.5
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+    - Class: rviz/PublishPoint
+      Single click: true
+      Topic: /clicked_point
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 15.263347625732422
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 3.449763298034668
+        Y: 3.263842821121216
+        Z: -1.753493070602417
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.6747957468032837
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 0.6072527766227722
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1056
+  Hide Left Dock: false
+  Hide Right Dock: false
+  Image:
+    collapsed: false
+  PublishTopic:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000400000000000001d900000386fc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b00000150000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d0061006700650100000191000001150000001600fffffffb0000000a0049006d00610067006501000002ac000000b30000001600fffffffb00000018005000750062006c0069007300680054006f00700069006301000003650000005c0000005c00ffffff000000010000010f000002e2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730000000028000002e2000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073f0000003efc0100000002fb0000000800540069006d006501000000000000073f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000005600000038600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1855
+  X: 65
+  Y: 24
