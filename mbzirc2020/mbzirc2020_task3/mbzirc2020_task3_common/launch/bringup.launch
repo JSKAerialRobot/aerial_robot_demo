@@ -8,7 +8,7 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="headless" default="True" />
   <arg name="use_rsd435" default="False" />
-  <arg name="rviz_config_path" default="$(find mbzirc2020_task3_common)/config/rviz_config"/>
+  <arg name="rviz_config_path" default="$(find mbzirc2020_task3_tasks)/rviz/task3_simulation.rviz"/>
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
   <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/virtual_fire_fighting.world" if="$(arg cheating_fire)"/>
   <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/real_fire_fighting.world" unless="$(arg cheating_fire)"/>
