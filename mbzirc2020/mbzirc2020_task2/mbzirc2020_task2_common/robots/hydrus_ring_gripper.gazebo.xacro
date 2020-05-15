@@ -97,7 +97,7 @@
       <update_rate>20.0</update_rate>
       <camera name="head">
 	<horizontal_fov>0.95725190791890935</horizontal_fov>
-	<vertical_fov>0.74223480644853568</vertical_fov>
+	<!--vertical_fov>0.74223480644853568</vertical_fov-->
 	<image>
 	  <width>640</width>
 	  <height>480</height>
