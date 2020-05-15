@@ -1,0 +1,47 @@
+<launch>
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="passive_gripper" default="False"/>
+  <arg name="ring_gripper" default="True"/>
+  <arg name="worldtype" default="single_long_object" />
+  <arg name="headless" default="Flase" />
+  <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/two_hydrus_rviz_config"/>
+
+  # hydrus1
+  <arg name="robot1_spawn_x" default="2.0"/>
+  <arg name="robot1_spawn_y" default="0.0"/>
+  <arg name="robot1_spawn_yaw" default="0.0"/>
+
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="$(arg real_machine)"/>
+    <arg name="simulation" value="$(arg simulation)"/>
+    <arg name="ring_gripper" value="$(arg ring_gripper)"/>
+    <arg name="passive_gripper" value="$(arg passive_gripper)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="worldtype" value="$(arg worldtype)"/>
+    <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
+    <arg name="robot_id" value="1" />
+    <arg name="spawn_x" default="$(arg robot1_spawn_x)"/>
+    <arg name="spawn_y" default="$(arg robot1_spawn_y)"/>
+    <arg name="spawn_yaw" default="$(arg robot1_spawn_yaw)"/>
+  </include>
+
+  # hydrus2
+  <arg name="robot2_spawn_x" default="-2.0"/>
+  <arg name="robot2_spawn_y" default="0.0"/>
+  <arg name="robot2_spawn_yaw" default="0.0"/>
+
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="$(arg real_machine)"/>
+    <arg name="simulation" value="$(arg simulation)"/>
+    <arg name="ring_gripper" value="$(arg ring_gripper)"/>
+    <arg name="passive_gripper" value="$(arg passive_gripper)"/>
+    <arg name="headless" value="True"/>
+    <arg name="launch_gazebo" value="False" />
+    <arg name="robot_id" value="2" />
+    <arg name="spawn_x" default="$(arg robot2_spawn_x)"/>
+    <arg name="spawn_y" default="$(arg robot2_spawn_y)"/>
+    <arg name="spawn_yaw" default="$(arg robot2_spawn_yaw)"/>
+  </include>
+
+</launch>

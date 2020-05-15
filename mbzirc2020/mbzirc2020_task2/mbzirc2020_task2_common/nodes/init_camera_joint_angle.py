@@ -12,12 +12,12 @@ class InitCameraJointAngle:
 
         while self.init_angle is None:
             try:
-                self.init_angle = rospy.get_param('/hydrusx/servo_controller/extra_servos/simulation/init_value')
+                self.init_angle = rospy.get_param('servo_controller/extra_servos/simulation/init_value')
             except:
                 pass
 
-        self.pub = rospy.Publisher('/hydrusx/extra_servos_ctrl', JointState, queue_size=1)
-        self.sub = rospy.Subscriber('/hydrusx/joint_states', JointState, self.callback)
+        self.pub = rospy.Publisher('extra_servos_ctrl', JointState, queue_size=1)
+        self.sub = rospy.Subscriber('joint_states', JointState, self.callback)
         self.complete = False
 
     def callback(self, msg):

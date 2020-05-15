@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot
-    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
 
   <!-- base kinematics model -->
   <xacro:include filename="$(find mbzirc2020_task2_common)/robots/default.urdf.xacro" />

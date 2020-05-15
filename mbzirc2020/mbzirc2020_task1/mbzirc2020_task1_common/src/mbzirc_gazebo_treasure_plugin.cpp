@@ -100,7 +100,7 @@ namespace gazebo
     if (_sdf->HasElement("pirateName") && _sdf->GetElement("pirateName")->GetValue())
       pirate_name_ = _sdf->GetElement("pirateName")->Get<std::string>();
     else
-      pirate_name_ = "hydrusx";
+      pirate_name_ = "hydrus";
 
     if (_sdf->HasElement("guardUavTreasureOffsetZ") && _sdf->GetElement("guardUavTreasureOffsetZ")->GetValue())
       guard_uav_treasure_offset_z_ = _sdf->GetElement("guardUavTreasureOffsetZ")->Get<double>();
@@ -266,7 +266,7 @@ namespace gazebo
       else
         offset = pirate_linear_acc_ / 9.8 * guard_uav_treasure_offset_z_;
     }
-    else if (robot_name == std::string("hydrusx"))
+    else if (robot_name == std::string("hydrus"))
       offset.Set(0.0, 0.0, pirate_uav_treasure_offset_z_);
 
 #if GAZEBO_MAJOR_VERSION >= 8

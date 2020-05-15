@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot
-    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx_fixed_link" >
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus_fixed_link" >
 
-  <xacro:macro name="hydrusx_fixed_link" params="self rotor_direction with_battery:=1 with_leg:=1 tilt_angle:=0">
+  <xacro:macro name="hydrus_fixed_link" params="self rotor_direction with_battery:=1 with_leg:=1 tilt_angle:=0">
 
     <!-- link -->
     <link name="link${self}">

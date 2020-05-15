@@ -9,6 +9,7 @@ class HydrusPositionReset:
         rospy.init_node('hydrus_position_reset')
         self.respawn_pos_x = rospy.get_param('~respawn_pos_x')
         self.respawn_pos_y = rospy.get_param('~respawn_pos_y')
+        self.tf_prefix = rospy.get_param('~tf_prefix')
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
 
@@ -17,10 +18,10 @@ class HydrusPositionReset:
         client = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         req = SetModelStateRequest()
 
-        trans = self.tf_buffer.lookup_transform('root', 'fc', rospy.Time(), rospy.Duration(10))
+        trans = self.tf_buffer.lookup_transform(self.tf_prefix + '/root', self.tf_prefix + '/fc', rospy.Time(), rospy.Duration(10))
         req.model_state.pose.position.x = self.respawn_pos_x - trans.transform.translation.x
         req.model_state.pose.position.y = self.respawn_pos_y - trans.transform.translation.y
-        req.model_state.model_name = 'hydrusx'
+        req.model_state.model_name = self.tf_prefix
 
         result = client(req)
         print(result)

@@ -72,10 +72,10 @@ class hydrusTrackingController:
         self.__primitive_params_sub = rospy.Subscriber("/track/primitive_params", PrimitiveParams, self.__primitiveParamsCallback)
 
         self.__hydrus_motion_init_flag_pub = rospy.Publisher('/track/hydrus_motion_init_flag', Empty, queue_size=1)
-        self.__hydrusx_start_pub = rospy.Publisher('/teleop_command/start', Empty, queue_size=1)
-        self.__hydrusx_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
-        self.__hydrusx_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
-        self.__hydrusx_joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
+        self.__hydrus_start_pub = rospy.Publisher('/teleop_command/start', Empty, queue_size=1)
+        self.__hydrus_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
+        self.__hydrus_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
+        self.__hydrus_joints_ctrl_pub = rospy.Publisher("/hydrus/joints_ctrl", JointState, queue_size=1)
         self.__mpc_stop_flag_pub = rospy.Publisher('/mpc/stop_cmd', Bool, queue_size=1)
         self.__mpc_target_waypoints_pub = rospy.Publisher('/mpc/target_waypoints', MpcWaypointList, queue_size=1)
         rospy.sleep(1.0)
@@ -100,16 +100,16 @@ class hydrusTrackingController:
         self.__hydrus_joints_ctrl_msg.position.append(math.pi / 2.0)
         self.__hydrus_joints_ctrl_msg.position.append(math.pi / 2.0)
 
-        ## hydrusx start and takeoff
+        ## hydrus start and takeoff
         if self.__hydrus_init_process:
             rospy.sleep(1.0)
-            self.__hydrusx_start_pub.publish(Empty())
+            self.__hydrus_start_pub.publish(Empty())
             rospy.sleep(1.0)
-            self.__hydrusx_takeoff_pub.publish(Empty())
+            self.__hydrus_takeoff_pub.publish(Empty())
             rospy.loginfo("Hydrus arming and takeoff command is sent.")
             rospy.sleep(21.0)
             rospy.loginfo("Hydrus takeoff finsihed.")
-            self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
+            self.__hydrus_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
             rospy.sleep(9.0)
             rospy.loginfo("Hydrus moved to initial position.")
             if self.__control_mode == MPC:
@@ -157,14 +157,14 @@ class hydrusTrackingController:
             if self.__control_mode == POS_VEL_PSI:
                 target_psi = self.__getPsiFromPrimitive(cur_time)
                 self.__hydrus_nav_cmd.target_psi = target_psi
-            self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
+            self.__hydrus_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
 
         elif self.__control_mode == POS:
             self.__hydrus_nav_cmd.header.stamp = rospy.Time.now()
             self.__hydrus_nav_cmd.target_pos_x = target_pos[0]
             self.__hydrus_nav_cmd.target_pos_y = target_pos[1]
             self.__hydrus_nav_cmd.target_pos_z = target_pos[2]
-            self.__hydrusx_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
+            self.__hydrus_nav_cmd_pub.publish(self.__hydrus_nav_cmd)
 
         elif self.__control_mode == MPC:
             # future 1 seconds waypoints
@@ -177,12 +177,12 @@ class hydrusTrackingController:
             if cur_time - self.__primitive_params.header.stamp.to_sec() < self.__primitive_params.period / 2.0:
                 self.__hydrus_joints_ctrl_msg.position[0] = 1.1
                 self.__hydrus_joints_ctrl_msg.position[2] = 1.1
-                self.__hydrusx_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
+                self.__hydrus_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
             ## case 2: close
             else:
                 self.__hydrus_joints_ctrl_msg.position[0] = math.pi / 2.0
                 self.__hydrus_joints_ctrl_msg.position[2] = math.pi / 2.0
-                self.__hydrusx_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
+                self.__hydrus_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
 
     def __objectOdomCallback(self, msg):
         self.__object_odom = msg

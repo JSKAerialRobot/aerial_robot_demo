@@ -9,7 +9,7 @@
 
   <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).$(arg description_mode).xacro" />
 
-  <group ns="hydrusx" >
+  <group ns="hydrus" >
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
     <rosparam file = "$(find mbzirc2020_common)/config/RvizInit.yaml" command="load" />

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot
-    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
 
   <!-- base kinematics model -->
   <xacro:arg name="horizontal_vio" default="false" />
