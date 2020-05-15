@@ -24,10 +24,12 @@
         </geometry>
         <max_contacts>10</max_contacts>
         <surface>
-          <ode>
-            <mu>0.3</mu>
-            <mu2>0.3</mu2>
-          </ode>
+          <friction>
+            <ode>
+              <mu>0.3</mu>
+              <mu2>0.3</mu2>
+            </ode>
+          </friction>
         </surface>
       </collision>
       <visual name='visual'>
