@@ -31,6 +31,7 @@
     <param name="estimation/mode" value= "$(arg estimate_mode)" if="$(arg real_machine)"/>
 
     <param name="uav_model" value= "16" />
+    <rosparam file="$(arg config_path)/RobotModel.yaml" command="load" />
 
     ###########  Motor Config  ###########
     <rosparam file="$(find mbzirc2020_common)/config/MotorInfo.yaml" command="load" />
@@ -41,8 +42,7 @@
     ###########  Battery Config  ###########
     <rosparam file="$(arg config_path)/Battery.yaml" command="load" />
 
-    ###########  PID Control  ###########
-    <param name="control_plugin_name" value="control_plugin/agile_flatness_pid" />
+    ###########  Control  ###########
     <rosparam file="$(arg config_path)/FlightControl.yaml" command="load" />
 
     ###########  Sensor Fusion  ###########
@@ -52,14 +52,6 @@
     ###########  Teleop  ###########
     <rosparam file="$(arg config_path)/TeleopNavigationConfig.yaml" command="load" />
   </group>
-
-  ###########  Sensors  ###########
-  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
-    <arg name="real_machine" value="$(arg real_machine)" />
-    <arg name="simulation" value="$(arg simulation)" />
-    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
-    <arg name="robot_ns" value="$(arg robot_ns)" />
-  </include >
 
   ###########  Base Platform  ###########
   <node pkg="aerial_robot_base" type="aerial_robot_base_node" name="aerial_robot_base_node" ns="$(arg robot_ns)"  output="screen" >
@@ -81,14 +73,16 @@
     <arg name="need_joint_state" value="false" if ="$(eval arg('simulation') + arg('real_machine'))"/>
   </include>
 
+  ###########  Sensors  ###########
+  <include file="$(find mbzirc2020_common)/launch/base_sensors.launch" >
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="simulation" value="$(arg simulation)" />
+    <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
+    <arg name="robot_ns" value="$(arg robot_ns)" />
+  </include >
+
   ###########  Servo Bridge  ###########
   <node pkg="aerial_robot_model" type="servo_bridge_node" name="servo_bridge"  output="screen"  ns="$(arg robot_ns)" />
-
-  ###########  Transform Control  ###########
-  <node pkg="hydrus" type="tilted_transform_control_node" name="lqi_gain_generator"  output="screen" ns="$(arg robot_ns)">
-    <rosparam file="$(arg config_path)/LQI.yaml" command="load" />
-    <param name="tf_prefix" value="$(arg robot_ns)" />
-  </node>
 
   ########## Simulation in Gazebo #########
   <include file="$(find aerial_robot_simulation)/launch/simulation.launch" if = "$(eval arg('simulation') * (1 - arg('real_machine')))" >

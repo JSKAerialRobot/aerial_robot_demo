@@ -6,7 +6,6 @@
   <arg name="estimate_mode"  default= "0" />
   <arg name="sim_estimate_mode"  default= "2" />
   <arg name="horizontal_vio" default="False" />
-  <arg name="ground_mode" default="False" />
   <arg name="passive_gripper" default="False"/>
   <arg name="ring_gripper" default="True"/>
   <arg name="robot_id" default="" />
@@ -31,7 +30,6 @@
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="worldtype" value="$(find mbzirc2020_task2_simulation)/gazebo_model/world/mbzirc2020_task2_$(arg worldtype).world" />
     <arg name="task" value="2" />
-    <arg name="model_suffix" value="_ground_mode" if="$(arg ground_mode)"/>
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
     <arg name="spawn_x" value="$(arg spawn_x)"/>
@@ -41,9 +39,6 @@
     <arg name="robot_id" value="$(arg robot_id)" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
   </include>
-
-  ######### config for actuated legs #########
-  <rosparam file="$(find mbzirc2020_task2_common)/config/_ground_mode/ActuatedLegs.yaml" command="load" if="$(arg ground_mode)"/>
 
   ########## servo for realsense d435  ########
   <group unless="$(arg ground_mode)">
@@ -57,12 +52,6 @@
   </group>
 
   <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle" ns="$(arg robot_ns)" />
-
-  <!-- Is this necessary?
-  <node if="$(arg simulation)"
-        pkg="timed_roslaunch" type="timed_roslaunch.sh" ns="$(arg robot_ns)"
-        args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y) robot_ns:=$(arg robot_ns)" name="timed_roslaunch" output="screen"/>
-  -->
 
   <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch" >
     <arg name="robot_ns" value="$(arg robot_ns)" />
