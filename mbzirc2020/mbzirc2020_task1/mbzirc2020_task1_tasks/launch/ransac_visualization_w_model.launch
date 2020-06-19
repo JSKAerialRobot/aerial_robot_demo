@@ -8,7 +8,7 @@
   <arg name="camera_height" default="0" />
   <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro"  />
   <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
-  <group ns="hydrusx" >
+  <group ns="hydrus" >
     <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height)" />
   </group >
 

@@ -41,7 +41,7 @@ class task1SpecialLanding:
         rospy.init_node('task1_spcial_landing', anonymous=True)
         self.__speicial_landing_sub = rospy.Subscriber("/task1_motion_state_machine/task1_special_landing", Empty, self.__specialLandingCallback)
 
-        self.__hydrusx_joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
+        self.__hydrus_joints_ctrl_pub = rospy.Publisher("/hydrus/joints_ctrl", JointState, queue_size=1)
         self.__land_pub = rospy.Publisher("/teleop_command/land", Empty,  queue_size=1)
         rospy.sleep(0.5)
 
@@ -53,7 +53,7 @@ class task1SpecialLanding:
 
     def __specialLandingCallback(self, msg):
         self.__object_odom = msg
-        self.__hydrusx_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
+        self.__hydrus_joints_ctrl_pub.publish(self.__hydrus_joints_ctrl_msg)
         self.__land_pub.publish(Empty())
         time.sleep(0.5)
 

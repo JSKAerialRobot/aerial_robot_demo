@@ -1,5 +1,5 @@
 # Sensor Fuser Loader
-estimator:
+estimation:
         # sensor plugin
         sensor_list:
         - sensor_plugin/imu
@@ -7,7 +7,6 @@ estimator:
         - sensor_plugin/alt
         - sensor_plugin/vo
         - sensor_plugin/gps
-        - sensor_plugin/vo
 
         # egomotion estimation
         egomotion_list:
@@ -44,7 +43,7 @@ estimator:
 # EXPERIMENT_MODE = 1
 # GROUND_TRUTH_MODE = 2
 
-/sensor_plugin:
+sensor_plugin:
         imu:
                 estimate_mode: 3 # 1<<0 + 1<<1
                 level_acc_bias_noise_sigma: 0.0001
@@ -54,16 +53,7 @@ estimator:
                 estimate_mode: 1 # 1<<0
         gps:
                 estimate_mode: 1 # 1<<0
-                delay: -0.45 # normal: -0.4 ~ -0.6 + -0.05: daylight: -0.45, night: -0.5
         vo:
                 estimate_mode: 1 # 1<<0
         vo1: #downward
-                vo_sub_topic_name: /realsense1/odom/throttle
-                sensor_frame: realsense1_pose_frame
-                downwards_vo_min_height: 0.25
-                outdoor_vel_noise_sigma: 0.03 #todo: please tuning this [0.01 ~ 0.03]
-                reset_srv_name: /realsense1/reset
-#        vo2: #horizontal
-#                vo_sub_topic_name: /realsense2/odom/throttle
-#                sensor_frame: realsense2_pose_frame
-
+                vo_sub_topic_name: realsense1/odom/throttle

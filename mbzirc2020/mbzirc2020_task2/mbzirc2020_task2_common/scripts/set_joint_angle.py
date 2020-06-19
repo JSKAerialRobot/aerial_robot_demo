@@ -9,8 +9,8 @@ class SetJointAngle:
     def __init__(self):
         rospy.init_node('set_joint_angle')
         self.joint_state = JointState()
-        self.pub = rospy.Publisher('/hydrusx/joints_ctrl', JointState, queue_size = 1)
-        self.sub = rospy.Subscriber('/hydrusx/joint_states', JointState, self.jointStateCallback)
+        self.pub = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
+        self.sub = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
 
     def jointStateCallback(self, msg):
         self.joint_state = msg

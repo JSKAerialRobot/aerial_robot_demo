@@ -43,14 +43,14 @@ __author__ = 'shifan@jsk.imi.i.u-tokyo.ac.jp (Fan Shi)'
 if __name__ == '__main__':
     rospy.init_node('task_1_cheat', anonymous=True)
     hawk_pose_cmd_pub = rospy.Publisher("/hawk/command/pose", PoseStamped, queue_size=1)
-    hydrusx_start_pub = rospy.Publisher('/teleop_command/start', Empty, queue_size=1)
-    hydrusx_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
-    hydrusx_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
+    hydrus_start_pub = rospy.Publisher('/teleop_command/start', Empty, queue_size=1)
+    hydrus_takeoff_pub = rospy.Publisher('/teleop_command/takeoff', Empty, queue_size=1)
+    hydrus_nav_cmd_pub = rospy.Publisher("/uav/nav", FlightNav, queue_size=1)
     rospy.sleep(1.0)
-    ## hydrusx start and takeoff
-    hydrusx_start_pub.publish(Empty())
+    ## hydrus start and takeoff
+    hydrus_start_pub.publish(Empty())
     rospy.sleep(1.0)
-    hydrusx_takeoff_pub.publish(Empty())
+    hydrus_takeoff_pub.publish(Empty())
 
     ## hawk enable motor
     rospy.wait_for_service('/hawk/enable_motors')
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     rospy.sleep(15)
     rospy.loginfo("pirate robot takeoffs")
 
-    ## hydrusx fly to the fixed position
+    ## hydrus fly to the fixed position
     hydrus_cmd_msg = FlightNav()
     hydrus_cmd_msg.control_frame = hydrus_cmd_msg.WORLD_FRAME
     hydrus_cmd_msg.target = hydrus_cmd_msg.COG
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     hydrus_cmd_msg.target_pos_y = 2.0 - 0.6 * 0.707
     hydrus_cmd_msg.target_pos_z = 2.05
     hydrus_cmd_msg.target_psi = -0.7850
-    hydrusx_nav_cmd_pub.publish(hydrus_cmd_msg)
+    hydrus_nav_cmd_pub.publish(hydrus_cmd_msg)
     rospy.loginfo("pirate robot flys to grub treasure")
     rospy.sleep(10)
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     hydrus_cmd_msg.target_pos_x = 0.0
     hydrus_cmd_msg.target_pos_y = 0.0
     hydrus_cmd_msg.target_pos_z = 0.7
-    hydrusx_nav_cmd_pub.publish(hydrus_cmd_msg)
+    hydrus_nav_cmd_pub.publish(hydrus_cmd_msg)
     rospy.loginfo("pirate robot flys to safe position")
     rospy.sleep(3)
 

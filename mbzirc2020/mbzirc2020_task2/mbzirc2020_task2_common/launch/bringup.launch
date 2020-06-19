@@ -3,17 +3,21 @@
   ###########  launch config  ###########
   <arg name="real_machine" default="True" />
   <arg name="simulation" default="False" />
-  <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
+  <arg name="sim_estimate_mode"  default= "2" />
   <arg name="horizontal_vio" default="False" />
   <arg name="ground_mode" default="False" />
   <arg name="passive_gripper" default="False"/>
   <arg name="ring_gripper" default="True"/>
+  <arg name="robot_id" default="" />
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
   <arg name="spawn_x" default="0.0"/>
   <arg name="spawn_y" default="0.0"/>
+  <arg name="spawn_yaw" default="0.0"/>
+  <arg name="robot_ns" value="hydrus$(arg robot_id)" />
+  <arg name="launch_gazebo" default="True" />
 
   <param name="/simulation" value="$(arg simulation)"/>
 
@@ -21,8 +25,8 @@
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
     <arg name="real_machine" value="$(arg real_machine)" />
     <arg name="simulation" value="$(arg simulation)" />
-    <arg name="control_mode" value="$(arg control_mode)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="sim_estimate_mode"  value= "$(arg sim_estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="worldtype" value="$(find mbzirc2020_task2_simulation)/gazebo_model/world/mbzirc2020_task2_$(arg worldtype).world" />
@@ -30,29 +34,38 @@
     <arg name="model_suffix" value="_ground_mode" if="$(arg ground_mode)"/>
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
+    <arg name="spawn_x" value="$(arg spawn_x)"/>
+    <arg name="spawn_y" value="$(arg spawn_y)"/>
+    <arg name="spawn_yaw" value="$(arg spawn_yaw)"/>
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
+    <arg name="robot_id" value="$(arg robot_id)" />
+    <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
   </include>
 
   ######### config for actuated legs #########
   <rosparam file="$(find mbzirc2020_task2_common)/config/_ground_mode/ActuatedLegs.yaml" command="load" if="$(arg ground_mode)"/>
 
   ########## servo for realsense d435  ########
-
   <group unless="$(arg ground_mode)">
-    <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" />
+    <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" ns="$(arg robot_ns)" />
     <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" if="$(arg real_machine)"/>
+          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" ns="$(arg robot_ns)"  if="$(arg real_machine)"/>
   </group>
 
   <group if="$(arg passive_gripper)">
-    <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load"/>
+    <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load" ns="$(arg robot_ns)" />
   </group>
 
-  <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle"/>
+  <node pkg="mbzirc2020_task2_common" type="init_camera_joint_angle.py" name="init_camera_joint_angle" ns="$(arg robot_ns)" />
 
+  <!-- Is this necessary?
   <node if="$(arg simulation)"
-        pkg="timed_roslaunch" type="timed_roslaunch.sh"
-        args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y)" name="timed_roslaunch" output="screen"/>
+        pkg="timed_roslaunch" type="timed_roslaunch.sh" ns="$(arg robot_ns)"
+        args="10 mbzirc2020_task2_simulation hydrus_position_reset.launch x:=$(arg spawn_x) y:=$(arg spawn_y) robot_ns:=$(arg robot_ns)" name="timed_roslaunch" output="screen"/>
+  -->
 
-  <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch" >
+    <arg name="robot_ns" value="$(arg robot_ns)" />
+  </include>
+
 </launch>

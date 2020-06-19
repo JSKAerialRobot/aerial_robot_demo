@@ -15,7 +15,7 @@
             here, they won't be found in the SDF.
         -->
         <arm>
-          <arm_name>hydrusx_arm</arm_name>
+          <arm_name>hydrus_arm</arm_name>
           <palm_link>link2</palm_link>
           <gripper_link>link4</gripper_link>
           <gripper_link>root</gripper_link>

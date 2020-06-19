@@ -27,7 +27,7 @@ ReactiveMotion::ReactiveMotion(ros::NodeHandle nh, ros::NodeHandle nhp){
   motion_state_sub_ = nh_.subscribe<std_msgs::Int8>("/reactive_motion/state", 1, &ReactiveMotion::reactiveMotionStateCallback, this, ros::TransportHints().tcpNoDelay());
 
   flight_nav_pub_ = nh_.advertise<aerial_robot_msgs::FlightNav>("/uav/nav", 1);
-  joints_ctrl_pub_ = nh_.advertise<sensor_msgs::JointState>("/hydrusx/joints_ctrl", 1);
+  joints_ctrl_pub_ = nh_.advertise<sensor_msgs::JointState>("/hydrus/joints_ctrl", 1);
   // nearest_waypoint_pub_ = nh_.advertise<visualization_msgs::Marker>("/reactive_motion/target", 1);
   nearest_waypoint_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/target", 1);
   uav_cog_point_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/reactive_motion/cog_point", 1);

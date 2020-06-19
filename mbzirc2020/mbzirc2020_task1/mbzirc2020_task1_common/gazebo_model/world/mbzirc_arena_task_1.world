@@ -49,7 +49,7 @@
       </include>
       <plugin name="mbzirc_gazebo_treasure_plugin_sphere_1" filename="libmbzirc_gazebo_treasure_plugin.so">
         <guardName>hawk</guardName>
-        <pirateName>hydrusx</pirateName>
+        <pirateName>hydrus</pirateName>
         <treasurePositionTopicName>/treasure/point_from_gazebo</treasurePositionTopicName>
         <markerTopicName>/treasure/marker</markerTopicName>
         <grabThreshold>0.3</grabThreshold>

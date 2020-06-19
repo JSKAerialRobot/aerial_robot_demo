@@ -24,9 +24,9 @@ class HydrusCommander():
         self.land_pub = rospy.Publisher("/teleop_command/land", Empty,  queue_size=1)
         self.halt_pub = rospy.Publisher('/teleop_command/halt', Empty, queue_size=1)
 
-        self.set_joint_torque_client = rospy.ServiceProxy('/hydrusx/joints/torque_enable', SetBool)
-        self.extra_servos_ctrl_pub = rospy.Publisher("/hydrusx/extra_servos_ctrl", JointState, queue_size=1)
-        self.joints_ctrl_pub = rospy.Publisher("/hydrusx/joints_ctrl", JointState, queue_size=1)
+        self.set_joint_torque_client = rospy.ServiceProxy('/hydrus/joints/torque_enable', SetBool)
+        self.extra_servos_ctrl_pub = rospy.Publisher("/hydrus/extra_servos_ctrl", JointState, queue_size=1)
+        self.joints_ctrl_pub = rospy.Publisher("/hydrus/joints_ctrl", JointState, queue_size=1)
 
         self.cover_pose = rospy.get_param('~cover_pose')
         self.close_pose = rospy.get_param('~close_pose')

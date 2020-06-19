@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <robot
-    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
+
+  <xacro:arg name="robot_name" default="hydrus" />
+  <xacro:arg name="monocular_camera" default="true" />
 
   <!-- base robot model -->
   <xacro:include filename="$(find mbzirc2020_task3_common)/robots/hydrus.urdf.xacro" />
@@ -31,6 +34,7 @@
         </noise>
       </camera>
       <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <robotNamespace>$(arg robot_name)</robotNamespace>
         <alwaysOn>true</alwaysOn>
         <updateRate>0.0</updateRate>
         <cameraName>flir</cameraName>

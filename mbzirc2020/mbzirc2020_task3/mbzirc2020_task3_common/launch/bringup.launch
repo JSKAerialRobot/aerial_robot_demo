@@ -3,11 +3,12 @@
   ###########  launch config  ###########
   <arg name="real_machine" default="True" />
   <arg name="simulation" default="False" />
-  <arg name="control_mode" default="0" />
   <arg name="estimate_mode"  default= "0" />
+  <arg name="sim_estimate_mode"  default= "2" />
   <arg name="horizontal_vio" default="False" />
   <arg name="headless" default="True" />
   <arg name="use_rsd435" default="False" />
+  <arg name="robot_id" default="" />
   <arg name="rviz_config_path" default="$(find mbzirc2020_task3_tasks)/rviz/task3_simulation.rviz"/>
   <arg name="cheating_fire"  default= "False" /> <!-- use primitive object instead of real fire -->
   <arg name="gazebo_world" default="$(find mbzirc2020_task3_common)/gazebo_model/world/virtual_fire_fighting.world" if="$(arg cheating_fire)"/>
@@ -17,14 +18,15 @@
   <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
     <arg name="real_machine" value="$(arg real_machine)" />
     <arg name="simulation" value="$(arg simulation)" />
-    <arg name="control_mode" value="$(arg control_mode)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="sim_estimate_mode"  value= "$(arg sim_estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="worldtype" value="$(arg gazebo_world)" />
     <arg name="task" value="3" />
     <arg name="model_suffix" value="_rsd435" if="$(arg use_rsd435)"/>
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
+    <arg name="robot_id" value="$(arg robot_id)" />
   </include>
 
 </launch>

@@ -469,7 +469,7 @@ class ApproachPlacePosition(Task2State):
         if self.simulation:
             client = rospy.ServiceProxy('/gazebo/apply_body_wrench', ApplyBodyWrench)
             req = ApplyBodyWrenchRequest()
-            req.body_name = 'hydrusx::root'
+            req.body_name = 'hydrus::root'
             req.wrench.force.z = 10
             req.duration.nsecs = 300000000
             try:

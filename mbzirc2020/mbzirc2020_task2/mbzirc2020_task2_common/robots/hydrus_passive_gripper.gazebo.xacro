@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot
-    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrusx" >
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
+
+  <xacro:arg name="robot_name" default="hydrus" />
 
   <!-- base robot model -->
   <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_passive_gripper.urdf.xacro" />
@@ -114,6 +116,7 @@
 	</noise>
       </camera>
       <plugin name="depth_camera" filename="libgazebo_ros_openni_kinect.so">
+        <robotNamespace>$(arg robot_name)</robotNamespace>
 	<baseline>0.06</baseline>
 	<alwaysOn>true</alwaysOn>
 	<updateRate>0.0</updateRate>
