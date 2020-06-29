@@ -41,11 +41,9 @@
   </include>
 
   ########## servo for realsense d435  ########
-  <group unless="$(arg ground_mode)">
-    <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" ns="$(arg robot_ns)" />
-    <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" ns="$(arg robot_ns)"  if="$(arg real_machine)"/>
-  </group>
+  <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" ns="$(arg robot_ns)" />
+  <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
+        args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" ns="$(arg robot_ns)"  if="$(arg real_machine)"/>
 
   <group if="$(arg passive_gripper)">
     <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load" ns="$(arg robot_ns)" />
