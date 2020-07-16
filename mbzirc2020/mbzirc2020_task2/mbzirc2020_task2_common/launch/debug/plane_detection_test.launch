@@ -1,0 +1,32 @@
+<launch>
+  <param name="/use_sim_time" value="true"/>
+
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="true"/>
+    <arg name="simulation" value="true"/>
+    <arg name="estimate_mode" value="0"/>
+  </include>
+
+  <node name="image_republish1" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/hydrus/rs_d435/color/image_rect_color" />
+    <remap from="out" to="/hydrus/rs_d435/color/image_rect_color" />
+  </node>
+
+  <node name="image_republish2" pkg="image_transport" type="republish" args="compressedDepth raw">
+    <remap from="in" to="/hydrus/rs_d435/aligned_depth_to_color/image_raw" />
+    <remap from="out" to="/hydrus/rs_d435/aligned_depth_to_color/image_raw" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="cloudify" output="screen"
+        args="standalone depth_image_proc/point_cloud_xyzrgb" >
+    <remap from="rgb/camera_info" to="/hydrus/rs_d435/color/camera_info"/>
+    <remap from="rgb/image_rect_color" to="/hydrus/rs_d435/color/image_rect_color"/>
+    <remap from="depth_registered/image_rect" to="/hydrus/rs_d435/aligned_depth_to_color/image_raw"/>
+    <remap from="depth_registered/points" to="/hydrus/rs_d435/depth_registered/points"/>
+  </node>
+
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" args="-d $(find mbzirc2020_task2_common)/launch/debug/plane_detection_test.rviz" respawn="true"/>
+
+  <!--include file="$(find mbzirc2020_task2_common)/launch/sample_multi_plane_sac_segmentation.launch"/-->
+
+</launch>

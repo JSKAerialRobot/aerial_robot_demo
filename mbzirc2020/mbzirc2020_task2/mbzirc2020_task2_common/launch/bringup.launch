@@ -42,8 +42,10 @@
 
   ########## servo for realsense d435  ########
   <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" ns="$(arg robot_ns)" />
+
+  <node pkg="nodelet" type="nodelet" name="realsense2_camera_manager" args="manager 2>/dev/null" output="log" ns="$(arg robot_ns)/rs_d435"/>
   <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-        args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 depth_fps:=15 infra_fps:=15 color_fps:=15" name="timed_roslaunch" output="screen" ns="$(arg robot_ns)"  if="$(arg real_machine)"/>
+        args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 publish_tf:=false depth_fps:=15 infra_fps:=15 color_fps:=15 external_manager:=true manager:=realsense2_camera_manager" name="timed_roslaunch" output="log" ns="$(arg robot_ns)"  if="$(arg real_machine)"/>
 
   <group if="$(arg passive_gripper)">
     <rosparam if="$(arg simulation)" file="$(find mbzirc2020_task2_common)/config/_passive_gripper/MimicJoint.yaml" command="load" ns="$(arg robot_ns)" />
@@ -53,6 +55,11 @@
 
   <include file="$(find mbzirc2020_task2_common)/launch/additional/gps_tf_publisher.launch" >
     <arg name="robot_ns" value="$(arg robot_ns)" />
+  </include>
+
+  ########## plane detection for alt estimation ##########
+  <include file="$(find mbzirc2020_task2_common)/launch/plane_detection/multi_plane_sac_segmentation.launch">
+    <arg name="robot_ns" value="$(arg robot_ns)"/>
   </include>
 
 </launch>

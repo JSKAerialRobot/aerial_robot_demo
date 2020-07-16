@@ -1,0 +1,36 @@
+<launch>
+  <arg name="gui" default="false" />
+  <arg name="manager" default="rs_d435/realsense2_camera_manager"/>
+  <arg name="robot_ns" default="hydrus"/>
+
+  <group ns="$(arg robot_ns)">
+
+    <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid $(arg manager)">
+      <remap from="~input" to="rs_d435/depth_registered/points" />
+      <rosparam>
+        filter_limit_min: 0.0
+        filter_limit_max: 0.2
+        filter_limit_negative: true
+        leaf_size: 0.02
+      </rosparam>
+    </node>
+
+    <node pkg="nodelet" type="nodelet"
+          name="multi_plane_sac_segmentation"
+          args="load jsk_pcl/MultiPlaneSACSegmentation $(arg manager)">
+      <remap from="~input" to="voxel_grid/output"/>
+      <rosparam>
+        use_normal: false
+        use_clusters: false
+        use_imu_parallel: false
+        use_imu_perpendicular: false
+        max_iterations: 100
+        min_trial: 2
+        min_points: 1000
+        min_inliers: 500
+      </rosparam>
+    </node>
+
+  </group>
+
+</launch>
