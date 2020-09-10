@@ -214,7 +214,7 @@ class HydrusInterface:
         nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
         nav_msg.psi_nav_mode = FlightNav.NO_NAVIGATION
         nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
-        self.navigation(nav_msg)
+        self.nav_pub_.publish(nav_msg)
 
     def goPos(self, frame, target_xy, target_z, target_yaw, gps_mode=False):
         nav_msg = FlightNav()
@@ -225,8 +225,6 @@ class HydrusInterface:
         else:
             rospy.logerr('invalid frame %s' % (frame))
             return
-
-        target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
 
         nav_msg.header.stamp = rospy.Time.now()
         nav_msg.target = FlightNav.BASELINK
@@ -242,8 +240,19 @@ class HydrusInterface:
         else:
             nav_msg.target_pos_x = target_xy[0] + self.xy_pos_offset_[0]
             nav_msg.target_pos_y = target_xy[1] + self.xy_pos_offset_[1]
-        nav_msg.target_psi = target_yaw
-        nav_msg.target_pos_z = target_z
+
+        if target_yaw is None:
+            nav_msg.psi_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.psi_nav_mode = FlightNav.POS_MODE
+            target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
+            nav_msg.target_psi = target_yaw
+
+        if target_z is None:
+            nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
+            nav_msg.target_pos_z = target_z
 
         self.nav_pub_.publish(nav_msg)
 
