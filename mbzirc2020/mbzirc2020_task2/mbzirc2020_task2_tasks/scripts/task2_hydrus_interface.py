@@ -6,11 +6,12 @@ import tf2_ros
 class Task2HydrusInterface(HydrusInterface):
     def __init__(self):
         HydrusInterface.__init__(self, debug_view=True)
-        self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle')
-        self.ungrasp_joint_angle = rospy.get_param('~ungrasp_joint_angle')
-        self.preshape_joint_angle = rospy.get_param('~preshape_joint_angle')
-        self.reset_joint_angle = rospy.get_param('~reset_joint_angle')
-        self.open_joint_angle = rospy.get_param('~open_joint_angle')
+        self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle', [1.5, 1.5])
+        self.ungrasp_joint_angle = rospy.get_param('~ungrasp_joint_angle', [0.9, 0.9])
+        self.preshape_joint_angle = rospy.get_param('~preshape_joint_angle', [0.75, 0.75])
+        self.reset_joint_angle = rospy.get_param('~reset_joint_angle', [1.5, 1.5])
+        self.open_joint_angle = rospy.get_param('~open_joint_angle', [0.6, 0.6])
+
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.joy_sub = rospy.Subscriber('/joy', Joy, self.joyCallback)
