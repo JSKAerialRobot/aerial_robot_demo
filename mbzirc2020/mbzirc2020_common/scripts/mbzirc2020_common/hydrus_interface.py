@@ -25,7 +25,6 @@ class HydrusInterface:
         self.target_z_ = None
         self.target_yaw_ = None
 
-        self.xy_pos_offset_ = [0, 0]
         self.gps_lat_lon_ = None
 
         #flight state
@@ -37,9 +36,9 @@ class HydrusInterface:
         self.HOVER_STATE = 5
         self.STOP_STATE = 6
 
-        self.joint_state_sub_ = rospy.Subscriber('hydrus/joint_states', JointState, self.jointStateCallback)
-        self.joint_ctrl_pub_ = rospy.Publisher('hydrus/joints_ctrl', JointState, queue_size = 1)
-        self.extra_joint_ctrl_pub_ = rospy.Publisher('hydrus/extra_servos_ctrl', JointState, queue_size = 1)
+        self.joint_state_sub_ = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
+        self.joint_ctrl_pub_ = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
+        self.extra_joint_ctrl_pub_ = rospy.Publisher('extra_servos_ctrl', JointState, queue_size = 1)
         self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
         self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
         self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
@@ -50,9 +49,9 @@ class HydrusInterface:
         self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
         self.add_extra_module_client_ = rospy.ServiceProxy('hydrus/add_extra_module', AddExtraModule)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
-        self.ros_gps_sub_ = rospy.Subscriber('fix', NavSatFix, self.rosGpsCallback)
+        self.ros_gps_sub_ = rospy.Subscriber('sim/gps/fix', NavSatFix, self.rosGpsCallback)
         self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
-        self.set_joint_torque_client_ = rospy.ServiceProxy('/hydrus/joints/torque_enable', SetBool)
+        self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
@@ -69,13 +68,9 @@ class HydrusInterface:
         self.joint_state_ = msg
 
     def cogOdomCallback(self, msg):
-        msg.pose.pose.position.x -= self.xy_pos_offset_[0]
-        msg.pose.pose.position.y -= self.xy_pos_offset_[1]
         self.cog_odom_ = msg
 
     def baselinkOdomCallback(self, msg):
-        msg.pose.pose.position.x -= self.xy_pos_offset_[0]
-        msg.pose.pose.position.y -= self.xy_pos_offset_[1]
         self.baselink_odom_ = msg
 
         if self.target_xy_ is None:
@@ -138,9 +133,6 @@ class HydrusInterface:
             self.set_joint_torque_client_(req)
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
-
-    def setXYPosOffset(self, xy_pos_offset_):
-        self.xy_pos_offset_ = xy_pos_offset_
 
     def getJointState(self):
         return self.joint_state_
@@ -212,7 +204,7 @@ class HydrusInterface:
         nav_msg = FlightNav()
         nav_msg.header.stamp = rospy.Time.now()
         nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
-        nav_msg.psi_nav_mode = FlightNav.NO_NAVIGATION
+        nav_msg.yaw_nav_mode = FlightNav.NO_NAVIGATION
         nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
         self.nav_pub_.publish(nav_msg)
 
@@ -228,39 +220,37 @@ class HydrusInterface:
 
         nav_msg.header.stamp = rospy.Time.now()
         nav_msg.target = FlightNav.BASELINK
+
         if gps_mode:
             nav_msg.pos_xy_nav_mode = FlightNav.GPS_WAYPOINT_MODE
         else:
             nav_msg.pos_xy_nav_mode = FlightNav.POS_MODE
-        nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
-        nav_msg.psi_nav_mode = FlightNav.POS_MODE
-        if gps_mode:
+
+        if target_xy is None:
+            nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
+        else:
             nav_msg.target_pos_x = target_xy[0]
             nav_msg.target_pos_y = target_xy[1]
-        else:
-            nav_msg.target_pos_x = target_xy[0] + self.xy_pos_offset_[0]
-            nav_msg.target_pos_y = target_xy[1] + self.xy_pos_offset_[1]
+            self.target_xy_ = target_xy
 
         if target_yaw is None:
-            nav_msg.psi_nav_mode = FlightNav.NO_NAVIGATION
+            nav_msg.yaw_nav_mode = FlightNav.NO_NAVIGATION
         else:
-            nav_msg.psi_nav_mode = FlightNav.POS_MODE
+            nav_msg.yaw_nav_mode = FlightNav.POS_MODE
             target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
-            nav_msg.target_psi = target_yaw
+            nav_msg.target_yaw = target_yaw
+            self.target_yaw_ = target_yaw
 
         if target_z is None:
             nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
         else:
             nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
             nav_msg.target_pos_z = target_z
+            self.target_z_ = target_z
 
         self.nav_pub_.publish(nav_msg)
 
-        self.target_xy_ = target_xy
-        self.target_z_ = target_z
-        self.target_yaw_ = target_yaw
-
-    def isConvergent(self, frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh=0.06):
+    def isConvergent(self, frame, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh=0.06):
         current_xy = self.getBaselinkPos()[0:2]
         current_z = self.getBaselinkPos()[2]
         current_yaw = self.getBaselinkRPY()[2]
@@ -268,17 +258,17 @@ class HydrusInterface:
         current_rp = self.getBaselinkRPY()[0:2]
 
         if gps_mode:
-            delta_pos = gps2xy(self.gps_lat_lon_, target_xy)
+            delta_pos = gps2xy(self.gps_lat_lon_, self.target_xy_)
         else:
             if frame == 'global':
-                delta_pos = np.array([target_xy[0] - current_xy[0], target_xy[1] - current_xy[1], target_z - current_z])
+                delta_pos = np.array([self.target_xy_[0] - current_xy[0], self.target_xy_[1] - current_xy[1], self.target_z_ - current_z])
             elif frame == 'local':
-                delta_pos = np.array([target_xy[0], target_xy[1], target_z - current_z])
+                delta_pos = np.array([self.target_xy_[0], self.target_xy_[1], self.target_z_ - current_z])
             else:
                 rospy.logerr('invalid frame %s' % (frame))
                 return
 
-        delta_yaw = target_yaw - current_yaw
+        delta_yaw = self.target_yaw_ - current_yaw
         if delta_yaw > np.pi:
             delta_yaw -= np.pi * 2
         elif delta_yaw < -np.pi:
@@ -293,7 +283,7 @@ class HydrusInterface:
             text.text_size = 12
             text.line_width = 2
             text.font = "DejaVu Sans Mono"
-            text.text = 'Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n  roll: {:.4g}, pitch: {:.4g}\nSetPoint\n  x: {:.11g} y: {:.11g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), abs(current_rp[0]), abs(current_rp[1]), target_xy[0], target_xy[1], target_z, target_yaw)
+            text.text = 'Diff\n  pos: {:.4g}, yaw: {:.4g}, vel: {:.4g}\n  roll: {:.4g}, pitch: {:.4g}\nSetPoint\n  x: {:.11g} y: {:.11g} z: {:.4g} yaw: {:.4g}'.format(np.linalg.norm(delta_pos), abs(delta_yaw), np.linalg.norm(current_vel), abs(current_rp[0]), abs(current_rp[1]), self.target_xy_[0], self.target_xy_[1], self.target_z_, self.target_yaw_)
 
             self.nav_debug_pub_.publish(text)
 
@@ -306,7 +296,7 @@ class HydrusInterface:
         self.goPos(frame, target_xy, target_z, target_yaw, gps_mode)
         start_time = rospy.get_time()
 
-        while not self.isConvergent(frame, target_xy, target_z, target_yaw, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh):
+        while not self.isConvergent(frame, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh):
             elapsed_time = rospy.get_time() - start_time
             if elapsed_time > timeout:
                 return False

@@ -55,8 +55,6 @@ class Task2HydrusInterface(HydrusInterface):
 
     def getTF(self, frame_id, wait=0.5, parent_frame_id='world'):
         trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, rospy.Time.now(), rospy.Duration(wait))
-        trans.transform.translation.x -= self.xy_pos_offset_[0]
-        trans.transform.translation.y -= self.xy_pos_offset_[1]
         return trans
 
     def joyCallback(self, msg):
