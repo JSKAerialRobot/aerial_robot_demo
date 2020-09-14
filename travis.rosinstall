@@ -1,7 +1,7 @@
 - git:
     local-name: aerial_robot
     uri: https://github.com/tongtybj/aerial_robot.git
-    version: robot_namespace
+    version: 458f1a2
 - git: 
     local-name: aerial_robot_recognition
     uri: https://github.com/tongtybj/aerial_robot_recognition.git
