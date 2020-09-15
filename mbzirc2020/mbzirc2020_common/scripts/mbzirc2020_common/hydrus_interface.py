@@ -47,7 +47,7 @@ class HydrusInterface:
         self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
         self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
         self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
-        self.add_extra_module_client_ = rospy.ServiceProxy('hydrus/add_extra_module', AddExtraModule)
+        self.add_extra_module_client_ = rospy.ServiceProxy('add_extra_module', AddExtraModule)
         self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
         self.ros_gps_sub_ = rospy.Subscriber('sim/gps/fix', NavSatFix, self.rosGpsCallback)
         self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
@@ -103,7 +103,8 @@ class HydrusInterface:
             joint_msg.header.stamp = rospy.Time.now()
             joint_msg.position = joint_pos
             self.joint_ctrl_pub_.publish(joint_msg)
-            rospy.sleep(1.0 / self.joint_update_freq_)
+            if time != 0:
+                rospy.sleep(1.0 / self.joint_update_freq_)
 
     def setExtraJointAngle(self, target_joint_state, time = 1000):
         joint_seq_len = int(time * self.joint_update_freq_ / 1000.0)
@@ -124,7 +125,8 @@ class HydrusInterface:
             joint_msg.header.stamp = rospy.Time.now()
             joint_msg.position = joint_pos
             self.extra_joint_ctrl_pub_.publish(joint_msg)
-            rospy.sleep(1.0 / self.joint_update_freq_)
+            if time != 0:
+                rospy.sleep(1.0 / self.joint_update_freq_)
 
     def setJointTorque(self, state):
         req = SetBoolRequest()
@@ -249,6 +251,45 @@ class HydrusInterface:
             self.target_z_ = target_z
 
         self.nav_pub_.publish(nav_msg)
+
+    def goVel(self, frame, target_xy_vel, target_z, target_yaw):
+        nav_msg = FlightNav()
+        if frame == 'global':
+            nav_msg.control_frame = nav_msg.WORLD_FRAME
+        elif frame == 'local':
+            nav_msg.control_frame = nav_msg.LOCAL_FRAME
+        else:
+            rospy.logerr('invalid frame %s' % (frame))
+            return
+
+        nav_msg.header.stamp = rospy.Time.now()
+        nav_msg.target = FlightNav.COG
+
+
+        if target_xy_vel is None:
+            nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.pos_xy_nav_mode = FlightNav.VEL_MODE
+            nav_msg.target_vel_x = target_xy_vel[0]
+            nav_msg.target_vel_y = target_xy_vel[1]
+
+        if target_yaw is None:
+            nav_msg.yaw_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.yaw_nav_mode = FlightNav.POS_MODE
+            target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
+            nav_msg.target_yaw = target_yaw
+            self.target_yaw_ = target_yaw
+
+        if target_z is None:
+            nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
+            nav_msg.target_pos_z = target_z
+            self.target_z_ = target_z
+
+        self.nav_pub_.publish(nav_msg)
+
 
     def isConvergent(self, frame, gps_mode, pos_conv_thresh, yaw_conv_thresh, vel_conv_thresh, att_conv_thresh=0.06):
         current_xy = self.getBaselinkPos()[0:2]
