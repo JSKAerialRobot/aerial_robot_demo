@@ -1,47 +1,41 @@
 <launch>
-  <arg name="world" default="abudhabi_202002"/>
-  <arg name="do_object_recognition" default="true"/>
-  <arg name="do_channel_recognition" default="true"/>
-  <arg name="single_object_mode" default="true"/>
-  <arg name="target_object_number" default="0"/>
-  <arg name="object_num" default="3"/>
-  <arg name="debug_look_down" default="false"/>
-  <arg name="debug_adjust_grasp" default="false"/>
+  <arg name="world" default="kashiwa_202009"/>
+  <arg name="robot_ns" default="hydrus"/>
+  <arg name="object_color" default="red"/>
+  <arg name="debug_scan_pick_area" default="false"/>
+  <arg name="debug_pick_visual_servoing" default="false"/>
   <arg name="debug_grasp" default="false"/>
-  <arg name="debug_adjust_place" default="false"/>
-  <arg name="no_lookdown_mode" default="false"/>
-  <arg name="object_color" default="green"/>
+  <arg name="debug_approach_place_area" default="false"/>
 
   ### bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
     <arg name="real_machine" value="True"/>
-    <arg name="simulation" value="False"/>
+    <arg name="simulation" value="false"/>
     <arg name="ring_gripper" value="true"/>
-    <arg name="headless" value="True"/>
+    <arg name="headless" value="true"/>
   </include>
 
-  ### motion
-  <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
-    <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
-    <arg name="do_object_recognition" value="$(arg do_object_recognition)"/>
-    <arg name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
-    <arg name="debug_look_down" value="$(arg debug_look_down)"/>
-    <arg name="debug_adjust_grasp" value="$(arg debug_adjust_grasp)"/>
-    <arg name="debug_grasp" value="$(arg debug_grasp)"/>
-    <arg name="debug_adjust_place" value="$(arg debug_adjust_place)"/>
-    <arg name="single_object_mode" default="$(arg single_object_mode)"/>
-    <arg name="target_object_number" default="$(arg target_object_number)"/>
-    <arg name="object_num" default="$(arg object_num)"/>
-    <arg name="no_lookdown_mode" default="$(arg no_lookdown_mode)"/>
-    <arg name="object_color" value="$(arg object_color)"/>
-  </include>
+  <group ns="$(arg robot_ns)">
+    ### motion
+    <include file="$(find mbzirc2020_task2_tasks)/launch/motion.launch">
+      <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+      <arg name="object_color" value="$(arg object_color)"/>
+      <arg name="debug_scan_pick_area" value="$(arg debug_scan_pick_area)"/>
+      <arg name="debug_pick_visual_servoing" value="$(arg debug_pick_visual_servoing)"/>
+      <arg name="debug_grasp" value="$(arg debug_grasp)"/>
+      <arg name="debug_approach_place_area" value="$(arg debug_approach_place_area)"/>
+    </include>
 
-  ### recognition
-  <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
-    <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
-    <arg name="object_color" value="$(arg object_color)"/>
-    <arg name="external_manager" value="false"/>
-  </include>
+    ### recognition
+    <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+      <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
+      <arg name="object_color" value="$(arg object_color)"/>
+      <arg name="external_manager" value="false"/>
+    </include>
+
+  </group>
+
+  <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" args="call --wait /hydrus/task2_recognition_manager/set_logger_level 'ros' 'Fatal'" />
 
   ### communication to ground station
   <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch"/>

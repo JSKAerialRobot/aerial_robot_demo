@@ -1,40 +1,34 @@
 <launch>
   <arg name="config_dir" />
-  <arg name="do_object_recognition" default="true"/>
-  <arg name="do_channel_recognition" default="true"/>
-  <arg name="debug_look_down" default="false"/>
-  <arg name="debug_adjust_grasp" default="false"/>
-  <arg name="debug_grasp" default="false"/>
-  <arg name="debug_adjust_place" default="false"/>
-  <arg name="single_object_mode" default="true"/>
-  <arg name="target_object_number" default="0"/>
-  <arg name="object_num" default="3"/>
-  <arg name="no_lookdown_mode" default="false"/>
   <arg name="object_color"/>
+  <arg name="debug_scan_pick_area" default="false"/>
+  <arg name="debug_pick_visual_servoing" default="false"/>
+  <arg name="debug_grasp" default="false"/>
+  <arg name="debug_approach_place_area" default="false"/>
 
   <group ns="task2_motion">
-    <group if="$(arg debug_look_down)">
+    <group if="$(arg debug_scan_pick_area)">
       <rosparam>
         skip_takeoff: true
-        skip_approach_pick_position: true
-        skip_look_down: false
-        skip_adjust_grasp_position: false
+        skip_approach_pick_area: true
+        skip_scan_pick_area: false
+        skip_pick_visual_servoing: false
         skip_grasp: false
-        skip_move_to_place_position: false
-        skip_adjust_place_position: false
+        skip_approach_place_area: false
+        skip_place_visual_servoing: false
         skip_ungrasp: false
       </rosparam>
     </group>
 
-    <group if="$(arg debug_adjust_grasp)">
+    <group if="$(arg debug_pick_visual_servoing)">
       <rosparam>
         skip_takeoff: true
-        skip_approach_pick_position: true
-        skip_look_down: true
-        skip_adjust_grasp_position: false
+        skip_approach_pick_area: true
+        skip_scan_pick_area: true
+        skip_pick_visual_servoing: false
         skip_grasp: false
-        skip_move_to_place_position: false
-        skip_adjust_place_position: false
+        skip_approach_place_area: false
+        skip_place_visual_servoing: false
         skip_ungrasp: false
       </rosparam>
     </group>
@@ -42,25 +36,25 @@
     <group if="$(arg debug_grasp)">
       <rosparam>
         skip_takeoff: true
-        skip_approach_pick_position: true
-        skip_look_down: true
-        skip_adjust_grasp_position: true
+        skip_approach_pick_area: true
+        skip_scan_pick_area: true
+        skip_pick_visual_servoing: true
         skip_grasp: false
-        skip_move_to_place_position: false
-        skip_adjust_place_position: false
+        skip_approach_place_area: false
+        skip_place_visual_servoing: false
         skip_ungrasp: false
       </rosparam>
     </group>
 
-    <group if="$(arg debug_adjust_place)">
+    <group if="$(arg debug_approach_place_area)">
       <rosparam>
         skip_takeoff: true
-        skip_approach_pick_position: true
-        skip_look_down: true
-        skip_adjust_grasp_position: true
+        skip_approach_pick_area: true
+        skip_scan_pick_area: true
+        skip_pick_visual_servoing: true
         skip_grasp: true
-        skip_move_to_place_position: true
-        skip_adjust_place_position: false
+        skip_approach_place_area: false
+        skip_place_visual_servoing: false
         skip_ungrasp: false
       </rosparam>
     </group>
@@ -72,18 +66,11 @@
     <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
     <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/Motion.yaml"/>
     <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
-    <param name="do_object_recognition" value="$(arg do_object_recognition)"/>
-    <param name="do_channel_recognition" value="$(arg do_channel_recognition)"/>
-    <param name="single_object_mode" value="$(arg single_object_mode)"/>
-    <param name="target_object_number" value="$(arg target_object_number)"/>
-    <param name="object_num" value="$(arg object_num)" unless="$(arg single_object_mode)"/>
-    <param name="object_num" value="1" if="$(arg single_object_mode)"/>
-    <param name="no_lookdown_mode" value="$(arg no_lookdown_mode)"/>
   </node>
 
   <node pkg="jsk_rviz_plugins" type="rosconsole_overlay_text.py" respawn="true" name="rosconsole_overlay_text">
     <rosparam>
-      nodes: ["/task2_motion"]
+      nodes: ["/hydrus/task2_motion"]
       reverse_lines: false
     </rosparam>
   </node>

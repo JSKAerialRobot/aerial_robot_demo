@@ -1,4 +1,4 @@
-hls_color_filter_img:
+hls_color_filter:
   h_limit_max: 37
   h_limit_min: 325
   l_limit_max: 251
@@ -7,14 +7,6 @@ hls_color_filter_img:
   s_limit_min: 72
   use_camera_info: false
   queue_size: 10
-
-hsi_color_filter:
-  h_limit_max: -80
-  h_limit_min: 45
-  s_limit_max: 255
-  s_limit_min: 128
-  i_limit_max: 165
-  i_limit_min: 13
 
 rectangle_detection_color:
   target_object_area: 0.07

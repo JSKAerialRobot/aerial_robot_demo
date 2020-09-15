@@ -64,4 +64,8 @@
     <arg name="robot_ns" value="$(arg robot_ns)"/>
   </include>
 
+  <node pkg="mbzirc2020_task2_common" type="base_footprint_tf_publisher.py" name="base_footprint_tf_publisher" ns="$(arg robot_ns)">
+    <param name="robot_ns" value="$(arg robot_ns)"/>
+  </node>
+
 </launch>
