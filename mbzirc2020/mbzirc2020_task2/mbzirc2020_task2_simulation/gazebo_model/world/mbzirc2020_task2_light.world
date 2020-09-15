@@ -24,6 +24,8 @@
           <speed>12</speed>
         </clouds>
       </sky>
+      <ambient>0.7 0.7 0.7 1</ambient>
+      <background>0.1 0.1 0.1 1</background>
    </scene>
 
     <include>
@@ -41,7 +43,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>100 100</size>
+              <size>20 20</size>
             </plane>
           </geometry>
           <surface>
@@ -58,7 +60,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>100 100</size>
+              <size>20 20</size>
             </plane>
           </geometry>
           <material>
@@ -93,13 +95,6 @@
       </include>
     </model>
 
-    <model name="red_brick_1-3" >
-      <pose>-2.7 0 0.15 1.57 0 1.57</pose>
-      <include>
-        <uri>model://red_brick</uri>
-      </include>
-    </model>
-
     <model name="picking_place_2" >
       <pose>-5 -0.75 0 0 0 0</pose>
       <include>
@@ -121,10 +116,45 @@
       </include>
     </model>
 
-    <model name="red_brick_2-3" >
-      <pose>-2.7 -0.75 0.15 1.57 0 1.57</pose>
+    <model name="picking_place_3" >
+      <pose>-5 -1.5 0 0 0 0</pose>
       <include>
-        <uri>model://red_brick</uri>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-1" >
+      <pose>-1.5 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_1-2" >
+      <pose>-3.0 -1.5 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="picking_place_4" >
+      <pose>-5 -2.25 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_pick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-1" >
+      <pose>-1.5 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
+      </include>
+    </model>
+
+    <model name="green_brick_2-2" >
+      <pose>-3.0 -2.25 0.15 1.57 0 1.57</pose>
+      <include>
+        <uri>model://green_brick</uri>
       </include>
     </model>
 

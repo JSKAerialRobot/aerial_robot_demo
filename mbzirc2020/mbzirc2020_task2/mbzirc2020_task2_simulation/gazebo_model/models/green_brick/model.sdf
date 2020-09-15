@@ -22,14 +22,23 @@
             <size>0.2 0.2 0.6</size>
           </box>
         </geometry>
-        <max_contacts>10</max_contacts>
+        <max_contacts>50</max_contacts>
         <surface>
           <friction>
             <ode>
-              <mu>0.3</mu>
-              <mu2>0.3</mu2>
+              <mu>1.5</mu>
+              <mu2>1.5</mu2>
+              <fdir>1 0 0</fdir>
             </ode>
           </friction>
+          <contact>
+            <ode>
+              <kp>1400000.0</kp>
+              <kd>2800.0</kd>
+              <maxVel>10.0</maxVel>
+              <minDepth>0.00</minDepth>
+            </ode>
+          </contact>
         </surface>
       </collision>
       <visual name='visual'>
