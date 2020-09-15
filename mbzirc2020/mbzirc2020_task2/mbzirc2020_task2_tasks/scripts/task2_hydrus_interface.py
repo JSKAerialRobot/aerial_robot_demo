@@ -51,10 +51,12 @@ class Task2HydrusInterface(HydrusInterface):
         joint_state = JointState()
         joint_state.name = ['rs_d435_servo_joint']
         joint_state.position = [angle] #look down
-        self.setExtraJointAngle(joint_state, time = 1000)
+        self.setExtraJointAngle(joint_state, time = time)
 
-    def getTF(self, frame_id, wait=0.5, parent_frame_id='world'):
-        trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, rospy.Time.now(), rospy.Duration(wait))
+    def getTF(self, frame_id, wait=0.5, parent_frame_id='world', time = None):
+        if time is None:
+            time = rospy.Time.now()
+        trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, time, rospy.Duration(wait))
         return trans
 
     def joyCallback(self, msg):
