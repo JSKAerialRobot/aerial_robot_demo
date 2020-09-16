@@ -6,11 +6,13 @@
   <arg name="debug_pick_visual_servoing" default="false"/>
   <arg name="debug_grasp" default="false"/>
   <arg name="debug_approach_place_area" default="false"/>
+  <arg name="estimate_mode" default="0"/>
 
   ### bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
     <arg name="real_machine" value="True"/>
     <arg name="simulation" value="false"/>
+    <arg name="estimate_mode" value="$(arg estimate_mode)"/>
     <arg name="ring_gripper" value="true"/>
     <arg name="headless" value="true"/>
   </include>
