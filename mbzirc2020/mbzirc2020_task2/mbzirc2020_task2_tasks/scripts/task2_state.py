@@ -42,6 +42,7 @@ class Task2State(smach.State):
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
         self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
         self.plane_detection_service_name = rospy.get_param('~plane_detection_service_name')
+        self.realsense_reset_service_name = rospy.get_param('~realsense_reset_service_name')
         self.scan_area_velocity = rospy.get_param('~scan_area_velocity')
         self.scan_area_length = rospy.get_param('~scan_area_length')
         self.scan_area_pos_thre = rospy.get_param('~scan_area_pos_thre')
@@ -64,6 +65,7 @@ class Task2State(smach.State):
 
         self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
         self.plane_detection_service_client = rospy.ServiceProxy(self.plane_detection_service_name, std_srvs.srv.SetBool)
+        self.realsense_reset_service_client = rospy.ServiceProxy(self.realsense_reset_service_name, std_srvs.srv.Empty)
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -509,8 +511,23 @@ class Grasp(Task2State):
         #reset realsense odom
         if not self.simulation:
             rospy.logwarn(self.__class__.__name__ + ": reset realsense odom")
-            cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
-            subprocess.Popen(cmd.split())
+
+            #this process is no longer necessary after realsense v2.29.0
+            #cmd = "rosrun mbzirc2020_task2_common reset_vo.sh"
+            #subprocess.Popen(cmd.split())
+
+            #just call reset
+            try:
+                req = std_srvs.srv.EmptyRequest()
+                res = self.realsense_reset_service_client(req)
+
+                if res is not None:
+                    rospy.logwarn("Reset realsense")
+                else:
+                    rospy.logerr("Failed to reset realsense")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
 
             rospy.logerr("WARNING!! THE ROBOT WILL TAKE OFF AFTER 10 SEC")
             rospy.sleep(10)

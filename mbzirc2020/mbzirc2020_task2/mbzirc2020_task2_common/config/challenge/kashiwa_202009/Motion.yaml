@@ -42,6 +42,7 @@ channel_tf_frame_id: channel_center
 
 alt_sensor_service_name: sensor_plugin/alt1/estimate_flag
 plane_detection_service_name: sensor_plugin/plane_detection1/estimate_flag
+realsense_reset_service_name: sensor_plugin/vo1/reset
 
 #search motion params
 
