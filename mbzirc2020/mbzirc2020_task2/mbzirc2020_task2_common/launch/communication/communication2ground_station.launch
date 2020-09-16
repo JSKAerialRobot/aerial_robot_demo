@@ -4,7 +4,7 @@
   <arg name="HIGH_PORT1" default="16484" />
   <arg name="HIGH_PORT2" default="8192" />
   <arg name="LOW_PORT" default="1024" />
-  <arg name="camera_nodelet_manager" default="/rs_d435/realsense2_camera_manager"/>
+  <arg name="camera_nodelet_manager" default="rs_d435/realsense2_camera_manager"/>
   <arg name="robot_ns" default="hydrus"/>
 
   <node pkg="nodelet" type="nodelet" name="rgb_image_throttle"
