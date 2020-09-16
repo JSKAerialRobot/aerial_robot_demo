@@ -17,8 +17,8 @@ scan_rp_thre: 0.1
 
 pick_visual_servoing_z_diff: 0.03
 
-grasp_horizontal_interpolation_time: 100
-grasp_vertical_interpolation_time: 100
+grasp_horizontal_interpolation_time: 50 # *0.1 -> sec
+grasp_vertical_interpolation_time: 100 # *0.1 -> sec
 
 object_grasping_height: 0.2
 object_yaw_thresh: 0.2
