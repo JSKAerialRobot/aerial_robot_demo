@@ -9,12 +9,12 @@ hls_color_filter_img:
   queue_size: 10
 
 hsi_color_filter:
-  h_limit_max: -80
-  h_limit_min: 45
-  s_limit_max: 255
-  s_limit_min: 128
-  i_limit_max: 165
-  i_limit_min: 13
+  h_limit_max: -35
+  h_limit_min: 21
+  s_limit_max: 217
+  s_limit_min: 23
+  i_limit_max: 216
+  i_limit_min: 31
 
 rectangle_detection_color:
   target_object_area: 0.07
