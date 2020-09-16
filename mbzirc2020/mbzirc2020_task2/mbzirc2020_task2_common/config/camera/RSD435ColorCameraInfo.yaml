@@ -1,4 +1,4 @@
-frame_id: "rs_d435_color_optical_frame"
+frame_id: "hydrus/rs_d435_color_optical_frame"
 height: 480
 width: 640
 distortion_model: "plumb_bob"

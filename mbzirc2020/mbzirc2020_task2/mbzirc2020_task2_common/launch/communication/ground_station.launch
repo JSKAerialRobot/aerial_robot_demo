@@ -61,7 +61,7 @@
       <remap from="rgb/camera_info" to="rs_d435/color/camera_info"/>
       <remap from="rgb/image_rect_color" to="rs_d435/color/image_rect_color/throttle"/>
       <remap from="depth_registered/image_rect" to="rs_d435/aligned_depth_to_color/image_raw/throttle"/>
-      <remap from="depth_registered/points" to="rs_d435/points"/>
+      <remap from="depth_registered/points" to="rs_d435/depth_registered/points"/>
       <param name="queue_size" value="100"/>
     </node>
 

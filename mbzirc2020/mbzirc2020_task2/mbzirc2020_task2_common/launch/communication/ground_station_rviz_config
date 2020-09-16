@@ -9,6 +9,7 @@ Panels:
         - /TF1
         - /RobotModel1
         - /Image1
+        - /PointCloud21
       Splitter Ratio: 0.720379174
     Tree Height: 641
   - Class: rviz/Selection
@@ -29,7 +30,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
   - Class: jsk_rviz_plugin/PublishTopic
     Name: PublishTopic
     Topic: /task_start
@@ -511,7 +512,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Flat Squares
-      Topic: /hydrus/rs_d435/points
+      Topic: /hydrus/rs_d435/depth_registered/points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -598,7 +599,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.76780224
+      Distance: 10.5400915
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
