@@ -30,13 +30,14 @@
     <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
       <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg world)"/>
       <arg name="object_color" value="$(arg object_color)"/>
-      <arg name="external_manager" value="false"/>
+      <arg name="external_manager" value="true"/>
+      <arg name="manager" value="rs_d435/realsense2_camera_manager"/>
     </include>
 
+    ### communication to ground station
+    <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch"/>
   </group>
 
   <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" args="call --wait /hydrus/task2_recognition_manager/set_logger_level 'ros' 'Fatal'" />
 
-  ### communication to ground station
-  <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch"/>
 </launch>

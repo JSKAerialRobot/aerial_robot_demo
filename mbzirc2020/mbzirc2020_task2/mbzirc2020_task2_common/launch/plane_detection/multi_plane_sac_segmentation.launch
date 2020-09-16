@@ -2,16 +2,18 @@
   <arg name="gui" default="false" />
   <arg name="manager" default="rs_d435/realsense2_camera_manager"/>
   <arg name="robot_ns" default="hydrus"/>
+  <arg name="point_cloud_topic" default="rs_d435/depth_registered/points"/>
 
   <group ns="$(arg robot_ns)">
 
     <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid $(arg manager)">
-      <remap from="~input" to="rs_d435/depth_registered/points" />
+      <remap from="~input" to="$(arg point_cloud_topic)" />
       <rosparam>
-        filter_limit_min: 0.0
-        filter_limit_max: 0.2
-        filter_limit_negative: true
-        leaf_size: 0.02
+        filter_field_name: z
+        filter_limit_min: 0.01
+        filter_limit_max: 20.0
+        filter_limit_negative: False
+        leaf_size: 0.015
       </rosparam>
     </node>
 

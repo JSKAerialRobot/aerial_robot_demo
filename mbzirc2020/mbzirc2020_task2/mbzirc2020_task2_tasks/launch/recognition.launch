@@ -5,6 +5,7 @@
   <arg name="depth_image_topic" default="rs_d435/aligned_depth_to_color/image_raw" />
   <arg name="depth_camera_info_topic" default="rs_d435/aligned_depth_to_color/camera_info" />
   <arg name="point_cloud_topic" default="rs_d435/depth_registered/points"/>
+  <arg name="need_voxel_grid" default="false"/>
 
   <arg name="external_manager" default="false"/>
   <arg name="manager" default="task2_recognition_manager"/>
@@ -36,7 +37,8 @@
     <remap from="~cam_info" to="$(arg rgb_camera_info_topic)" />
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid $(arg manager)" output="log">
+  <node if="$(arg need_voxel_grid)"
+        pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid $(arg manager)" output="log">
     <remap from="~input" to="$(arg point_cloud_topic)" />
     <rosparam>
       filter_field_name: z
