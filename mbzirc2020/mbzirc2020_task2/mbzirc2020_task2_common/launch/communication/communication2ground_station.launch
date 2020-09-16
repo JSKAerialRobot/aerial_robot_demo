@@ -8,15 +8,15 @@
 
   <node pkg="nodelet" type="nodelet" name="rgb_image_throttle"
         args="load jsk_topic_tools/LightweightThrottle $(arg camera_nodelet_manager)" output="screen">
-    <remap from="~input"  to="/rs_d435/color/image_rect_color/compressed"/>
-    <remap from="~output" to="/rs_d435/color/image_rect_color/throttle/compressed" />
+    <remap from="~input"  to="rs_d435/color/image_rect_color/compressed"/>
+    <remap from="~output" to="rs_d435/color/image_rect_color/throttle/compressed" />
     <param name="update_rate" value="3" />
   </node>
 
   <node pkg="nodelet" type="nodelet" name="depth_image_throttle"
         args="load jsk_topic_tools/LightweightThrottle $(arg camera_nodelet_manager)" output="screen">
-    <remap from="~input"  to="/rs_d435/aligned_depth_to_color/image_raw/compressedDepth"/>
-    <remap from="~output" to="/rs_d435/aligned_depth_to_color/image_raw/throttle/compressedDepth" />
+    <remap from="~input"  to="rs_d435/aligned_depth_to_color/image_raw/compressedDepth"/>
+    <remap from="~output" to="rs_d435/aligned_depth_to_color/image_raw/throttle/compressedDepth" />
     <param name="update_rate" value="3" />
   </node>
 
