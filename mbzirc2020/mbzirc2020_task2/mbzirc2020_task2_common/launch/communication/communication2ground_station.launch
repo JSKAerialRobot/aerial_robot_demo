@@ -1,10 +1,11 @@
 <launch>
-  <arg name="GROUND_STATION_IP" default="192.168.1.10" />
+  <arg name="GROUND_STATION_IP" default="192.168.1.143" />
   <arg name="UAV_IP" default="$(env ROS_IP)" />
   <arg name="HIGH_PORT1" default="16484" />
   <arg name="HIGH_PORT2" default="8192" />
   <arg name="LOW_PORT" default="1024" />
   <arg name="camera_nodelet_manager" default="/rs_d435/realsense2_camera_manager"/>
+  <arg name="robot_ns" default="hydrus"/>
 
   <node pkg="nodelet" type="nodelet" name="rgb_image_throttle"
         args="load jsk_topic_tools/LightweightThrottle $(arg camera_nodelet_manager)" output="screen">
@@ -47,5 +48,8 @@
     <param name="topic_prefix" value="" />
   </node>
 
+  <node pkg="mbzirc2020_task2_common" type="world_to_root_tf_msg_publisher.py" name="world_to_root_tf_msg_publisher">
+    <param name="robot_ns" value="$(arg robot_ns)"/>
+  </node>
 
 </launch>

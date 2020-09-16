@@ -35,7 +35,9 @@
     </include>
 
     ### communication to ground station
-    <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch"/>
+    <include file="$(find mbzirc2020_task2_common)/launch/communication/communication2ground_station.launch">
+      <arg name="robot_ns" value="$(arg robot_ns)"/>
+    </include>
   </group>
 
   <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" args="call --wait /hydrus/task2_recognition_manager/set_logger_level 'ros' 'Fatal'" />
