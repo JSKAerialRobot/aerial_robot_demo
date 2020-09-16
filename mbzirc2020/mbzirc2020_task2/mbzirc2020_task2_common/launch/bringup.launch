@@ -62,6 +62,7 @@
   ########## plane detection for alt estimation ##########
   <include file="$(find mbzirc2020_task2_common)/launch/plane_detection/multi_plane_sac_segmentation.launch">
     <arg name="robot_ns" value="$(arg robot_ns)"/>
+    <arg name="manager" value="task2_recognition_manager" if="$(arg simulation)"/>
   </include>
 
   <node pkg="mbzirc2020_task2_common" type="base_footprint_tf_publisher.py" name="base_footprint_tf_publisher" ns="$(arg robot_ns)">
