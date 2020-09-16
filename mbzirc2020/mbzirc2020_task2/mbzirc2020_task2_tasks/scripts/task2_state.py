@@ -41,6 +41,7 @@ class Task2State(smach.State):
         self.grasping_yaw_in_fc = rospy.get_param('~grasping_yaw_in_fc')
         self.global_object_yaw = rospy.get_param('~global_object_yaw')
         self.alt_sensor_service_name = rospy.get_param('~alt_sensor_service_name')
+        self.plane_detection_service_name = rospy.get_param('~plane_detection_service_name')
         self.scan_area_velocity = rospy.get_param('~scan_area_velocity')
         self.scan_area_length = rospy.get_param('~scan_area_length')
         self.scan_area_pos_thre = rospy.get_param('~scan_area_pos_thre')
@@ -62,6 +63,7 @@ class Task2State(smach.State):
 
 
         self.alt_sensor_service_client = rospy.ServiceProxy(self.alt_sensor_service_name, std_srvs.srv.SetBool)
+        self.plane_detection_service_client = rospy.ServiceProxy(self.plane_detection_service_name, std_srvs.srv.SetBool)
 
         grasping_point = rospy.get_param('~grasping_point')
         grasping_yaw = rospy.get_param('~grasping_yaw')
@@ -109,7 +111,7 @@ class ApproachPickArea(Task2State):
         if self.skip_approach_pick_area:
             return 'succeeded'
 
-        #enable alt sensor
+        #enable alt sensor, disable plane detection
         if not self.simulation:
             try:
                 req = std_srvs.srv.SetBoolRequest()
@@ -119,12 +121,23 @@ class ApproachPickArea(Task2State):
                 if res is not None:
                     rospy.logwarn("Enable alt sensor")
                 else:
-                    rospy.logerr("Failed to disable alt sensor")
+                    rospy.logerr("Failed to enable alt sensor")
 
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-        ## TODO disable plane detection
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = False
+                res = self.plane_detection_service_client(req)
+
+                if res is not None:
+                    rospy.logwarn("Disable plane detection")
+                else:
+                    rospy.logerr("Failed to disable place detection")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
 
         target_uav_yaw = self.global_object_yaw - self.grasping_yaw_in_fc
         self.robot.goPosWaitConvergence('global', self.global_lookdown_pos_gps, None, target_uav_yaw, gps_mode = True, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
@@ -533,8 +546,22 @@ class ApproachPlaceArea(Task2State):
 
         self.robot.goPosWaitConvergence('global', None, self.place_lookdown_height, None, pos_conv_thresh = 0.4, yaw_conv_thresh = 0.2, vel_conv_thresh = 0.2)
 
-        #disable alt sensor
+        #enable plane detection, disable alt sensor
         if not self.simulation:
+
+            try:
+                req = std_srvs.srv.SetBoolRequest()
+                req.data = True
+                res = self.plane_detection_service_client(req)
+
+                if res is not None:
+                    rospy.logwarn("Enable plane detection")
+                else:
+                    rospy.logerr("Failed to enable place detection")
+
+            except rospy.ServiceException, e:
+                rospy.logerr("Service call failed: %s", e)
+
             try:
                 req = std_srvs.srv.SetBoolRequest()
                 req.data = False
@@ -548,16 +575,6 @@ class ApproachPlaceArea(Task2State):
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: %s", e)
 
-            ## TODO enable plane_detection
-
-            # try:
-            #     rospy.logwarn("Enable VO pos")
-            #     req = std_srvs.srv.SetBoolRequest()
-            #     req.data = True
-            #     res = self.vo_service_client(req)
-
-            # except rospy.ServiceException, e:
-            #     rospy.logerr("Service call failed: %s", e)
 
         uav_target_yaw = self.global_place_channel_yaw - self.grasping_yaw_in_fc
         self.robot.goPosWaitConvergence('global', self.global_place_channel_center_pos_gps, None, uav_target_yaw, gps_mode = True, timeout=60, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)

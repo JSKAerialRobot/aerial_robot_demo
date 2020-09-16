@@ -40,7 +40,8 @@ place_height: 2.5 #[m] should be height than 2.0[m]
 channel_pos_thresh: 0.3
 channel_tf_frame_id: channel_center
 
-alt_sensor_service_name: estimator/sensor_plugin/alt1/estimate_flag
+alt_sensor_service_name: sensor_plugin/alt1/estimate_flag
+plane_detection_service_name: sensor_plugin/plane_detection1/estimate_flag
 
 #search motion params
 
