@@ -7,8 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1
-        - /TF1/Status1
         - /RobotModel1
+        - /Image1
       Splitter Ratio: 0.720379174
     Tree Height: 641
   - Class: rviz/Selection
@@ -75,8 +75,6 @@ Visualization Manager:
         hydrus/bat3:
           Value: true
         hydrus/bat4:
-          Value: true
-        hydrus/cog:
           Value: true
         hydrus/fc:
           Value: true
@@ -166,79 +164,78 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        hydrus/root:
-          hydrus/link1:
-            hydrus/bat1:
-              {}
-            hydrus/leg1:
-              hydrus/leg_collision_model1:
+        world:
+          hydrus/root:
+            hydrus/link1:
+              hydrus/bat1:
                 {}
-            hydrus/leg2:
-              hydrus/leg_collision_model2:
-                {}
-            hydrus/link2:
-              hydrus/bat2:
-                {}
-              hydrus/fc:
-                hydrus/cog:
-                  world:
+              hydrus/leg1:
+                hydrus/leg_collision_model1:
+                  {}
+              hydrus/leg2:
+                hydrus/leg_collision_model2:
+                  {}
+              hydrus/link2:
+                hydrus/bat2:
+                  {}
+                hydrus/fc:
+                  {}
+                hydrus/gps:
+                  hydrus/magnet:
                     {}
-              hydrus/gps:
-                hydrus/magnet:
+                hydrus/leddarone:
                   {}
-              hydrus/leddarone:
-                {}
-              hydrus/link3:
-                hydrus/bat3:
-                  {}
-                hydrus/fixed_joint_unit:
-                  {}
-                hydrus/leg_collision_model5:
-                  {}
-                hydrus/link4:
-                  hydrus/bat4:
+                hydrus/link3:
+                  hydrus/bat3:
                     {}
-                  hydrus/leg3:
-                    hydrus/leg_collision_model3:
+                  hydrus/fixed_joint_unit:
+                    {}
+                  hydrus/leg_collision_model5:
+                    {}
+                  hydrus/link4:
+                    hydrus/bat4:
                       {}
-                  hydrus/leg4:
-                    hydrus/leg_collision_model4:
-                      {}
-                  hydrus/ring_gripper_right:
-                    {}
-                  hydrus/thrust4:
-                    {}
-                hydrus/realsense1_pose_frame:
-                  {}
-                hydrus/thrust3:
-                  {}
-              hydrus/neuron3:
-                {}
-              hydrus/pc:
-                {}
-              hydrus/rs_d435_mount:
-                {}
-              hydrus/rs_d435_servo:
-                hydrus/rs_d435_unit:
-                  hydrus/rs_d435_link:
-                    hydrus/rs_d435_depth_frame:
-                      hydrus/rs_d435_color_frame:
-                        hydrus/rs_d435_color_optical_frame:
-                          {}
-                      hydrus/rs_d435_depth_optical_frame:
+                    hydrus/leg3:
+                      hydrus/leg_collision_model3:
                         {}
-                      hydrus/rs_d435_left_ir_frame:
-                        hydrus/rs_d435_left_ir_optical_frame:
+                    hydrus/leg4:
+                      hydrus/leg_collision_model4:
+                        {}
+                    hydrus/ring_gripper_right:
+                      {}
+                    hydrus/thrust4:
+                      {}
+                  hydrus/realsense1_pose_frame:
+                    {}
+                  hydrus/thrust3:
+                    {}
+                hydrus/neuron3:
+                  {}
+                hydrus/pc:
+                  {}
+                hydrus/rs_d435_mount:
+                  {}
+                hydrus/rs_d435_servo:
+                  hydrus/rs_d435_unit:
+                    hydrus/rs_d435_link:
+                      hydrus/rs_d435_depth_frame:
+                        hydrus/rs_d435_color_frame:
+                          hydrus/rs_d435_color_optical_frame:
+                            {}
+                        hydrus/rs_d435_depth_optical_frame:
                           {}
-                      hydrus/rs_d435_right_ir_frame:
-                        hydrus/rs_d435_right_ir_optical_frame:
-                          {}
-              hydrus/thrust2:
+                        hydrus/rs_d435_left_ir_frame:
+                          hydrus/rs_d435_left_ir_optical_frame:
+                            {}
+                        hydrus/rs_d435_right_ir_frame:
+                          hydrus/rs_d435_right_ir_optical_frame:
+                            {}
+                hydrus/thrust2:
+                  {}
+              hydrus/ring_gripper_left:
                 {}
-            hydrus/ring_gripper_left:
-              {}
-            hydrus/thrust1:
-              {}
+              hydrus/thrust1:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -601,25 +598,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.03002453
+      Distance: 4.76780224
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.237771258
-        Y: 0.284783483
-        Z: -0.221557409
+        X: 0.0332354568
+        Y: 0.244630203
+        Z: 0.0708912909
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.8847965
+      Pitch: 0.864796579
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.61540294
+      Yaw: 3.48540568
     Saved: ~
 Window Geometry:
   Displays:
