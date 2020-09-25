@@ -49,6 +49,7 @@ class Task2State(smach.State):
         self.scan_rp_thre = rospy.get_param('~scan_rp_thre')
         self.pick_visual_servoing_z_diff = rospy.get_param('~pick_visual_servoing_z_diff')
         self.object_approach_height = rospy.get_param('~object_approach_height')
+        self.grasp_vs_end_height = rospy.get_param('~grasp_vs_end_height')
         self.joint_torque_thresh = rospy.get_param('~joint_torque_thresh')
         self.stop_if_grasp_failed = rospy.get_param('~stop_if_grasp_failed')
         self.object_length = rospy.get_param('~object_length')
@@ -283,6 +284,7 @@ class PickVisualServoing(Task2State):
                 prev_object_x = object_global_pos[0]
                 prev_object_y = object_global_pos[1]
                 rospy.logerr("%s: succeed to find valid object x: %f, y: %f", self.__class__.__name__, object_global_pos[0], object_global_pos[1])
+                #rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
 
                 object_global_x_axis = target_object_coords[0:3, 0]
                 object_global_yaw = np.arctan2(object_global_x_axis[1], object_global_x_axis[0])
@@ -375,7 +377,7 @@ class Grasp(Task2State):
         grasping_point2link3 = tft.inverse_matrix(self.grasping_point_coords)
         grasping_point2link3_pos = tft.translation_from_matrix(grasping_point2link3)
         waypoint2 = np.array([grasping_point2link3_pos[0], grasping_point2link3_pos[1], self.object_approach_height])
-        waypoint3 = np.array([grasping_point2link3_pos[0], grasping_point2link3_pos[1], 0.0])
+        waypoint3 = np.array([grasping_point2link3_pos[0], grasping_point2link3_pos[1], self.grasp_vs_end_height])
         object2link3_rot = tft.quaternion_matrix(tft.quaternion_from_matrix(grasping_point2link3))
 
         object2baselink_waypoints = []
@@ -421,11 +423,13 @@ class Grasp(Task2State):
                     rospy.logerr(self.__class__.__name__ + ": cannot find camera tf")
                     return 'failed'
 
+                rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
+
                 for obj in self.object_bbox.boxes:
                     object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(obj.pose))
                     object_global_pos = tft.translation_from_matrix(object_global_coords)
                     distance = (prev_object_x - object_global_pos[0]) ** 2 + (prev_object_y - object_global_pos[1]) ** 2
-                    #rospy.logwarn("%f", distance)
+                    rospy.logwarn("%f", distance)
                     if distance < min_distance:
                         min_distance = distance
                         target_object_bbox = obj
@@ -436,9 +440,9 @@ class Grasp(Task2State):
                 target_object_bbox.pose.orientation.z = 0.0
                 target_object_bbox.pose.orientation.w = 1.0
                 bbox_center_coords = ros_numpy.numpify(target_object_bbox.pose)
-                bbox_center_pos = tft.translation_from_matrix(bbox_center_coords)
-                prev_object_x = bbox_center_pos[0]
-                prev_object_y = bbox_center_pos[1]
+                bbox_center_world_coords = tft.concatenate_matrices(cam_trans, bbox_center_coords)
+                bbox_center_world_pos = tft.translation_from_matrix(bbox_center_world_coords)
+                prev_object_x, prev_object_y = bbox_center_world_pos[0], bbox_center_world_pos[1]
 
                 object_center_coords = tft.concatenate_matrices(bbox_center_coords, tft.translation_matrix([-target_object_bbox.dimensions.x / 2 + self.object_length / 2, 0, target_object_bbox.dimensions.z / 2]))
                 object_center_worldcoords = tft.concatenate_matrices(cam_trans, object_center_coords)

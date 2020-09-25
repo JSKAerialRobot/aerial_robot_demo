@@ -19,6 +19,7 @@ pick_visual_servoing_z_diff: 0.03
 
 grasp_horizontal_interpolation_time: 100
 grasp_vertical_interpolation_time: 100
+grasp_vs_end_height: 0.3
 
 object_grasping_height: 0.2
 object_yaw_thresh: 0.2
@@ -42,6 +43,7 @@ channel_tf_frame_id: channel_center
 
 alt_sensor_service_name: sensor_plugin/alt1/estimate_flag
 plane_detection_service_name: sensor_plugin/plane_detection1/estimate_flag
+realsense_reset_service_name: sensor_plugin/vo1/reset
 
 #search motion params
 
