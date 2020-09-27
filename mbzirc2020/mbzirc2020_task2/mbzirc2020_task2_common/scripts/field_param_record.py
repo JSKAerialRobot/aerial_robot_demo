@@ -8,8 +8,8 @@ class GpsRecord:
     def __init__(self):
         rospy.init_node('gps_record')
 
-        self.gps_sub = rospy.Subscriber('/gps', Gps, self.gpsCallback)
-        self.imu_sub = rospy.Subscriber('/imu', Imu, self.imuCallback)
+        self.gps_sub = rospy.Subscriber('hydrus/gps', Gps, self.gpsCallback)
+        self.imu_sub = rospy.Subscriber('hydrus/imu', Imu, self.imuCallback)
         self.location = [0, 0]
         self.yaw = 0
 
