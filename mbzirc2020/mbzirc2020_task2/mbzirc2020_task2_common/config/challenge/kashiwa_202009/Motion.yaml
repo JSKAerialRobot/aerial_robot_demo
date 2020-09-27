@@ -1,31 +1,32 @@
 grasp_joint_angle: [1.4, 1.4]
 ungrasp_joint_angle: [0.9, 0.9]
-preshape_joint_angle: [0.78, 0.78]
+preshape_joint_angle: [0.6, 0.6]
 reset_joint_angle: [1.5, 1.5]
 open_joint_angle: [0.6, 0.6]
 
 object_translation_in_link2: [0.1, 0.5, 0.0] #in link2 frame
 object_yaw_in_link2: -0.785
 
-object_lookdown_height: 3.0
+object_lookdown_height: 4.0
 object_approach_height: 1.2
 
-scan_area_velocity: 0.2
-scan_area_length: 4.0
+scan_area_velocity: 0.3
+scan_area_length: 8.0
 scan_area_pos_thre: 0.3
-scan_rp_thre: 0.1
+scan_rp_thre: 0.2
 
-pick_visual_servoing_z_diff: 0.03
+pick_visual_servoing_z_diff: 0.04
 
-grasp_horizontal_interpolation_time: 50 # *0.1 -> sec
-grasp_vertical_interpolation_time: 100 # *0.1 -> sec
+grasp_horizontal_interpolation_time: 70 # *0.1 -> sec
+grasp_vertical_interpolation_time: 70 # *0.1 -> sec
+grasp_vs_end_height: 0.35
 
 object_grasping_height: 0.2
 object_yaw_thresh: 0.2
 object_pos_thresh: 0.15
 adjust_grasp_image_type: color
 
-global_object_yaw: 3.141
+global_object_yaw: 0.6398255228996277
 recognition_wait: 1.0
 
 grasping_yaw: 0.785 #in link3 frame
@@ -35,8 +36,8 @@ grasping_yaw_in_fc: 2.356
 joint_torque_thresh: 3 #[Nm]
 stop_if_grasp_failed: false
 
-place_lookdown_height: 3.0 #[m] should be higher than 2.0[m]
-place_height: 2.5 #[m] should be height than 2.0[m]
+place_lookdown_height: 4.0 #[m] should be higher than 2.0[m]
+place_height: 2.4 #[m] should be height than 2.0[m]
 channel_pos_thresh: 0.3
 channel_tf_frame_id: channel_center
 

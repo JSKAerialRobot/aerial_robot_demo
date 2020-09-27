@@ -8,7 +8,7 @@ rectangle_detection_color:
   #target_object_area: 0.08 #0.2 * 0.6 #define in HLSColorFilter*.yaml
   #target_object_area_margin: 0.02 #define in HLSColorFilter*.yaml
   object_height: 0.2
-  lowest_margin: 3
+  lowest_margin: 2
 
 base_footprint_tf_publisher:
   yaw_offset: 2.35619
