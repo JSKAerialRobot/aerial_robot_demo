@@ -5,17 +5,13 @@ add_definitions(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
   aerial_robot_msgs
-  edgetpu_roscpp
   geometry_msgs
-  message_filters
   message_generation
   message_runtime
   nav_msgs
   roscpp
   sensor_msgs
   std_msgs
-  tf2_geometry_msgs
-  tf2_ros
   visualization_msgs
   )
 
@@ -69,9 +65,6 @@ catkin_package(
   DEPENDS EIGEN3
   )
 
-# download detection models
-add_custom_target(install_detection_models ALL
-  COMMAND ${PROJECT_SOURCE_DIR}/script/install_detection_models.py)
 
 add_library(motion_single_primitive src/MotionSinglePrimitive.cpp)
 target_link_libraries(motion_single_primitive ${catkin_LIBRARIES})
@@ -96,15 +89,3 @@ target_link_libraries(trajectory_predictor_node trajectory_predictor ${catkin_LI
 
 add_executable(trajectory_tracker_node src/trajectory_tracker_node.cpp)
 target_link_libraries(trajectory_tracker_node trajectory_tracker ${catkin_LIBRARIES})
-
-# Detection
-add_library(drone_ball_tracking_detection SHARED
-  src/vision/color_filter_based_tracking_detection.cpp
-  src/vision/cascaded_deep_tracking_detection.cpp)
-target_link_libraries(drone_ball_tracking_detection ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable(ransac_line_fitting_node src/ransac_line_fitting_node.cpp)
-target_link_libraries(ransac_line_fitting_node reactive_motion ransac_line_fitting ${catkin_LIBRARIES})
-
-add_executable(target_world_pose_node src/target_world_pose.cpp)
-target_link_libraries(target_world_pose_node ${catkin_LIBRARIES})

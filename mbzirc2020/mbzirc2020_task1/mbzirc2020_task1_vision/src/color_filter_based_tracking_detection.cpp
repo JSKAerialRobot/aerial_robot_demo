@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <mbzirc2020_task1_tasks/vision/color_filter_based_tracking_detection.h>
+#include <mbzirc2020_task1_tasks/color_filter_based_tracking_detection.h>
 
 namespace edgetpu_roscpp
 {

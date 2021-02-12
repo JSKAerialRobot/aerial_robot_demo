@@ -4,7 +4,9 @@ from jsk_data import download_data
 
 
 def main():
-    PKG = 'mbzirc2020_task1_tasks'
+    PKG = 'mbzirc2020_task1_vision'
+
+    ## on-site testbed in Kashiwa Campus of The University of Tokyo, Chiba, Japan
 
     ### 20191229_kashiwa_DJI450_mavic2pro_1080HD
     download_data(
@@ -15,30 +17,12 @@ def main():
         extract=True,
     )
 
-    ### 20191229_kashiwa_DJI450_mavic2pro_1080HD cropped annotated data
-    download_data(
-        pkg_name=PKG,
-        path='train/drone_and_ball/20191229_kashiwa_DJI450_mavic2pro_1080HD_cropped_annotated_data.tar.gz',
-        url='https://drive.google.com/uc?id=1NOr4EFnBb3wlB9T9x0OulJM7wjtt-ahk',
-        md5='5385d56f42f09000453235014f457960',
-        extract=True,
-    )
-
     ### 20200103_kashiwa_DJIF450_hydrus_rsd435_720HD
     download_data(
         pkg_name=PKG,
         path='train/drone_and_ball/20200103_kashwia_DJI450_hydrus_rsd435_720HD.tar.gz',
         url='https://drive.google.com/uc?id=1IsSOzLfMc1iV2FBezmX0cXATRjrtUt7R',
         md5='7d611ba4c50683ac69cc27af2ab69d57',
-        extract=True,
-    )
-
-    ### 20200103_kashiwa_DJIF450_hydrus_rsd435_720HD corpped image
-    download_data(
-        pkg_name=PKG,
-        path='train/drone_and_ball/20200103_kashwia_DJI450_hydrus_rsd435_720HD_cropped_annotated_data.tar.gz',
-        url='https://drive.google.com/uc?id=19m-jXm2w0OKcBa3IM4Rofrdxi3b5zsbh',
-        md5='13a8372c096d1dc68836880500d0f114',
         extract=True,
     )
 
@@ -78,6 +62,26 @@ def main():
         extract=True,
     )
 
+    ### 20200204-outdoor-f450-net-hydrus-elp-fov60-1080HD
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/20200204-outdoor-f450-net-hydrus-elp-fov60-1080HD.tar.gz',
+        url='https://drive.google.com/uc?id=1xFRl9W_q1Zziq2N-Z0WyOuRWg0Z-eVt7',
+        md5='badfe6b7b37d183af53a152f183a4408',
+        extract=True,
+    )
+
+    ## Trained model from above on-site testbed dataset, whcih will be used for transfer learning with followin real competition dataset
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/train_from_original_ssd_5000_batch64_augment_20191229_to_2020204_624.tar.gz',
+        url='https://drive.google.com/uc?id=1iPDeKFAXwf7P1xq3OdGEfuYddDRz8nHK',
+        md5='3f4211450b09ea4ea0a8c9769e8b1cba',
+        extract=True,
+    )
+
+
+    ## real competition arena in ADENC, Abu Dhabi, UAE
     ### 20200220_MBZIRC_rehearsal_annotation_data
     download_data(
         pkg_name=PKG,
@@ -113,6 +117,29 @@ def main():
         md5='a237d87679855f70fb8457ff42a06689',
         extract=True,
     )
+
+
+
+    ## cacscaded detection model for separate model in bouding box (drone OR ball)
+
+    ### 20191229_kashiwa_DJI450_mavic2pro_1080HD cropped annotated data
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/20191229_kashiwa_DJI450_mavic2pro_1080HD_cropped_annotated_data.tar.gz',
+        url='https://drive.google.com/uc?id=1NOr4EFnBb3wlB9T9x0OulJM7wjtt-ahk',
+        md5='5385d56f42f09000453235014f457960',
+        extract=True,
+    )
+
+    ### 20200103_kashiwa_DJIF450_hydrus_rsd435_720HD corpped image
+    download_data(
+        pkg_name=PKG,
+        path='train/drone_and_ball/20200103_kashwia_DJI450_hydrus_rsd435_720HD_cropped_annotated_data.tar.gz',
+        url='https://drive.google.com/uc?id=19m-jXm2w0OKcBa3IM4Rofrdxi3b5zsbh',
+        md5='13a8372c096d1dc68836880500d0f114',
+        extract=True,
+    )
+
 
 if __name__ == '__main__':
     main()
