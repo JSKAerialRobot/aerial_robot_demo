@@ -4,7 +4,7 @@ from jsk_data import download_data
 
 
 def main():
-    PKG = 'mbzirc2020_task1_tasks'
+    PKG = 'mbzirc2020_task1_vision'
 
     download_data(
         pkg_name=PKG,

@@ -18,7 +18,7 @@
   </include>
 
   ########### perception ###########
-  <include file="$(find mbzirc2020_task1_tasks)/launch/drone_ball_tracking_by_detection.launch" >
+  <include file="$(find mbzirc2020_task1_vision)/launch/drone_ball_tracking_by_detection.launch" >
     <arg name="standalone" value="true" />
     <arg name="image_view" value="true" />
     <arg name="verbose" value="false" />

@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <mbzirc2020_task1_tasks/vision/cascaded_deep_tracking_detection.h>
+#include <mbzirc2020_task1_tasks/cascaded_deep_tracking_detection.h>
 
 namespace
 {

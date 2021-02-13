@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package>
+  <name>mbzirc2020_task1_vision</name>
+  <version>1.0.1</version>
+  <description>The mbzirc2020_task1_vision package</description>
+
+  <maintainer email="chou@jsk.imi.i.u-tokyo.ac.jp">Moju Zhao</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>edgetpu_roscpp</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>edgetpu_roscpp</run_depend>
+  <run_depend>message_filters</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>tf2_geometry_msgs</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+
+  <run_depend>jsk_data</run_depend>
+  <run_depend>python-gdown-pip</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/plugins/nodelet/detection_nodelet.xml"/>
+  </export>
+
+</package>

@@ -5,8 +5,8 @@ Please install and build following packages before installing this repository
 
 - aeiral_robot: https://github.com/tongtybj/aerial_robot
 
-**Note**: you should also check the individual dependency for packges listed as follows. Or you can direct install all necessary dependency from [travis.rosinstall](travis.rosinstall) using `wstool merge`
+**Note**: you should also check dependencies for individual project listed as follows. Or you can directly install all necessary dependency from [travis.rosinstall](travis.rosinstall) using `wstool merge`
 
-## Packages:
+### Packages:
 - [hydrus_ground_transportation](https://github.com/tongtybj/aerial_robot_demo/tree/master/hydrus_ground_transportation): ground locomotion by quad type hydrus with extendable legs
--  [mbzirc2020](https://github.com/tongtybj/aerial_robot_demo/tree/master/mbzirc2020): packages for task1,2,3 in mbzirc2020
+- [mbzirc2020](https://github.com/tongtybj/aerial_robot_demo/tree/master/mbzirc2020): Challenge1,2,3 in mbzirc2020

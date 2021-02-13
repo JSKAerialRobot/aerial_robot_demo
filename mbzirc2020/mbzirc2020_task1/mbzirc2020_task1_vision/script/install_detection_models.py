@@ -4,32 +4,32 @@ from jsk_data import download_data
 
 
 def main():
-    PKG = 'mbzirc2020_task1_tasks'
+    PKG = 'mbzirc2020_task1_vision'
 
     ##### single detection model for bind model (drone AND ball)
-    download_data(
-        pkg_name=PKG,
-        path='models/drone_detection_edgetpu_20200103_617.tflite',
-        url='https://drive.google.com/uc?id=1xuZRpfeeGwe_A7GC6u-6RKtUm_CPF1Mk',
-        md5='6aec8cf3ff7f9cdb5b15425b08cbf118',
-        extract=False,
-    )
+    # download_data(
+    #     pkg_name=PKG,
+    #     path='models/drone_detection_edgetpu_20200103_617.tflite',
+    #     url='https://drive.google.com/uc?id=1xuZRpfeeGwe_A7GC6u-6RKtUm_CPF1Mk',
+    #     md5='6aec8cf3ff7f9cdb5b15425b08cbf118',
+    #     extract=False,
+    # )
 
-    download_data(
-        pkg_name=PKG,
-        path='models/drone_detection_edgetpu_20200130_509.tflite',
-        url='https://drive.google.com/uc?id=1DLCTH_MWnXKpQ9OMWZ4WRMeM0qQQ9JHT',
-        md5='d0ea9489b52a2ef65cbc36aac559e722',
-        extract=False,
-    )
+    # download_data(
+    #     pkg_name=PKG,
+    #     path='models/drone_detection_edgetpu_20200130_509.tflite',
+    #     url='https://drive.google.com/uc?id=1DLCTH_MWnXKpQ9OMWZ4WRMeM0qQQ9JHT',
+    #     md5='d0ea9489b52a2ef65cbc36aac559e722',
+    #     extract=False,
+    # )
 
-    download_data(
-        pkg_name=PKG,
-        path='models/drone_detection_edgetpu_20200204_576.tflite',
-        url='https://drive.google.com/uc?id=1h3WKLxpjGhcVK4WKSC0dX4ZuU9aCBR4L',
-        md5='e74d46a73d77f08310731b490db96c6e',
-        extract=False,
-    )
+    # download_data(
+    #     pkg_name=PKG,
+    #     path='models/drone_detection_edgetpu_20200204_576.tflite',
+    #     url='https://drive.google.com/uc?id=1h3WKLxpjGhcVK4WKSC0dX4ZuU9aCBR4L',
+    #     md5='e74d46a73d77f08310731b490db96c6e',
+    #     extract=False,
+    # )
 
     download_data(
         pkg_name=PKG,
@@ -39,13 +39,13 @@ def main():
         extract=False,
     )
 
-    download_data(
-        pkg_name=PKG,
-        path='models/drone_detection_edgetpu_20200204_624.tflite',
-        url='https://drive.google.com/uc?id=17sDYSJXrB7pCBJFkGp23KSOr-gUxFhrt',
-        md5='9b202baf619055ef8172aef050858efd',
-        extract=False,
-    )
+    # download_data(
+    #     pkg_name=PKG,
+    #     path='models/drone_detection_edgetpu_20200204_624.tflite',
+    #     url='https://drive.google.com/uc?id=17sDYSJXrB7pCBJFkGp23KSOr-gUxFhrt',
+    #     md5='9b202baf619055ef8172aef050858efd',
+    #     extract=False,
+    # )
 
     download_data(
         pkg_name=PKG,
