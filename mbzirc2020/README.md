@@ -27,13 +27,13 @@ catkin build
 
 ### transformable robot platform
 - aeiral_robot:
-   - url: https://github.com/tongtybj/aerial_robot
+   - url: https://github.com/JSKAerialRobot/aerial_robot
    - version: `458f1a2` # temporal version. Stable version will come soon
 
 ### vision
 - aeiral_robot_recognition:
    - purpose: general aerial vision
-   - url: https://github.com/tongtybj/aerial_robot_recognition
+   - url: https://github.com/JSKAerialRobot/aerial_robot_recognition
    - version: `master`
 - edgetpu_roscpp:
    - purpose: deep object detection and tracking for task1
