@@ -1,8 +1,8 @@
 - git:
     local-name: aerial_robot
     uri: https://github.com/JSKAerialRobot/aerial_robot.git
-    version: 458f1a2
-- git: 
+    version: 1.2.0
+- git:
     local-name: aerial_robot_recognition
     uri: https://github.com/JSKAerialRobot/aerial_robot_recognition.git
     version: master

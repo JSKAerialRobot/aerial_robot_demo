@@ -2,10 +2,10 @@
 servo_controller:
   extra_servos:
     ctrl_pub_topic: extra_servo_cmd
-
+    #servo: SG92R
     angle_sgn: 1
-    angle_scale: 0.0018055 # pi/2 / (1490 - 620)
-    zero_point_offset: 1490 # sample: [min_pwm: 550; max_pwm: 2450]
+    angle_scale: 0.0019156052 # pi/2 / (1620 - 800)
+    zero_point_offset: 1610 # sample: [min_pwm: 550; max_pwm: 2450]
 
     # for simulation
     simulation:
