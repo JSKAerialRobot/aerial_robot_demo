@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find aerial_robot_base)/launch/external_module/joy_stick.launch">
+    <arg name="robot_name" value="hydrus1"/>
+  </include>
+
+  <node name="joy_stick_bridge"
+        pkg="mbzirc2020_task2_common"
+        type="joy_stick_bridge.py"
+        output="screen" >
+
+        <param name="robot_ns_master" value="hydrus1"/>
+        <param name="robot_ns_slave" value="hydrus2"/>
+  </node>
+
+</launch>
