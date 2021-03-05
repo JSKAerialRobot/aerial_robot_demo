@@ -1,0 +1,27 @@
+servo_controller:
+  joints:
+    state_sub_topic: servo/states
+    ctrl_pub_topic: servo/target_states
+    torque_pub_topic: servo/torque_enable
+    angle_sgn: 1
+    angle_scale: 0.00076699
+    zero_point_offset: 2047
+    torque_scale: 0.03483 # convert to N*m
+
+    # for simulation
+    simulation:
+      pid: {p: 50.0, i: 0.01, d: 2.0}
+      init_value: 1.3
+      type: effort_controllers/JointPositionController
+
+    # should be in order in terms of kinematics model
+    # i.e. joint1 -> jointN
+    controller1:
+      id: 0
+      name: joint1
+      angle_sgn: -1
+
+    controller2:
+      id: 1
+      name: joint3
+

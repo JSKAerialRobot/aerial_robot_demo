@@ -42,6 +42,9 @@
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
   </include>
 
+  ########## overwrite Servo.yaml ###########
+  <rosparam file="$(find mbzirc2020_task2_common)/config/Servo.yaml" command="load" ns="$(arg robot_ns)" />
+
   ########## servo for realsense d435  ########
   <rosparam file="$(find mbzirc2020_task2_common)/config/RealsenseServo.yaml" command="load" ns="$(arg robot_ns)" />
 
