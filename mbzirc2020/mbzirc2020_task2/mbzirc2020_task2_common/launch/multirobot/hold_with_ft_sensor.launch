@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="robot_id" default=""/>
+  <arg name="robot_ns" default="hydrus$(arg robot_id)"/>
+  <arg name="real_machine" default="True" />
+  <arg name="simulation" default="False" />
+  <arg name="estimate_mode"  default= "0" />
+  <arg name="passive_gripper" default="False"/>
+  <arg name="ring_gripper" default="False"/>
+  <arg name="ball_joint_gripper" default="True"/>
+  <arg name="worldtype" default="single_object" />
+  <arg name="headless" default="True" />
+  <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/rviz_config$(arg robot_id)"/>
+
+  <arg name="spawn_x" default="0.15"/>
+  <arg name="spawn_y" default="0.85"/>
+  <arg name="spawn_yaw" default="3.89"/>
+
+  <arg name="sensor_takeoff" default="False"/>
+  <arg name="sensor_landing" default="False"/>
+
+  <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
+    <arg name="real_machine" value="$(arg real_machine)"/>
+    <arg name="simulation" value="$(arg simulation)"/>
+    <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="ball_joint_gripper" value="True"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="worldtype" value="$(arg worldtype)"/>
+    <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
+    <arg name="robot_id" value="$(arg robot_id)"/>
+    <arg name="spawn_x" default="$(arg spawn_x)"/>
+    <arg name="spawn_y" default="$(arg spawn_y)"/>
+    <arg name="spawn_yaw" default="$(arg spawn_yaw)"/>
+  </include>
+
+  <include file="$(find cfs_sensor)/launch/two_sensors.launch" if="$(arg real_machine)"/>
+
+  <param name="/$(arg robot_ns)/tf_prefix" value="$(arg robot_ns)"/>
+
+  # navigate hydrus by ft_sensor
+  <node name="ft_sensor_feedback_navigation"
+        pkg="mbzirc2020_task2_common"
+        type="ft_sensor_feedback_navigation.py" 
+        output="screen" > 
+
+    <param name="robot_ns" value="$(arg robot_ns)"/> 
+    <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
+    <param name="sensor_landing" value="$(arg sensor_landing)"/>
+
+  </node>
+
+  # joystick node for switching ft_sensor_nav
+  <node name="joy_nav_switch"
+        pkg="mbzirc2020_task2_tasks"
+        type="joy_nav_switch.py" 
+        output="screen"
+        if="$(arg real_machine)" >
+
+        <param name="robot_ns" value="$(arg robot_ns)"/> 
+
+  </node>
+
+  ################### if simulation ############################
+  # basic command for simulation env
+  <node name="hydrus_task" 
+        pkg="mbzirc2020_task2_simulation" 
+        type="hydrus_task.py" 
+        output="screen" 
+        if="$(arg simulation)" >
+
+        <param name="robot_ns" value="$(arg robot_ns)"/>
+
+  </node>
+
+  # convert simulation sensor topic into real sensor topic
+  <node name="ft_sensor_calib" 
+        pkg="mbzirc2020_task2_simulation" 
+        type="ft_sensor_calib.py" 
+        output="screen" 
+        if="$(arg simulation)" >
+
+        <param name="robot_ns" value="$(arg robot_ns)"/>
+
+  </node>
+
+  #plot juggler
+
+  <node name="plotjuggler"
+        pkg="plotjuggler"
+        type="plotjuggler"
+        args="--layout $(find mbzirc2020_task2_common)/launch/multirobot/plotjuggler_hold_with_ft_sensor.xml"
+        if="$(arg simulation)" />
+
+</launch>
