@@ -6,11 +6,11 @@ import argparse
 import numpy as np
 
 class SetJointAngle:
-    def __init__(self):
+    def __init__(self, robot_ns):
         rospy.init_node('set_joint_angle')
         self.joint_state = JointState()
-        self.pub = rospy.Publisher('hydrus/joints_ctrl', JointState, queue_size = 1)
-        self.sub = rospy.Subscriber('hydrus/joint_states', JointState, self.jointStateCallback)
+        self.pub = rospy.Publisher(robot_ns + '/joints_ctrl', JointState, queue_size = 1)
+        self.sub = rospy.Subscriber(robot_ns + '/joint_states', JointState, self.jointStateCallback)
 
     def jointStateCallback(self, msg):
         self.joint_state = msg
@@ -18,7 +18,7 @@ class SetJointAngle:
 
     def publishJointMsg(self, target_joint_position, execute_time, frequency):
 
-        while not self.joint_state.name:
+        while (not rospy.is_shutdown()) and (not self.joint_state.name):
             pass
 
         joint_seq_len = int(execute_time * frequency / 1000.0)
@@ -43,15 +43,16 @@ class SetJointAngle:
             rospy.sleep(1.0 / args.f)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='example: "rosrun mbzirc2020_task2_common set_joint_angle.py -q 1.0 1.0 -n hydrus1')
     parser.add_argument('-q', nargs='+', help='joint angle [rad]*2')
     parser.add_argument('-t', type=int, help='execute time [ms]', default=3000)
     parser.add_argument('-f', type=float, help='joint publish frequency [Hz]', default='20.0')
+    parser.add_argument('-n', type=str, help='robot namespace', default='hydrus1')
     args = parser.parse_args()
 
     if len(args.q) != 2:
         rospy.logerr("incorrect number of joint angle")
         exit(0)
 
-    node = SetJointAngle()
+    node = SetJointAngle(args.n)
     node.publishJointMsg(args.q, args.t, args.f)
