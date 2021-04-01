@@ -63,7 +63,7 @@
   ################### if simulation ############################
   # basic command for simulation env
   <node name="hydrus_task" 
-        pkg="mbzirc2020_task2_simulation" 
+        pkg="mbzirc2020_task2_tasks" 
         type="hydrus_task.py" 
         output="screen" 
         if="$(arg simulation)" >
@@ -74,7 +74,7 @@
 
   # convert simulation sensor topic into real sensor topic
   <node name="ft_sensor_calib" 
-        pkg="mbzirc2020_task2_simulation" 
+        pkg="mbzirc2020_task2_tasks" 
         type="ft_sensor_calib.py" 
         output="screen" 
         if="$(arg simulation)" >
