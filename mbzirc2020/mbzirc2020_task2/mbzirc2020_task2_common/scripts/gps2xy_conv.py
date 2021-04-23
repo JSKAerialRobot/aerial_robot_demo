@@ -14,6 +14,9 @@ if __name__ == '__main__':
     bag_name = str(args[1])
     start_from = int(args[2])
     max_count = int(args[3])
+    topic_name = "/gps"
+    if len(args) > 4:
+        topic_name = str(args[4])
 
     x = []
     y = []
@@ -22,7 +25,7 @@ if __name__ == '__main__':
     count = 0
 
     for topic, msg, t in rosbag.Bag(bag_name):
-        if topic == "/gps":
+        if topic == topic_name:
             if first_run:
                 orig_lat = msg.location[0]
                 orig_lon = msg.location[1]
