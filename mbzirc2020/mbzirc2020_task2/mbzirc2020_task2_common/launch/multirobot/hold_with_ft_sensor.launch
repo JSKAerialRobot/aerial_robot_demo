@@ -33,7 +33,7 @@
     <arg name="spawn_yaw" default="$(arg spawn_yaw)"/>
   </include>
 
-  <include file="$(find cfs_sensor)/launch/two_sensors.launch" if="$(arg real_machine)"/>
+  <include file="$(find mbzirc2020_task2_common)/launch/two_tf_sensors.launch" if="$(arg real_machine)"/>
 
   <param name="/$(arg robot_ns)/tf_prefix" value="$(arg robot_ns)"/>
 

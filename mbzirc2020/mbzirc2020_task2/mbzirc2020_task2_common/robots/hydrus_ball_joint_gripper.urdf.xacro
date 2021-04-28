@@ -8,6 +8,23 @@
   <xacro:property name="modified_leg_collision_model_height" value="0.1715"/>
   <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "$(arg default_battery)" with_leg="0" />
 
+  <!--  The following values model the aluminum peripherial case for the
+        D435 camera, with the camera joint represented by the actual
+        peripherial camera tripod mount -->
+  <xacro:property name="d435_cam_depth_to_left_ir_offset" value="0.0"/>
+  <xacro:property name="d435_cam_depth_to_right_ir_offset" value="-0.050"/>
+  <xacro:property name="d435_cam_depth_to_color_offset" value="0.015"/>
+  <xacro:property name="d435_cam_width" value="0.090"/>
+  <xacro:property name="d435_cam_height" value="0.025"/>
+  <xacro:property name="d435_cam_depth" value="0.02505"/>
+  <xacro:property name="d435_cam_mount_from_center_offset" value="0.0149"/>
+
+  <!--  The following offset is relative the the physical D435 camera peripherial
+        camera tripod mount -->
+  <xacro:property name="d435_cam_depth_px" value="${d435_cam_mount_from_center_offset}"/>
+  <xacro:property name="d435_cam_depth_py" value="0.0175"/>
+  <xacro:property name="d435_cam_depth_pz" value="${d435_cam_height/2}"/>
+
   <!-- special battery arrangement -->
 
   <xacro:if value="${$(arg default_battery) == 0}">
@@ -122,6 +139,66 @@
           izz="0.0"/>
     </inertial>
   </xacro:extra_module>
+
+  <!-- camera depth joints and links -->
+  <joint name="rs_d435_depth_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="rs_d435_link"/>
+    <child link="rs_d435_depth_frame" />
+  </joint>
+  <link name="rs_d435_depth_frame"/>
+
+  <joint name="rs_d435_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_depth_optical_frame" />
+  </joint>
+  <link name="rs_d435_depth_optical_frame"/>
+
+  <!-- camera left IR joints and links -->
+  <joint name="rs_d435_left_ir_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_left_ir_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_left_ir_frame" />
+  </joint>
+  <link name="rs_d435_left_ir_frame"/>
+
+  <joint name="rs_d435_left_ir_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_left_ir_frame" />
+    <child link="rs_d435_left_ir_optical_frame" />
+  </joint>
+  <link name="rs_d435_left_ir_optical_frame"/>
+
+  <!-- camera right IR joints and links -->
+  <joint name="rs_d435_right_ir_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_right_ir_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_right_ir_frame" />
+  </joint>
+  <link name="rs_d435_right_ir_frame"/>
+
+  <joint name="rs_d435_right_ir_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_right_ir_frame" />
+    <child link="rs_d435_right_ir_optical_frame" />
+  </joint>
+  <link name="rs_d435_right_ir_optical_frame"/>
+
+  <!-- camera color joints and links -->
+  <joint name="rs_d435_color_joint" type="fixed">
+    <origin xyz="0 ${d435_cam_depth_to_color_offset} 0" rpy="0 0 0" />
+    <parent link="rs_d435_depth_frame" />
+    <child link="rs_d435_color_frame" />
+  </joint>
+  <link name="rs_d435_color_frame"/>
+
+  <joint name="rs_d435_color_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="rs_d435_color_frame" />
+    <child link="rs_d435_color_optical_frame" />
+  </joint>
+  <link name="rs_d435_color_optical_frame"/>
 
   ########## sensor wire ###########
   <xacro:extra_module name="cfs_wire_left" parent = "link2" visible = "0" >

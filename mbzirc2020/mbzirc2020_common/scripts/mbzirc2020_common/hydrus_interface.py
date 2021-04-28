@@ -15,7 +15,8 @@ from std_srvs.srv import SetBool, SetBoolRequest
 from gps_utils import *
 
 class HydrusInterface:
-    def __init__(self, debug_view = False):
+    def __init__(self, robot_ns="",debug_view = False):
+        self.robot_ns = robot_ns
         self.debug_view_ = debug_view
         self.joint_state_ = None
         self.cog_odom_ = None
@@ -36,22 +37,22 @@ class HydrusInterface:
         self.HOVER_STATE = 5
         self.STOP_STATE = 6
 
-        self.joint_state_sub_ = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
-        self.joint_ctrl_pub_ = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
-        self.extra_joint_ctrl_pub_ = rospy.Publisher('extra_servos_ctrl', JointState, queue_size = 1)
-        self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
-        self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
-        self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
-        self.start_pub_ = rospy.Publisher('teleop_command/start', Empty, queue_size = 1)
-        self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
-        self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
-        self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
-        self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
-        self.add_extra_module_client_ = rospy.ServiceProxy('add_extra_module', AddExtraModule)
-        self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
-        self.ros_gps_sub_ = rospy.Subscriber('sim/gps/fix', NavSatFix, self.rosGpsCallback)
-        self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
-        self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
+        self.joint_state_sub_ = rospy.Subscriber(robot_ns+'/joint_states', JointState, self.jointStateCallback)
+        self.joint_ctrl_pub_ = rospy.Publisher(robot_ns+'/joints_ctrl', JointState, queue_size = 1)
+        self.extra_joint_ctrl_pub_ = rospy.Publisher(robot_ns+'/extra_servos_ctrl', JointState, queue_size = 1)
+        self.cog_odom_sub_ = rospy.Subscriber(robot_ns+'/uav/cog/odom', Odometry, self.cogOdomCallback)
+        self.baselink_odom_sub_ = rospy.Subscriber(robot_ns+'/uav/baselink/odom', Odometry, self.baselinkOdomCallback)
+        self.nav_pub_ = rospy.Publisher(robot_ns+'/uav/nav', FlightNav, queue_size = 1)
+        self.start_pub_ = rospy.Publisher(robot_ns+'/teleop_command/start', Empty, queue_size = 1)
+        self.takeoff_pub_ = rospy.Publisher(robot_ns+'/teleop_command/takeoff', Empty, queue_size = 1)
+        self.land_pub_ = rospy.Publisher(robot_ns+'/teleop_command/land', Empty, queue_size = 1)
+        self.force_landing_pub_ = rospy.Publisher(robot_ns+'/teleop_command/force_landing', Empty, queue_size = 1)
+        self.halt_pub_ = rospy.Publisher(robot_ns+'/teleop_command/halt', Empty, queue_size = 1)
+        self.add_extra_module_client_ = rospy.ServiceProxy(robot_ns+'/add_extra_module', AddExtraModule)
+        self.flight_state_sub_ = rospy.Subscriber(robot_ns+'/flight_state', UInt8, self.flightStateCallback)
+        self.ros_gps_sub_ = rospy.Subscriber(robot_ns+'/sim/gps/fix', NavSatFix, self.rosGpsCallback)
+        self.gps_sub_ = rospy.Subscriber(robot_ns+'/gps', Gps, self.gpsCallback)
+        self.set_joint_torque_client_ = rospy.ServiceProxy(robot_ns+'/joints/torque_enable', SetBool)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)

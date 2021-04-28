@@ -1,4 +1,6 @@
+<?xml version="1.0"?>
 <launch>
+  <arg name="tf_prefix" default=""/>
   <arg name="config_dir" />
   <arg name="rgb_image_topic" default="rs_d435/color/image_rect_color" />
   <arg name="rgb_camera_info_topic" default="rs_d435/color/camera_info" />
@@ -98,6 +100,7 @@
 
   <node pkg="nodelet" type="nodelet" name="channel_detection"
         args="load aerial_robot_perception/GroundObjectDetection $(arg manager)" output="screen">
+    <param name="tf_prefix" value="$(arg tf_prefix)" />
     <remap from="image" to="opening_depth_distance_filter_channel/output" />
     <remap from="camera_info" to="$(arg rgb_camera_info_topic)"/>
   </node>

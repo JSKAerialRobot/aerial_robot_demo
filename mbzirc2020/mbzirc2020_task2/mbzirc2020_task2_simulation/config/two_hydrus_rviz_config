@@ -1,14 +1,15 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 75
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /RobotModel1
         - /TF1/Frames1
         - /RobotModel2
+        - /RobotModel2/Status1
       Splitter Ratio: 0.5
-    Tree Height: 966
+    Tree Height: 140
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -17,7 +18,7 @@ Panels:
       - /2D Nav Goal1
       - /Publish Point1
     Name: Tool Properties
-    Splitter Ratio: 0.588679016
+    Splitter Ratio: 0.5886790156364441
   - Class: rviz/Views
     Expanded:
       - /Current View1
@@ -27,10 +28,12 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: depth image
   - Class: jsk_rviz_plugin/PublishTopic
     Name: PublishTopic
     Topic: /task_start
+Preferences:
+  PromptSaveOnExit: true
 Toolbars:
   toolButtonStyle: 2
 Visualization Manager:
@@ -42,7 +45,7 @@ Visualization Manager:
       Color: 160; 160; 164
       Enabled: true
       Line Style:
-        Line Width: 0.0299999993
+        Line Width: 0.029999999329447746
         Value: Lines
       Name: Grid
       Normal Cell Count: 0
@@ -64,6 +67,36 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        ball_joint11_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint11_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint12_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint12_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint2_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint2_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         bat1:
           Alpha: 1
           Show Axes: false
@@ -84,6 +117,50 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        cfs_wire_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cfs_wire_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        circle_gripper_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        circle_gripper_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy2_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy2_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy_gripper_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy_gripper_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         fc:
           Alpha: 1
           Show Axes: false
@@ -184,16 +261,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         realsense1_pose_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        ring_gripper_left:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        ring_gripper_right:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -283,6 +350,20 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        hydrus1/ball_joint11_left:
+          Value: true
+        hydrus1/ball_joint11_right:
+          Value: true
+        hydrus1/ball_joint12_left:
+          Value: true
+        hydrus1/ball_joint12_right:
+          Value: true
+        hydrus1/ball_joint2_left:
+          Value: true
+        hydrus1/ball_joint2_right:
+          Value: true
+        hydrus1/base_footprint:
+          Value: true
         hydrus1/bat1:
           Value: true
         hydrus1/bat2:
@@ -291,7 +372,27 @@ Visualization Manager:
           Value: true
         hydrus1/bat4:
           Value: true
+        hydrus1/cfs_wire_left:
+          Value: true
+        hydrus1/cfs_wire_right:
+          Value: true
+        hydrus1/circle_gripper_left:
+          Value: true
+        hydrus1/circle_gripper_right:
+          Value: true
         hydrus1/cog:
+          Value: true
+        hydrus1/dummy2_left:
+          Value: true
+        hydrus1/dummy2_right:
+          Value: true
+        hydrus1/dummy_gripper_left:
+          Value: true
+        hydrus1/dummy_gripper_right:
+          Value: true
+        hydrus1/dummy_left:
+          Value: true
+        hydrus1/dummy_right:
           Value: true
         hydrus1/fc:
           Value: true
@@ -335,10 +436,6 @@ Visualization Manager:
           Value: true
         hydrus1/realsense1_pose_frame:
           Value: true
-        hydrus1/ring_gripper_left:
-          Value: true
-        hydrus1/ring_gripper_right:
-          Value: true
         hydrus1/root:
           Value: true
         hydrus1/rs_d435_color_frame:
@@ -373,6 +470,20 @@ Visualization Manager:
           Value: true
         hydrus1/thrust4:
           Value: true
+        hydrus2/ball_joint11_left:
+          Value: true
+        hydrus2/ball_joint11_right:
+          Value: true
+        hydrus2/ball_joint12_left:
+          Value: true
+        hydrus2/ball_joint12_right:
+          Value: true
+        hydrus2/ball_joint2_left:
+          Value: true
+        hydrus2/ball_joint2_right:
+          Value: true
+        hydrus2/base_footprint:
+          Value: true
         hydrus2/bat1:
           Value: true
         hydrus2/bat2:
@@ -381,7 +492,27 @@ Visualization Manager:
           Value: true
         hydrus2/bat4:
           Value: true
+        hydrus2/cfs_wire_left:
+          Value: true
+        hydrus2/cfs_wire_right:
+          Value: true
+        hydrus2/circle_gripper_left:
+          Value: true
+        hydrus2/circle_gripper_right:
+          Value: true
         hydrus2/cog:
+          Value: true
+        hydrus2/dummy2_left:
+          Value: true
+        hydrus2/dummy2_right:
+          Value: true
+        hydrus2/dummy_gripper_left:
+          Value: true
+        hydrus2/dummy_gripper_right:
+          Value: true
+        hydrus2/dummy_left:
+          Value: true
+        hydrus2/dummy_right:
           Value: true
         hydrus2/fc:
           Value: true
@@ -425,10 +556,6 @@ Visualization Manager:
           Value: true
         hydrus2/realsense1_pose_frame:
           Value: true
-        hydrus2/ring_gripper_left:
-          Value: true
-        hydrus2/ring_gripper_right:
-          Value: true
         hydrus2/root:
           Value: true
         hydrus2/rs_d435_color_frame:
@@ -465,17 +592,27 @@ Visualization Manager:
           Value: true
         world:
           Value: true
-      Marker Scale: 0.300000012
+      Marker Scale: 0.30000001192092896
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
         world:
+          hydrus1/base_footprint:
+            {}
           hydrus1/root:
             hydrus1/cog:
               {}
             hydrus1/link1:
+              hydrus1/ball_joint11_left:
+                hydrus1/ball_joint12_left:
+                  hydrus1/dummy_left:
+                    hydrus1/dummy2_left:
+                      hydrus1/ball_joint2_left:
+                        hydrus1/circle_gripper_left:
+                          hydrus1/dummy_gripper_left:
+                            {}
               hydrus1/bat1:
                 {}
               hydrus1/leg1:
@@ -487,6 +624,8 @@ Visualization Manager:
               hydrus1/link2:
                 hydrus1/bat2:
                   {}
+                hydrus1/cfs_wire_left:
+                  {}
                 hydrus1/fc:
                   {}
                 hydrus1/gps:
@@ -497,11 +636,21 @@ Visualization Manager:
                 hydrus1/link3:
                   hydrus1/bat3:
                     {}
+                  hydrus1/cfs_wire_right:
+                    {}
                   hydrus1/fixed_joint_unit:
                     {}
                   hydrus1/leg_collision_model5:
                     {}
                   hydrus1/link4:
+                    hydrus1/ball_joint11_right:
+                      hydrus1/ball_joint12_right:
+                        hydrus1/dummy_right:
+                          hydrus1/dummy2_right:
+                            hydrus1/ball_joint2_right:
+                              hydrus1/circle_gripper_right:
+                                hydrus1/dummy_gripper_right:
+                                  {}
                     hydrus1/bat4:
                       {}
                     hydrus1/leg3:
@@ -510,8 +659,6 @@ Visualization Manager:
                     hydrus1/leg4:
                       hydrus1/leg_collision_model4:
                         {}
-                    hydrus1/ring_gripper_right:
-                      {}
                     hydrus1/thrust4:
                       {}
                   hydrus1/realsense1_pose_frame:
@@ -541,14 +688,22 @@ Visualization Manager:
                             {}
                 hydrus1/thrust2:
                   {}
-              hydrus1/ring_gripper_left:
-                {}
               hydrus1/thrust1:
                 {}
+          hydrus2/base_footprint:
+            {}
           hydrus2/root:
             hydrus2/cog:
               {}
             hydrus2/link1:
+              hydrus2/ball_joint11_left:
+                hydrus2/ball_joint12_left:
+                  hydrus2/dummy_left:
+                    hydrus2/dummy2_left:
+                      hydrus2/ball_joint2_left:
+                        hydrus2/circle_gripper_left:
+                          hydrus2/dummy_gripper_left:
+                            {}
               hydrus2/bat1:
                 {}
               hydrus2/leg1:
@@ -560,6 +715,8 @@ Visualization Manager:
               hydrus2/link2:
                 hydrus2/bat2:
                   {}
+                hydrus2/cfs_wire_left:
+                  {}
                 hydrus2/fc:
                   {}
                 hydrus2/gps:
@@ -570,11 +727,21 @@ Visualization Manager:
                 hydrus2/link3:
                   hydrus2/bat3:
                     {}
+                  hydrus2/cfs_wire_right:
+                    {}
                   hydrus2/fixed_joint_unit:
                     {}
                   hydrus2/leg_collision_model5:
                     {}
                   hydrus2/link4:
+                    hydrus2/ball_joint11_right:
+                      hydrus2/ball_joint12_right:
+                        hydrus2/dummy_right:
+                          hydrus2/dummy2_right:
+                            hydrus2/ball_joint2_right:
+                              hydrus2/circle_gripper_right:
+                                hydrus2/dummy_gripper_right:
+                                  {}
                     hydrus2/bat4:
                       {}
                     hydrus2/leg3:
@@ -583,8 +750,6 @@ Visualization Manager:
                     hydrus2/leg4:
                       hydrus2/leg_collision_model4:
                         {}
-                    hydrus2/ring_gripper_right:
-                      {}
                     hydrus2/thrust4:
                       {}
                   hydrus2/realsense1_pose_frame:
@@ -614,21 +779,21 @@ Visualization Manager:
                             {}
                 hydrus2/thrust2:
                   {}
-              hydrus2/ring_gripper_left:
-                {}
               hydrus2/thrust1:
                 {}
       Update Interval: 0
       Value: true
     - Align Bottom: false
-      Background Alpha: 0.800000012
+      Background Alpha: 0.800000011920929
       Background Color: 0; 0; 0
       Class: jsk_rviz_plugin/OverlayText
       Enabled: true
-      Foreground Alpha: 0.800000012
+      Foreground Alpha: 0.800000011920929
       Foreground Color: 25; 255; 240
+      Invert Shadow: false
       Name: OverlayText
-      Overtake Color Properties: true
+      Overtake BG Color Properties: false
+      Overtake FG Color Properties: false
       Overtake Position Properties: true
       Topic: /task2_motion/nav_debug
       Value: true
@@ -640,14 +805,16 @@ Visualization Manager:
       top: 0
       width: 500
     - Align Bottom: true
-      Background Alpha: 0.200000003
+      Background Alpha: 0.20000000298023224
       Background Color: 0; 0; 0
       Class: jsk_rviz_plugin/OverlayText
       Enabled: true
       Foreground Alpha: 1
       Foreground Color: 25; 255; 240
+      Invert Shadow: false
       Name: OverlayText
-      Overtake Color Properties: true
+      Overtake BG Color Properties: false
+      Overtake FG Color Properties: false
       Overtake Position Properties: true
       Topic: /rosconsole_overlay_text/output
       Value: true
@@ -663,7 +830,7 @@ Visualization Manager:
       Name: OverlayImage
       Topic: /hls_color_filter/image
       Value: true
-      alpha: 0.800000012
+      alpha: 0.800000011920929
       height: 128
       keep aspect ratio: true
       left: 1000
@@ -681,6 +848,36 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        ball_joint11_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint11_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint12_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint12_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint2_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ball_joint2_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         bat1:
           Alpha: 1
           Show Axes: false
@@ -701,6 +898,50 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        cfs_wire_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cfs_wire_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        circle_gripper_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        circle_gripper_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy2_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy2_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy_gripper_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy_gripper_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        dummy_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dummy_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         fc:
           Alpha: 1
           Show Axes: false
@@ -805,16 +1046,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        ring_gripper_left:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        ring_gripper_right:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         root:
           Alpha: 1
           Show Axes: false
@@ -895,6 +1126,42 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/Image
+      Enabled: false
+      Image Topic: /hydrus1/rs_d435/aligned_depth_to_color/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: depth image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: false
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /hydrus1/rs_d435/aligned_depth_to_color/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: depth image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /hydrus1/rs_d435/color/image_rect_color
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: rgb image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -910,7 +1177,10 @@ Visualization Manager:
     - Class: rviz/FocusCamera
     - Class: rviz/Measure
     - Class: rviz/SetInitialPose
+      Theta std deviation: 0.2617993950843811
       Topic: /initialpose
+      X std deviation: 0.5
+      Y std deviation: 0.5
     - Class: rviz/SetGoal
       Topic: /move_base_simple/goal
     - Class: rviz/PublishPoint
@@ -920,35 +1190,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 7.70619965
+      Distance: 7.706199645996094
       Enable Stereo Rendering:
-        Stereo Eye Separation: 0.0599999987
+        Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.883802891
-        Y: 0.0399391204
-        Z: 0.0269597769
+        X: 0.8838028907775879
+        Y: 0.039939120411872864
+        Z: 0.026959776878356934
       Focal Shape Fixed Size: true
-      Focal Shape Size: 0.0500000007
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
-      Near Clip Distance: 0.00999999978
-      Pitch: 0.584797204
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.584797203540802
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.11905909
+      Yaw: 4.119059085845947
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1576
+  Height: 809
   Hide Left Dock: false
   Hide Right Dock: false
   PublishTopic:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001c50000059efc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006100fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002800000452000000d700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000160064006500700074006800200069006d00610067006500000002450000016c0000000000000000fb0000001200720067006200200069006d0061006700650000000300000001eb0000000000000000fb00000018005000750062006c0069007300680054006f0070006900630100000480000001460000006400ffffff000000010000010f000002e2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730000000028000002e2000000ad00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000009bf0000003efc0100000002fb0000000800540069006d00650100000000000009bf0000030000fffffffb0000000800540069006d00650100000000000004500000000000000000000007f40000059e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001c50000028bfc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000003d000000c9000000c900fffffffa000000000100000002fb000000100044006900730070006c0061007900730100000000000001c50000015600fffffffb000000160064006500700074006800200069006d0061006700650000000000ffffffff0000008a00fffffffb0000001200720067006200200069006d006100670065010000010c000000ab0000001600fffffffb000000160064006500700074006800200069006d00610067006501000001bd000000a50000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000160064006500700074006800200069006d00610067006500000002450000016c0000000000000000fb0000001200720067006200200069006d0061006700650000000300000001eb0000000000000000fb00000018005000750062006c0069007300680054006f0070006900630100000268000000600000006000ffffff000000010000010f000002e2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730000000028000002e2000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000043d0000003efc0100000002fb0000000800540069006d006501000000000000043d000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000002720000028b00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -957,6 +1227,10 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2495
-  X: 65
-  Y: 24
+  Width: 1085
+  X: 67
+  Y: 27
+  depth image:
+    collapsed: false
+  rgb image:
+    collapsed: false

@@ -1,0 +1,21 @@
+depth_distance_filter_channel:
+  min_depth: 0.2
+  use_distance_from_ground: true
+  use_otsu_binarization: false
+  distance_from_ground: 1.0 #1.0
+
+closing_depth_distance_filter_channel:
+  size: 2
+  iterations: 4
+
+opening_depth_distance_filter_channel:
+  size: 1
+  iterations: 2
+
+channel_detection:
+  contour_area_size: 0 #for output the biggest contour
+  object_height: 1.7 #1.7
+  debug_view: true
+  frame_id: channel_center
+  all_contour: true
+  contour_area_min_thre: 0.05

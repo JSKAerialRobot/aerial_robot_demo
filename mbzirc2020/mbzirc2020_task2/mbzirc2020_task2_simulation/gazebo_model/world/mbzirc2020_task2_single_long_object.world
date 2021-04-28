@@ -73,7 +73,7 @@
     </model>
 
     <model name='object'>
-      <pose>0 2.5 0.5 0 0 0</pose>
+      <pose>0.95 -3.0 0.5 0 0 1.57</pose>
       <static>false</static>
       <link name='object_link'>
         <inertial>
@@ -91,7 +91,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>2 0.2 0.3</size>
+              <size>1.2 0.2 0.3</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -106,7 +106,7 @@
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-              <size>2 0.2 0.3</size>
+              <size>1.2 0.2 0.3</size>
             </box>
           </geometry>
           <material>
@@ -125,6 +125,34 @@
       <mu1>0.5</mu1>
       <mu2>0.5</mu2>
     </gazebo>
+
+    <model name="construct_place_1" >
+      <pose>6 0 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_2" >
+      <pose>8.2 1.85 0 0 0 1.57</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_3" >
+      <pose>10.0 4.05 0 0 0 0</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
+
+    <model name="construct_place_4" >
+      <pose>12.2 5.85 0 0 0 1.57</pose>
+      <include>
+        <uri>model://uchannel_place</uri>
+      </include>
+    </model>
 
   </world>
 </sdf>

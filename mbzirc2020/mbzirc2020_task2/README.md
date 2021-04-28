@@ -38,3 +38,38 @@ $ roslaunch mbzirc2020_task2_common bringup.launch ground_mode:=True
 ```
 $ roslaunch mbzirc2020_task2_common bringup.launch real_machine:=False simulation:=True headless:=False ground_mode:=True
 ```
+
+## Cooperative Task
+
+### real machine
+
+In external PC
+```
+$ rossetlocal
+$ rossetip
+$ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch
+```
+  
+In the leader machine  
+```
+$ rossetmaster (external PC's IP)
+$ rossetip
+$ roslaunch mbzirc2020_task2_common coop_task_agent.launch robot_id:=1 leader:=true
+```
+
+In the follower machine  
+```
+$ rossetmaster (external PC's IP)
+$ rossetip
+$ roslaunch mbzirc2020_task2_common coop_task_agent.launch robot_id:=2 leader:=false
+```
+
+### simulation
+```
+$ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch simulation:=true real_machine:=false headless:=false
+```
+
+### simulation indoor
+```
+$ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch simulation:=true real_machine:=false headless:=false outdoor:=false
+```

@@ -82,7 +82,7 @@
     </model>
 
     <model name="construct_place_1" >
-      <pose>2.5 0 0 0 0 1.57</pose>
+      <pose>-1.47 -0.57 0 0 0 1.57</pose>
       <include>
         <uri>model://uchannel_place_indoor</uri>
       </include>

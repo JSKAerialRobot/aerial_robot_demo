@@ -1,0 +1,15 @@
+<launch>
+
+  <node name="forces_node_left" pkg="cfs_sensor" type="cfs_node"  output="screen" respawn="true">
+    <param name="cfs_default_device_name" value="/dev/tf_sensor_left"/>
+    <param name="cfs_sensor_pub_name" value="/cfs/data/left/"/>
+    <param name="cfs_sensor_calib_srv_name" value="/cfs/sensor_calib/left"/>
+  </node>
+
+  <node name="forces_node_right" pkg="cfs_sensor" type="cfs_node"  output="screen" respawn="true">
+    <param name="cfs_default_device_name" value="/dev/tf_sensor_right"/>
+    <param name="cfs_sensor_pub_name" value="/cfs/data/right/"/>
+    <param name="cfs_sensor_calib_srv_name" value="/cfs/sensor_calib/right"/>
+  </node>
+
+</launch>
