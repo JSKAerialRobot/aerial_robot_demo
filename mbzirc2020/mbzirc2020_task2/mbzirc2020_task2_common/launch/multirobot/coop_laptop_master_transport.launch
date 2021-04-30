@@ -22,8 +22,11 @@
 
   <arg name="robot_ns_leader" value="hydrus1"/>
   <arg name="recognition_leader" default="true"/>
+  <arg name="ft_sensor_feedback_leader" default="false" />
+
   <arg name="robot_ns_follower" value="hydrus2"/>
   <arg name="recognition_follower" default="true"/>
+  <arg name="ft_sensor_feedback_follower" default="false" />
 
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/two_hydrus_rviz_config"/>
 
@@ -58,6 +61,7 @@
     <arg name="launch_gazebo" value="true" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_leader)" />
+    <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_leader)" />
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
     <arg name="worldtype" value="$(arg worldtype)" />
     <arg name="spawn_x" default="1.8" if="$(arg outdoor)"/>
@@ -82,6 +86,7 @@
     <arg name="launch_gazebo" value="false" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_follower)" />
+    <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_follower)" />
     <arg name="spawn_x" default="0.1" if="$(arg outdoor)"/>
     <arg name="spawn_y" default="-0.2" if="$(arg outdoor)"/>
     <arg name="spawn_yaw" default="-0.78" if="$(arg outdoor)"/>
