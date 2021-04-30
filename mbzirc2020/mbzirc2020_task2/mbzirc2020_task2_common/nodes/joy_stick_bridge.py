@@ -115,10 +115,6 @@ class JoyStickBridge:
                     self.joint_slave_pub.publish(joint_msg)
                     rospy.sleep(0.01)
 
-                self.master_set_yaw_free(flag = False)
-                self.slave_set_yaw_free(flag = False)
-
-                """
                 req = SetBoolRequest()
                 req.data = state
                 try:
@@ -132,7 +128,6 @@ class JoyStickBridge:
                     self.set_joint_torque_master_client(req)
                 except rospy.ServiceException, e:
                     print "Service call failed: %s"%e
-                """
 
                 rospy.sleep(0.5)
 
