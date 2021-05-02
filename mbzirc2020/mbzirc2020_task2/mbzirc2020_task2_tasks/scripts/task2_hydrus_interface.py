@@ -10,7 +10,7 @@ from dynamic_reconfigure.srv import Reconfigure
 import std_srvs.srv
 
 class Task2HydrusInterface(HydrusInterface):
-    def __init__(self,robot_ns):
+    def __init__(self,robot_ns="hydrus"):
         HydrusInterface.__init__(self, robot_ns=robot_ns,debug_view=True)
         self.grasp_joint_angle = rospy.get_param('~grasp_joint_angle', [1.5, 1.5])
         self.ungrasp_joint_angle = rospy.get_param('~ungrasp_joint_angle', [0.9, 0.9])

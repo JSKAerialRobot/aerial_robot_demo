@@ -52,3 +52,5 @@ adjust_place:
   grid_scale_x: 0.8
   grid_scale_y: 0.8
   grid_search_timeout: 10
+
+place_channel_length: 4.0
