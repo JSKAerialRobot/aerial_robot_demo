@@ -19,6 +19,7 @@
   <arg name="spawn_yaw" default="0.0"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
   <arg name="launch_gazebo" default="True" />
+  <arg name="use_vio" default="false"/>
 
   <param name="/simulation" value="$(arg simulation)"/>
 
@@ -42,6 +43,7 @@
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
     <arg name="robot_id" value="$(arg robot_id)" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
+    <arg name="use_vio" value="$(arg use_vio)"/>
   </include>
 
   ########## overwrite Servo.yaml ###########

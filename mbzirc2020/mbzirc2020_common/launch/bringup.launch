@@ -10,6 +10,7 @@
   <arg name="robot_id" default="" />
   <arg name="task" default="1" />
   <arg name="model_suffix" default="" />
+  <arg name="use_vio" default="True"/>
   <arg name="horizontal_vio" default="False" />
   <arg name="config_path" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/config/$(arg model_suffix)"/>
   <arg name="rviz_config_path" default="$(find hydrus)/config/rviz_config"/>
@@ -27,6 +28,7 @@
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
     <arg name="robot_id" value="$(arg robot_id)" if="$(eval arg('robot_id') != '')" />
+    <arg name="use_vio" value="$(arg use_vio)"/>
   </include>
 
   ###########  Parameters  ###########
