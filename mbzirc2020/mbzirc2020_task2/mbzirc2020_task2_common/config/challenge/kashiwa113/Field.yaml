@@ -1,4 +1,1 @@
-global_lookdown_pos_gps: [35.8950643, 139.9446941]
-global_place_channel_center_pos_gps: [35.8951117, 139.9446842]
-global_place_channel_yaw: 0.44144076108932495
-place_channel_length: 2.0
+channel_pos: [-1.59, -0.44]

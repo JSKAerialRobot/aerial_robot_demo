@@ -18,18 +18,21 @@ class Task2HydrusInterface(HydrusInterface):
         self.reset_joint_angle = rospy.get_param('~reset_joint_angle', [1.5, 1.5])
         self.open_joint_angle = rospy.get_param('~open_joint_angle', [0.6, 0.6])
         self.flight_state = -1
-
-        self.ctrl_mode_pub = rospy.Publisher(robot_ns + '/teleop_command/ctrl_mode', Int8, queue_size=10)
+        self.init_x = 0
+        self.init_y = 0
+        self.init_z = 0
+    
+        self.ctrl_mode_pub = rospy.Publisher('teleop_command/ctrl_mode', Int8, queue_size=10)
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-        self.flight_state_sub = rospy.Subscriber(robot_ns + '/flight_state', UInt8, self.FlightStateCallback)
-        self.joy_sub = rospy.Subscriber(robot_ns+'/joy', Joy, self.joyCallback)
+        self.flight_state_sub = rospy.Subscriber('flight_state', UInt8, self.FlightStateCallback)
+        self.joy_sub = rospy.Subscriber('joy', Joy, self.joyCallback)
         self.prev_joy_state = Joy()
 
-        self.set_yaw_free_service = rospy.ServiceProxy(robot_ns + '/controller/lqi/set_parameters',Reconfigure)
-        self.alt_sensor_service_client = rospy.ServiceProxy(robot_ns + '/sensor_plugin/alt1/estimate_flag', std_srvs.srv.SetBool)
-        self.plane_detection_service_client = rospy.ServiceProxy(robot_ns + '/sensor_plugin/plane_detection1/estimate_flag', std_srvs.srv.SetBool)
+        self.set_yaw_free_service = rospy.ServiceProxy('controller/lqi/set_parameters',Reconfigure)
+        self.alt_sensor_service_client = rospy.ServiceProxy('sensor_plugin/alt1/estimate_flag', std_srvs.srv.SetBool)
+        self.plane_detection_service_client = rospy.ServiceProxy('sensor_plugin/plane_detection1/estimate_flag', std_srvs.srv.SetBool)
 
     def enable_alt_sensor(self,flag):
         try:
@@ -160,13 +163,19 @@ class Task2HydrusInterface(HydrusInterface):
         trans = self.tf_buffer.lookup_transform(parent_frame_id, frame_id, time, rospy.Duration(wait))
         return trans
 
+    def saveInitialPosition(self):
+        pos = self.getBaselinkPos()
+        self.init_x = pos[0]
+        self.init_y = pos[1]
+        self.init_z = pos[2]
+
     def joyCallback(self, msg):
         if (msg.buttons[4] == 1) and (self.prev_joy_state.buttons[4] == 0): #L1 servo on
-            self.setJointTorque(True)
+            #self.setJointTorque(True)
             rospy.loginfo('Servo on')
 
         if (msg.buttons[5] == 1) and (self.prev_joy_state.buttons[5] == 0): #R1 servo off
-            self.setJointTorque(False)
+            #self.setJointTorque(False)
             rospy.loginfo('Servo off')
 
         self.prev_joy_state = msg

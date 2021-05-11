@@ -1,25 +1,42 @@
 #!/usr/bin/env python
 
 import rospy
+import smach
+import smach_ros
 
-import tf2_ros
-import tf.transformations as tft
-import ros_numpy
+from std_msgs.msg import Empty, String
 
-from std_msgs.msg import Empty
-from std_msgs.msg import Int8
-from std_msgs.msg import UInt8
-from geometry_msgs.msg import WrenchStamped
-from sensor_msgs.msg import JointState
-from aerial_robot_msgs.msg import FlightNav
+class Task2State(smach.State):
+    def __init__(self, state_name, outcomes=[], input_keys=[], output_keys=[], io_keys=[]):
+        smach.State.__init__(self, outcomes, input_keys, output_keys, io_keys)
+        self.state_pub = rospy.Publisher('~smach_state', String, queue_size=100)
+        self.state = state_name
 
-from std_srvs.srv import Empty as EmptyService
+        self.leader_state = ""
+        self.follower_state = ""
 
-from task2_hydrus_interface import Task2HydrusInterface
+        robot_ns_leader = rospy.get_param('~robot_ns_leader')
+        robot_ns_follower = rospy.get_param('~robot_ns_follower')
+        
+        self.leader_state_sub = rospy.Subscriber(robot_ns_leader + '/two_hydrus_task_kashiwa113_leader/smach_state', String, self.LeaderStateCallback)
+        self.follower_state_sub = rospy.Subscriber(robot_ns_follower + '/two_hydrus_task_kashiwa113_follower/smach_state', String, self.FollowerStateCallback)
 
-class TaskStart:
+    def publish_state(self):
+        msg = String()
+        msg.data = self.state
+        self.state_pub.publish(msg)
 
+    def LeaderStateCallback(self, msg):
+        self.leader_state = msg.data
+
+    def FollowerStateCallback(self, msg):
+        self.follower_state = msg.data
+
+class Start(Task2State):
     def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
         self.task_start_sub = rospy.Subscriber('/task_start', Empty, self.TaskStartCallback)
 
         self.task_start = False
@@ -27,91 +44,379 @@ class TaskStart:
     def TaskStartCallback(self,msg):
         self.task_start = True
 
-if __name__ == '__main__':
+    def execute(self, userdata):
 
-    rospy.init_node('two_hydrus_task')
+        while not self.task_start:
+            rospy.sleep(0.1)
 
-    task_start = TaskStart()
+        self.publish_state()
 
-    hydrus1 = Task2HydrusInterface(robot_ns='hydrus1')
-    hydrus2 = Task2HydrusInterface(robot_ns='hydrus2')
-    #sleep to wait for ros-clients' ready
-    rospy.sleep(1)
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
 
-    while not task_start.task_start:
-        rospy.sleep(1.0)
+        return 'succeeded'
 
-    #start
-    hydrus1.start()
-    hydrus2.start()
-    rospy.sleep(1)
+class Grasp(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
 
-    #takeoff
-    hydrus1.takeoff()
-    hydrus2.takeoff()
-    rospy.sleep(1)
+    def execute(self, userdata):
+        self.publish_state()
 
-    #wait for hovering
-    rospy.loginfo("wait for hovering")
-    hydrus1.wait_for_hovering()
-    hydrus2.wait_for_hovering()
-    rospy.loginfo("complete: wait for hovering")
-    rospy.sleep(1)
+        rospy.sleep(1)
 
-    #change the follower machine to vel-nav mode
-    rospy.loginfo("change the follower machine to vel-nav mode")
-    hydrus2.change_ctrl_mode(mode='vel')
-    rospy.loginfo("complete: change the follower machine to vel-nav mode")
-    rospy.sleep(1)
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
 
-    #set robots to yaw_free_ctrl
-    rospy.loginfo("set robots to yaw_free_ctrl")
-    hydrus1.set_yaw_free(flag=True)
-    hydrus2.set_yaw_free(flag=True)
-    rospy.loginfo("complete: set robots to yaw_free_ctrl")
-    rospy.sleep(1)
+        return 'succeeded'
 
-    #the leader machine approaches the place position
-    hydrus1.goPosWaitConvergence('global', [-1.47,-1.57], None, None, timeout=10, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
+class Takeoff(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
 
-    #change the leader machine to pos-nav mode
-    rospy.loginfo("change the leader machine to pos-nav mode")
-    hydrus1.change_ctrl_mode(mode='pos')
-    rospy.loginfo("complete: change the leader machine to pos-nav mode")
-    rospy.sleep(1)
+    def execute(self, userdata):
+        self.publish_state()
 
-    #the follower machine approaches the place position
-    rospy.loginfo("the follower machine approaches the place position")
-    hydrus2.goPosWaitConvergence('global', [-1.47,0.43], None, None, timeout=10, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-    rospy.loginfo("complete: the follower machine approaches the place position")
-    rospy.sleep(1)
+        rospy.sleep(1)
 
-    #ungrasp
-    rospy.loginfo("ungrasp")
-    hydrus1.ungrasp(time=500)
-    hydrus2.ungrasp(time=500)
-    rospy.loginfo("complete: ungrasp")
-    rospy.sleep(1)
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
 
-    #set robots  yaw_ctrl
-    rospy.loginfo("set robots yaw_ctrl")
-    hydrus1.set_yaw_free(flag=False)
-    hydrus2.set_yaw_free(flag=False)
-    rospy.loginfo("complete set robots yaw_ctrl")
-    rospy.sleep(5)
+        return 'succeeded'
 
-    # back to start position
-    rospy.loginfo("back to start position")
-    hydrus2.goPosWaitConvergence('global', [0.74,0.16], None, None, timeout=10, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-    rospy.sleep(10)
-    hydrus1.goPosWaitConvergence('global', [-0.6,-1.4], None, None, timeout=10, pos_conv_thresh = 0.3, yaw_conv_thresh = 0.1, vel_conv_thresh = 0.1)
-    rospy.loginfo("complete: back to start position")
+class WaitForHovering(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
 
-    #land
-    rospy.loginfo("land")
-    hydrus1.land()
-    hydrus2.land()
-    rospy.loginfo("complete: land")
-    rospy.sleep(1)
+    def execute(self, userdata):
+        self.publish_state()
 
-    rospy.loginfo("complete: all_tasks")
+        rospy.sleep(1)
+
+        while not (self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class ChangeHeight(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not (self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class EnablePlaneDetection(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not (self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class FollowerNavigated(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not (self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class SetYawFree(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not (self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class LeaderApproachPlacePosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class LeaderAdjustPlacePosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class LeaderNavigated(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class FollowerApproachPlacePosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class FollowerAdjustPlacePosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class AdjustHeight(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class Ungrasp(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class SetYawNotFree(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not (self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class FollowerBacktoStartPosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class LeaderBacktoStartPosition(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class Landing(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+class Finish(Task2State):
+    def __init__(self):
+        Task2State.__init__(self, state_name=self.__class__.__name__,
+                                  outcomes=['succeeded'])
+
+    def execute(self, userdata):
+        self.publish_state()
+
+        rospy.sleep(1)
+
+        while not(self.leader_state == self.state and self.follower_state == self.state):
+            rospy.sleep(0.1)
+
+        return 'succeeded'
+
+def main():
+
+    sm_top = smach.StateMachine(outcomes=['succeeded'])
+
+    with sm_top:
+        smach.StateMachine.add('Start', Start(),
+                               transitions={'succeeded':'Grasp'})
+
+        smach.StateMachine.add('Grasp', Grasp(),
+                               transitions={'succeeded':'Takeoff'})
+
+        smach.StateMachine.add('Takeoff', Takeoff(),
+                               transitions={'succeeded':'WaitForHovering'})
+
+        smach.StateMachine.add('WaitForHovering', WaitForHovering(),
+                               transitions={'succeeded':'ChangeHeight'})
+
+        smach.StateMachine.add('ChangeHeight', ChangeHeight(),
+                               transitions={'succeeded':'EnablePlaneDetection'})
+
+        smach.StateMachine.add('EnablePlaneDetection', EnablePlaneDetection(),
+                               transitions={'succeeded':'FollowerNavigated'})
+
+        smach.StateMachine.add('FollowerNavigated', FollowerNavigated(),
+                               transitions={'succeeded':'SetYawFree'})
+
+        smach.StateMachine.add('SetYawFree', SetYawFree(),
+                               transitions={'succeeded':'LeaderApproachPlacePosition'})
+
+        smach.StateMachine.add('LeaderApproachPlacePosition', LeaderApproachPlacePosition(),
+                               transitions={'succeeded':'LeaderAdjustPlacePosition'})
+
+        smach.StateMachine.add('LeaderAdjustPlacePosition', LeaderAdjustPlacePosition(),
+                               transitions={'succeeded':'LeaderNavigated'})
+
+        smach.StateMachine.add('LeaderNavigated', LeaderNavigated(),
+                               transitions={'succeeded':'FollowerApproachPlacePosition'})
+
+        smach.StateMachine.add('FollowerApproachPlacePosition', FollowerApproachPlacePosition(),
+                               transitions={'succeeded':'FollowerAdjustPlacePosition'})
+
+        smach.StateMachine.add('FollowerAdjustPlacePosition', FollowerAdjustPlacePosition(),
+                               transitions={'succeeded':'AdjustHeight'})
+
+        smach.StateMachine.add('AdjustHeight', AdjustHeight(),
+                               transitions={'succeeded':'Ungrasp'})
+
+        smach.StateMachine.add('Ungrasp', Ungrasp(),
+                               transitions={'succeeded':'SetYawNotFree'})
+
+        smach.StateMachine.add('SetYawNotFree', SetYawNotFree(),
+                               transitions={'succeeded':'FollowerBacktoStartPosition'})
+
+        smach.StateMachine.add('FollowerBacktoStartPosition', FollowerBacktoStartPosition(),
+                               transitions={'succeeded':'LeaderBacktoStartPosition'})
+
+        smach.StateMachine.add('LeaderBacktoStartPosition', LeaderBacktoStartPosition(),
+                               transitions={'succeeded':'Landing'})
+
+        smach.StateMachine.add('Landing', Landing(),
+                               transitions={'succeeded':'Finish'})
+
+        smach.StateMachine.add('Finish', Finish(),
+                               transitions={'succeeded':'succeeded'})
+
+        sis = smach_ros.IntrospectionServer('task2_smach_server', sm_top, '/TASK_MANAGER')
+        sis.start()
+
+    outcome = sm_top.execute()
+    rospy.spin()
+    sis.stop()
+
+if __name__=="__main__":
+
+    rospy.init_node('two_hydrus_task_kashiwa113')
+
+    main()
+
+

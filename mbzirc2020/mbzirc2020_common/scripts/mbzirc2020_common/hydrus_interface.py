@@ -37,27 +37,28 @@ class HydrusInterface:
         self.HOVER_STATE = 5
         self.STOP_STATE = 6
 
-        self.joint_state_sub_ = rospy.Subscriber(robot_ns+'/joint_states', JointState, self.jointStateCallback)
-        self.joint_ctrl_pub_ = rospy.Publisher(robot_ns+'/joints_ctrl', JointState, queue_size = 1)
-        self.extra_joint_ctrl_pub_ = rospy.Publisher(robot_ns+'/extra_servos_ctrl', JointState, queue_size = 1)
-        self.cog_odom_sub_ = rospy.Subscriber(robot_ns+'/uav/cog/odom', Odometry, self.cogOdomCallback)
-        self.baselink_odom_sub_ = rospy.Subscriber(robot_ns+'/uav/baselink/odom', Odometry, self.baselinkOdomCallback)
-        self.nav_pub_ = rospy.Publisher(robot_ns+'/uav/nav', FlightNav, queue_size = 1)
-        self.start_pub_ = rospy.Publisher(robot_ns+'/teleop_command/start', Empty, queue_size = 1)
-        self.takeoff_pub_ = rospy.Publisher(robot_ns+'/teleop_command/takeoff', Empty, queue_size = 1)
-        self.land_pub_ = rospy.Publisher(robot_ns+'/teleop_command/land', Empty, queue_size = 1)
-        self.force_landing_pub_ = rospy.Publisher(robot_ns+'/teleop_command/force_landing', Empty, queue_size = 1)
-        self.halt_pub_ = rospy.Publisher(robot_ns+'/teleop_command/halt', Empty, queue_size = 1)
-        self.add_extra_module_client_ = rospy.ServiceProxy(robot_ns+'/add_extra_module', AddExtraModule)
-        self.flight_state_sub_ = rospy.Subscriber(robot_ns+'/flight_state', UInt8, self.flightStateCallback)
-        self.ros_gps_sub_ = rospy.Subscriber(robot_ns+'/sim/gps/fix', NavSatFix, self.rosGpsCallback)
-        self.gps_sub_ = rospy.Subscriber(robot_ns+'/gps', Gps, self.gpsCallback)
-        self.set_joint_torque_client_ = rospy.ServiceProxy(robot_ns+'/joints/torque_enable', SetBool)
+        self.joint_state_sub_ = rospy.Subscriber('joint_states', JointState, self.jointStateCallback)
+        self.joint_ctrl_pub_ = rospy.Publisher('joints_ctrl', JointState, queue_size = 1)
+        self.extra_joint_ctrl_pub_ = rospy.Publisher('extra_servos_ctrl', JointState, queue_size = 1)
+        self.cog_odom_sub_ = rospy.Subscriber('uav/cog/odom', Odometry, self.cogOdomCallback)
+        self.baselink_odom_sub_ = rospy.Subscriber('uav/baselink/odom', Odometry, self.baselinkOdomCallback)
+        self.nav_pub_ = rospy.Publisher('uav/nav', FlightNav, queue_size = 1)
+        self.start_pub_ = rospy.Publisher('teleop_command/start', Empty, queue_size = 1)
+        self.takeoff_pub_ = rospy.Publisher('teleop_command/takeoff', Empty, queue_size = 1)
+        self.land_pub_ = rospy.Publisher('teleop_command/land', Empty, queue_size = 1)
+        self.force_landing_pub_ = rospy.Publisher('teleop_command/force_landing', Empty, queue_size = 1)
+        self.halt_pub_ = rospy.Publisher('teleop_command/halt', Empty, queue_size = 1)
+        self.add_extra_module_client_ = rospy.ServiceProxy('add_extra_module', AddExtraModule)
+        self.flight_state_sub_ = rospy.Subscriber('flight_state', UInt8, self.flightStateCallback)
+        self.ros_gps_sub_ = rospy.Subscriber('sim/gps/fix', NavSatFix, self.rosGpsCallback)
+        self.gps_sub_ = rospy.Subscriber('gps', Gps, self.gpsCallback)
+        self.set_joint_torque_client_ = rospy.ServiceProxy('joints/torque_enable', SetBool)
 
         if self.debug_view_:
             self.nav_debug_pub_ = rospy.Publisher('~nav_debug', OverlayText, queue_size = 1)
 
         self.joint_update_freq_ = rospy.get_param("~joint_update_freq", 20)
+        self.nav_update_freq_ = 20
 
     def rosGpsCallback(self, msg):
         self.gps_lat_lon_ = [msg.latitude, msg.longitude]
@@ -345,6 +346,64 @@ class HydrusInterface:
             rospy.sleep(0.1)
 
         return True
+
+    def goPosHeightInterpolation(self, frame, target_xy, target_z, target_yaw, gps_mode=False, time=1000):
+
+        nav_seq_len = int(time * self.nav_update_freq_ / 1000.0)
+
+        current_z = self.getBaselinkPos()[2]
+
+        if nav_seq_len > 1:
+            nav_seq = np.linspace(current_z, target_z, num = nav_seq_len, endpoint = True)
+        else:
+            nav_seq = [target_z]
+
+        nav_msg = FlightNav()
+        if frame == 'global':
+            nav_msg.control_frame = nav_msg.WORLD_FRAME
+        elif frame == 'local':
+            nav_msg.control_frame = nav_msg.LOCAL_FRAME
+        else:
+            rospy.logerr('invalid frame %s' % (frame))
+            return
+
+        nav_msg.header.stamp = rospy.Time.now()
+        nav_msg.target = FlightNav.BASELINK
+
+        if gps_mode:
+            nav_msg.pos_xy_nav_mode = FlightNav.GPS_WAYPOINT_MODE
+        else:
+            nav_msg.pos_xy_nav_mode = FlightNav.POS_MODE
+
+        if target_xy is None:
+            nav_msg.pos_xy_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.target_pos_x = target_xy[0]
+            nav_msg.target_pos_y = target_xy[1]
+            self.target_xy_ = target_xy
+
+        if target_yaw is None:
+            nav_msg.yaw_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.yaw_nav_mode = FlightNav.POS_MODE
+            target_yaw =  (target_yaw + np.pi) % (2 * np.pi) - np.pi
+            nav_msg.target_yaw = target_yaw
+            self.target_yaw_ = target_yaw
+
+        if target_z is None:
+            nav_msg.pos_z_nav_mode = FlightNav.NO_NAVIGATION
+        else:
+            nav_msg.pos_z_nav_mode = FlightNav.POS_MODE
+            self.target_z_ = target_z
+
+        self.nav_pub_.publish(nav_msg)
+
+        for nav_pos in nav_seq:
+            nav_msg.header.stamp = rospy.Time.now()
+            nav_msg.target_pos_z = nav_pos
+            self.nav_pub_.publish(nav_msg)
+            if time != 0:
+                rospy.sleep(1.0 / self.nav_update_freq_)
 
     def addExtraModule(self, action, module_name, parent_link_name, transform, inertia):
         try:

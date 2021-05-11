@@ -25,6 +25,12 @@
   <arg name="sensor_takeoff" default="False"/>
   <arg name="sensor_landing" default="False"/>
 
+  <arg name="role" value="leader" if="$(arg leader)"/>
+  <arg name="role" value="follower" unless="$(arg leader)"/>
+
+  <arg name="model" value="ball_joint_gripper" if="$(arg ball_joint_gripper)"/>
+  <arg name="model" value="ring_gripper" if="$(arg ring_gripper)"/>
+
   # bringup
   <include file="$(find mbzirc2020_task2_common)/launch/bringup.launch">
     <arg name="simulation" value="$(arg simulation)"/>
@@ -52,11 +58,9 @@
         type="ft_sensor_feedback_navigation.py" 
         output="screen" 
         if="$(arg ft_sensor_feedback)"> 
-
     <param name="robot_ns" value="$(arg robot_ns)"/> 
     <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
     <param name="sensor_landing" value="$(arg sensor_landing)"/>
-
   </node>
 
   # recognition
@@ -69,15 +73,18 @@
     </include>
   </group>
 
-  # bringup the interface node
+  # task smach
   <group ns="$(arg robot_ns)">
-    <node name="hydrus_interface_node"
+    <node name="two_hydrus_task_$(arg worldtype)_$(arg role)"
           pkg="mbzirc2020_task2_tasks"
-          type="hydrus_interface_node.py"
+          type="two_hydrus_task_$(arg worldtype)_$(arg role).py" 
           output="screen">
-          
-      <param name="robot_ns" value="$(arg robot_ns)"/>
+      <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
+      <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/Motion.yaml"/>
+      <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
+      <rosparam command="load" file="$(arg config_dir)/$(arg model)/Grasp.yaml"/>
+      <param name="robot_ns" value="$(arg robot_ns)"/> 
     </node>
-  </group>
+    </group>
 
 </launch>

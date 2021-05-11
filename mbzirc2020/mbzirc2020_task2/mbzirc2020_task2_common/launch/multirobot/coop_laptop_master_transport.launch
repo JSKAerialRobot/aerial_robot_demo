@@ -57,7 +57,7 @@
     <arg name="object_color" value="$(arg object_color)"/>
     <arg name="simulation" value="true"/>
     <arg name="real_machine" value="false" />
-    <arg name="headless" value="false" />
+    <arg name="headless" value="$(arg headless)" />
     <arg name="launch_gazebo" value="true" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_leader)" />
@@ -87,6 +87,7 @@
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_follower)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_follower)" />
+    <arg name="worldtype" value="$(arg worldtype)" />
     <arg name="spawn_x" default="0.1" if="$(arg outdoor)"/>
     <arg name="spawn_y" default="-0.2" if="$(arg outdoor)"/>
     <arg name="spawn_yaw" default="-0.78" if="$(arg outdoor)"/>
@@ -100,14 +101,14 @@
         type="two_hydrus_task_$(arg worldtype).py"
         pkg="mbzirc2020_task2_tasks"
         output="screen">
-    <rosparam command="load" file="$(arg config_dir)/Motion.yaml"/>
-    <rosparam command="load" file="$(arg config_dir)/$(arg object_color)/Motion.yaml"/>
-    <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
-    <rosparam command="load" file="$(arg config_dir)/$(arg model)/Grasp.yaml"/>
+    <param name="robot_ns_leader" value="$(arg robot_ns_leader)"/>
+    <param name="robot_ns_follower" value="$(arg robot_ns_follower)"/>
   </node>
 
   # if real_machine,  in each machine:
   # $ rossetlaptop
   # $ roslaunch mbzirc2020_task2_common coop_task_agent.launch in each machine.
+
+  <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer"/>
 
 </launch>
