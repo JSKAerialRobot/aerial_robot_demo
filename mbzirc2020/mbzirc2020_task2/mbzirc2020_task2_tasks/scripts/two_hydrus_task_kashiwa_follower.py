@@ -57,7 +57,7 @@ class Grasp(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.grasp()
+        #self.robot.grasp()
 
         self.publish_state()
 
