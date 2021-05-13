@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 <launch>
+  
+  <arg name="robot_id_leader" default="1" />
+  <arg name="robot_ns_leader" value="hydrus$(arg robot_id_leader)"/>
+  <arg name="recognition_leader" default="true"/>
+  <arg name="ft_sensor_feedback_leader" default="false" />
+
+  <arg name="robot_id_follower" default="2" />
+  <arg name="robot_ns_follower" value="hydrus$(arg robot_id_follower)"/>
+  <arg name="recognition_follower" default="true"/>
+  <arg name="ft_sensor_feedback_follower" default="false" />
+
   <arg name="simulation" default="False" />
   <arg name="real_machine" default="True" />
   <arg name="headless" default="True" />
@@ -19,14 +30,6 @@
   <arg name="ring_gripper" default="False" />
   <arg name="model" value="ring_gripper" if="$(arg ring_gripper)"/>
   <arg name="object_color" default="red" />
-
-  <arg name="robot_ns_leader" value="hydrus1"/>
-  <arg name="recognition_leader" default="true"/>
-  <arg name="ft_sensor_feedback_leader" default="false" />
-
-  <arg name="robot_ns_follower" value="hydrus2"/>
-  <arg name="recognition_follower" default="true"/>
-  <arg name="ft_sensor_feedback_follower" default="false" />
 
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/two_hydrus_rviz_config"/>
 
@@ -48,22 +51,22 @@
 
 
   # leader machine
-  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent.launch" 
+  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent_leader.launch" 
            if="$(arg simulation)">
-    <arg name="robot_id" value="1"/>
-    <arg name="leader" value="true"/>
+    <arg name="robot_id"  value="$(arg robot_id_leader)" /> 
     <arg name="ball_joint_gripper" value="true" />
-    <arg name="config_dir" value="$(arg config_dir)"/>
-    <arg name="object_color" value="$(arg object_color)"/>
     <arg name="simulation" value="true"/>
     <arg name="real_machine" value="false" />
     <arg name="headless" value="$(arg headless)" />
+    <arg name="worldtype" value="$(arg worldtype)" />
+    <arg name="config_dir" value="$(arg config_dir)"/>
+    <arg name="object_color" value="$(arg object_color)"/>
     <arg name="launch_gazebo" value="true" />
+    <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_leader)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_leader)" />
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
-    <arg name="worldtype" value="$(arg worldtype)" />
     <arg name="spawn_x" default="1.8" if="$(arg outdoor)"/>
     <arg name="spawn_y" default="0.2" if="$(arg outdoor)"/>
     <arg name="spawn_yaw" default="2.36" if="$(arg outdoor)"/>
@@ -73,17 +76,17 @@
   </include>
 
   # follower machine
-  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent.launch" 
+  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent_follower.launch" 
            if="$(arg simulation)">
-    <arg name="robot_id" value="2"/>
-    <arg name="leader" value="false"/>
+    <arg name="robot_id"  value="$(arg robot_id_follower)" /> 
     <arg name="ball_joint_gripper" value="true" />
-    <arg name="config_dir" value="$(arg config_dir)"/>
-    <arg name="object_color" value="$(arg object_color)"/>
     <arg name="simulation" value="true"/>
     <arg name="real_machine" value="false" />
     <arg name="headless" value="true" />
+    <arg name="config_dir" value="$(arg config_dir)"/>
+    <arg name="object_color" value="$(arg object_color)"/>
     <arg name="launch_gazebo" value="false" />
+    <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition_follower)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_follower)" />
@@ -97,8 +100,8 @@
     </include>
 
   # task
-  <node name="two_hydrus_task_$(arg worldtype)"
-        type="two_hydrus_task_$(arg worldtype).py"
+  <node name="two_hydrus_task"
+        type="two_hydrus_task.py"
         pkg="mbzirc2020_task2_tasks"
         output="screen">
     <param name="robot_ns_leader" value="$(arg robot_ns_leader)"/>

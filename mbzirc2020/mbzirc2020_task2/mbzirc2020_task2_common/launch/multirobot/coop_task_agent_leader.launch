@@ -1,20 +1,22 @@
 <?xml version="1.0"?>
 <launch>
 
+  <arg name="robot_id" default="1" />
+  <arg name="ball_joint_gripper" default="true" />
   <arg name="simulation" default="False" />
   <arg name="real_machine" default="True" />
   <arg name="headless" default="True" />
-
-  <arg name="outdoor" default="True" />
-  <arg name="estimate_mode" value="0" if="$(arg outdoor)"/>
-  <arg name="estimate_mode" value="1" unless="$(arg outdoor)"/>
+  <arg name="launch_gazebo" default="false" />
+  <arg name="outdoor" default="true" />
+  <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
+  <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa" if="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa113" unless="$(arg outdoor)"/>
   <arg name="config_version" default="_202104" if="$(arg outdoor)"/>
   <arg name="config_version" default="" unless="$(arg outdoor)"/>
 
-  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)$(arg config_version)" if="$(arg real_machine)"/>
-  <arg name="config_dir" value="$(find mbzirc2020_task2_simulation)/config/$(arg worldtype)" if="$(arg simulation)"/>
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)$(arg config_version)" if="$(arg real_machine)"/>
+  <arg name="config_dir" default="$(find mbzirc2020_task2_simulation)/config/$(arg worldtype)" if="$(arg simulation)"/>
 
   <arg name="object_color" default="red" />
 
@@ -24,27 +26,29 @@
 
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/two_hydrus_rviz_config"/>
 
+  <arg name="spawn_x" default="1.8" />
+  <arg name="spawn_y" default="0.2" />
+  <arg name="spawn_yaw" default="2.36" />
+
   # leader machine
   <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent.launch" >
-    <arg name="robot_id" value="1"/>
+    <arg name="robot_id" value="$(arg robot_id)"/>
     <arg name="leader" value="true"/>
-    <arg name="ball_joint_gripper" value="true" />
+    <arg name="ball_joint_gripper" value="$(arg ball_joint_gripper)" />
     <arg name="config_dir" value="$(arg config_dir)"/>
     <arg name="object_color" value="$(arg object_color)"/>
-    <arg name="simulation" value="false"/>
-    <arg name="real_machine" value="true" />
-    <arg name="headless" value="true" />
-    <arg name="launch_gazebo" value="false" />
+    <arg name="simulation" value="$(arg simulation)"/>
+    <arg name="real_machine" value="$(arg real_machine)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
+    <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
     <arg name="recognition" value="$(arg recognition)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback)" />
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
     <arg name="worldtype" value="$(arg worldtype)" />
-    <arg name="spawn_x" default="1.8" if="$(arg outdoor)"/>
-    <arg name="spawn_y" default="0.2" if="$(arg outdoor)"/>
-    <arg name="spawn_yaw" default="2.36" if="$(arg outdoor)"/>
-    <arg name="spawn_x" default="-1.65" unless="$(arg outdoor)"/>
-    <arg name="spawn_y" default="0.2" unless="$(arg outdoor)"/>
-    <arg name="spawn_yaw" default="2.36" unless="$(arg outdoor)"/>
+    <arg name="spawn_x" default="$(arg spawn_x)" />
+    <arg name="spawn_y" default="$(arg spawn_y)" />
+    <arg name="spawn_yaw" default="$(arg spawn_yaw)" />
   </include>
 </launch>
