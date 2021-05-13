@@ -21,6 +21,9 @@ class Task2State(smach.State):
 
         self.manager_state = ""
 
+        self.simulation = rospy.get_param('~simulation')
+        self.outdoor = rospy.get_param('~outdoor')
+
         self.robot = robot
 
         self.manager_state_sub = rospy.Subscriber('/two_hydrus_task/smach_state', String, self.ManagerStateCallback)
@@ -43,6 +46,8 @@ class Start(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
+        self.robot.saveInitialPosition()
+
         self.publish_state()
 
         return 'succeeded'
@@ -59,7 +64,8 @@ class Grasp(Task2State):
 
         #self.robot.grasp()
 
-        self.robot.add_long_object_to_model(action="add")
+        if not self.simulation:
+            self.robot.add_long_object_to_model(action="add")
 
         self.publish_state()
 
@@ -76,7 +82,7 @@ class Takeoff(Task2State):
 
         self.robot.start()
 
-        rospy.sleep(0.1)
+        rospy.sleep(0.5)
 
         self.robot.takeoff()
 
@@ -108,7 +114,10 @@ class ChangeHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 10000)
+        if self.outdoor:
+            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 15000)
+        elif not self.outdoor:
+            self.robot.goPosHeightInterpolation('global', None, 1.0, None, gps_mode=False, time = 5000)
 
         self.publish_state()
 
@@ -149,41 +158,57 @@ class SetYawFree(Task2State):
 class LeaderApproachPlacePosition(Task2State):
     def __init__(self, robot):
         Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
-        self.global_place_channel_center_pos_gps = rospy.get_param('~global_place_channel_center_pos_gps')
-        self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
-        self.place_channel_length = rospy.get_param('~place_channel_length')
+        
+        if self.outdoor:
+            self.global_place_channel_center_pos_gps = rospy.get_param('~global_place_channel_center_pos_gps')
+            self.global_place_channel_yaw = rospy.get_param('~global_place_channel_yaw')
+            self.place_channel_length = rospy.get_param('~place_channel_length')
+        elif not self.outdoor:
+            self.channel_center_pos = rospy.get_param('~channel_pos')
 
     def execute(self, userdata):
 
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goPosWaitConvergence(
-            'global',
-            self.global_place_channel_center_pos_gps, 
-            None, 
-            None, 
-            gps_mode = True, 
-            timeout=20, 
-            pos_conv_thresh = 0.3, 
-            yaw_conv_thresh = 1.0, 
-            vel_conv_thresh = 0.1)
+        if self.outdoor:
+            self.robot.goPosWaitConvergence(
+                'global',
+                self.global_place_channel_center_pos_gps, 
+                None, 
+                None, 
+                gps_mode = True, 
+                timeout=20, 
+                pos_conv_thresh = 0.3, 
+                yaw_conv_thresh = 1.0, 
+                vel_conv_thresh = 0.1)
 
-        baselink_pos = self.robot.getBaselinkPos()[0:2]
-        rospy.loginfo(baselink_pos)
-        rospy.loginfo(self.global_place_channel_yaw)
-        target_pos = [baselink_pos[0]+(self.place_channel_length/2)*np.cos(self.global_place_channel_yaw),
-                      baselink_pos[1]+(self.place_channel_length/2)*np.sin(self.global_place_channel_yaw)]
-        rospy.loginfo(target_pos)
-        self.robot.goPosWaitConvergence(
-            'global', 
-            target_pos, 
-            None, 
-            None, 
-            timeout=10, 
-            pos_conv_thresh = 0.3, 
-            yaw_conv_thresh = 0.1, 
-            vel_conv_thresh = 0.1)
+            baselink_pos = self.robot.getBaselinkPos()[0:2]
+            rospy.loginfo(baselink_pos)
+            rospy.loginfo(self.global_place_channel_yaw)
+            target_pos = [baselink_pos[0]+(self.place_channel_length/2)*np.cos(self.global_place_channel_yaw),
+                          baselink_pos[1]+(self.place_channel_length/2)*np.sin(self.global_place_channel_yaw)]
+            rospy.loginfo(target_pos)
+            self.robot.goPosWaitConvergence(
+                'global', 
+                target_pos, 
+                None, 
+                None, 
+                timeout=10, 
+                pos_conv_thresh = 0.3, 
+                yaw_conv_thresh = 0.1, 
+                vel_conv_thresh = 0.1)
+
+        elif not self.outdoor:
+            self.robot.goPosWaitConvergence(
+                'global', 
+                [self.channel_center_pos[0],self.channel_center_pos[1]-1.0], 
+                None, 
+                None, 
+                timeout=10, 
+                pos_conv_thresh = 0.3, 
+                yaw_conv_thresh = 0.1, 
+                vel_conv_thresh = 0.1)
 
         self.publish_state()
 
@@ -253,7 +278,14 @@ class AdjustHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goPosHeightInterpolation('global', None, 2.3, None, gps_mode=False, time = 10000)
+        self.robot.change_ctrl_mode(mode='pos')
+
+        rospy.sleep(3)
+
+        if self.outdoor:
+            self.robot.goPosHeightInterpolation('global', None, 2.3, None, gps_mode=False, time = 10000)
+        elif not self.outdoor:
+            self.robot.goPosHeightInterpolation('global', None, 0.75, None, gps_mode=False, time = 10000)
 
         self.publish_state()
 
@@ -298,9 +330,31 @@ class LeaderBacktoStartPosition(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
+        if self.outdoor:
+            self.robot.goPosWaitConvergence(
+                'global', 
+                None, 
+                3.0, 
+                None, 
+                timeout=10, 
+                pos_conv_thresh = 0.3, 
+                yaw_conv_thresh = 0.1, 
+                vel_conv_thresh = 0.1)
+
+        elif not self.outdoor:
+            self.robot.goPosWaitConvergence(
+                'global', 
+                None, 
+                1.0, 
+                None, 
+                timeout=10, 
+                pos_conv_thresh = 0.3, 
+                yaw_conv_thresh = 0.1, 
+                vel_conv_thresh = 0.1)
+
         self.robot.goPosWaitConvergence(
             'global', 
-            [0.00,0.00], 
+            [self.robot.init_x,self.robot.init_y], 
             None, 
             None, 
             timeout=10, 
@@ -374,6 +428,9 @@ def main():
                                transitions={'succeeded':'LeaderAdjustPlacePosition'})
 
         smach.StateMachine.add('LeaderAdjustPlacePosition', LeaderAdjustPlacePosition(hydrus,robot_ns = robot_ns),
+                               transitions={'succeeded':'LeaderNavigated'})
+
+        smach.StateMachine.add('LeaderNavigated', LeaderNavigated(hydrus),
                                transitions={'succeeded':'AdjustHeight'})
 
         smach.StateMachine.add('AdjustHeight', AdjustHeight(hydrus),

@@ -85,6 +85,7 @@
       <rosparam command="load" file="$(arg config_dir)/Field.yaml"/>
       <rosparam command="load" file="$(arg config_dir)/$(arg model)/Grasp.yaml"/>
       <param name="robot_ns" value="$(arg robot_ns)"/> 
+      <param name="simulation" value="$(arg simulation)" />
       <param name="outdoor" value="$(arg outdoor)" />
     </node>
     </group>

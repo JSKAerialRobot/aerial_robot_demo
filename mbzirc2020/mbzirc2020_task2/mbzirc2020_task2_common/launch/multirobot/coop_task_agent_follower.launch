@@ -31,7 +31,7 @@
   <arg name="spawn_yaw" default="-0.78" />
 
   # follower machine
-  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent.launch">
+  <include file="$(find mbzirc2020_task2_common)/launch/multirobot/coop_task_agent.launch" >
     <arg name="robot_id" value="$(arg robot_id)"/>
     <arg name="leader" value="false"/>
     <arg name="ball_joint_gripper" value="$(arg ball_joint_gripper)" />
