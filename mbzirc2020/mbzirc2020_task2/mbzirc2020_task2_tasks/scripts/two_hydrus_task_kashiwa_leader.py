@@ -59,6 +59,8 @@ class Grasp(Task2State):
 
         #self.robot.grasp()
 
+        self.robot.add_long_object_to_model(action="add")
+
         self.publish_state()
 
         return 'succeeded'

@@ -4,6 +4,8 @@ from std_msgs.msg import Int8
 from std_msgs.msg import UInt8
 from sensor_msgs.msg import JointState, Joy
 from dynamic_reconfigure.msg import Config,BoolParameter,DoubleParameter
+from geometry_msgs.msg import Transform, Inertia
+import tf.transformations as tft
 import tf2_ros
 
 from dynamic_reconfigure.srv import Reconfigure
@@ -120,6 +122,27 @@ class Task2HydrusInterface(HydrusInterface):
         for d in doubles:
             set_yaw_free_srv.doubles = [d]
             self.set_yaw_free_service(set_yaw_free_srv)
+
+    def add_long_object_to_model(self, action):
+        transform = Transform()
+        transform.translation.x = -0.1
+        transform.translation.y = 0.4
+        transform.translation.z = 0
+        quaternion = tft.quaternion_from_euler(0, 0, 0)
+        transform.rotation.x = quaternion[0]
+        transform.rotation.y = quaternion[1]
+        transform.rotation.z = quaternion[2]
+        transform.rotation.w = quaternion[3]
+        inertia = Inertia()
+        inertia.m = 1.8
+        inertia.com.x = 0.0
+        inertia.com.y = 0.0
+        inertia.com.z = 0.0
+        inertia.ixx = 1/6.0 * 1.8 * (0.2**2 + 0.2**2)
+        inertia.iyy = 1/6.0 * 1.8 * (0.2**2 + 0.3**2)
+        inertia.izz = 1/6.0 * 1.8 * (0.2**2 + 0.3**2)
+
+        self.addExtraModule(action, 'object', 'link1', transform, inertia)
 
     def grasp(self, time = 3000):
         joint_state = JointState()
