@@ -79,7 +79,7 @@ class JoyStickBridge:
 
                 rospy.sleep(0.5)
 
-                angle = 1.1
+                angle = 1.15
                 joint_msg = JointState()
                 joint_msg.name = ['joint1','joint3']
                 joint_msg.position = [angle,angle]
@@ -90,7 +90,7 @@ class JoyStickBridge:
                     self.joint_slave_pub.publish(joint_msg)
                     rospy.sleep(0.01)
 
-                angle = 1.1 # ring_gripper 1.5
+                angle = 1.15 # ring_gripper 1.5
                 joint_msg = JointState()
                 joint_msg.name = ['joint1','joint3']
                 joint_msg.position = [angle,angle]
