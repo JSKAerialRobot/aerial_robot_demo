@@ -23,7 +23,7 @@
   <param name="/simulation" value="$(arg simulation)"/>
 
   ##########  basic bringup file ########
-  <include file="$(find mbzirc2020_common)/launch/bringup.launch" >
+  <include file="$(find mbzirc2020_task2_common)/launch/base/base_bringup.launch" >
     <arg name="real_machine" value="$(arg real_machine)" />
     <arg name="simulation" value="$(arg simulation)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />

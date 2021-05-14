@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="real_machine" default="false" />
+  <arg name="simulation" default="false" />
+  <arg name="horizontal_vio" default="false" />
+  <arg name="robot_ns" default="hydrus" />
+  <arg name="robot_id" default="1"/>
+  <arg name="estimate_mode" default="0" />
+
+  <group ns="$(arg robot_ns)">
+
+    <group if="$(arg real_machine)">
+      <group unless="$(arg simulation)">
+        <!-- fc & IMU & GPS -->
+        <include file="$(find spinal_ros_bridge)/launch/serial.launch" >
+          <arg name="baud" value="921600" />
+          <arg name="port" value="/dev/flight_controller" />
+        </include>
+
+        <include file="$(find realsense2_camera)/launch/rs_t265.launch">
+          <arg name="camera" value="realsense1"/>
+          <arg name="tf_prefix" value="$(arg robot_ns)/realsense1"/>
+          <arg name="publish_odom_tf" value="false"/>
+        </include>
+
+        <node pkg="topic_tools" type="throttle" name="t265_throttle" args="messages realsense1/odom/sample 80.0 realsense1/odom/throttle">
+          <param name="unreliable" value="true"/>
+        </node>
+
+        <!-- mocap -->
+        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" if="$(eval arg('estimate_mode') != 0)">
+          <arg name="robot_id" value="$(arg robot_id)" />
+        </include>
+
+        <!-- leddar one -->
+        <include file="$(find leddar_one)/launch/leddar_one.launch" >
+          <arg name="port" value="/dev/leddarone" />
+        </include>
+
+      </group>
+      <group if="$(arg simulation)">
+        <node pkg="nodelet" type="nodelet" name="realsense2_camera_manager" ns="camera" args="manager" />
+      </group>
+    </group>
+
+    <!-- basic configuration for sensors (e.g. noise sigma) -->
+    <rosparam file="$(find hydrus)/config/sensors/imu/spinal.yaml" command="load" />
+    <rosparam file="$(find aerial_robot_base)/config/sensors/gps/ublox_m8n.yaml" command="load" />
+    <rosparam file="$(find hydrus)/config/sensors/vo/realsense_t265.yaml" command="load" />
+    <rosparam file="$(find aerial_robot_base)/config/sensors/mocap.yaml" command="load" />
+    <rosparam file="$(find aerial_robot_base)/config/sensors/altmeter/leddar_one.yaml" command="load" />
+
+  </group>
+
+</launch>
