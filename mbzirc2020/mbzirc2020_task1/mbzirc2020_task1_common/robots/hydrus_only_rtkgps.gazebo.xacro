@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
+
+  <!-- base robot model -->
+  <xacro:arg name="robot_name" default="hydrus" />
+
+  <xacro:include filename="$(find mbzirc2020_task1_common)/robots/hydrus_only_rtkgps.urdf.xacro" />
+
+  <!-- gazebo plugin for sensors -->
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />
+
+</robot>

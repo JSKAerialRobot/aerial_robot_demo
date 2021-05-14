@@ -7,6 +7,7 @@ estimation:
         - sensor_plugin/alt
         - sensor_plugin/vo
         - sensor_plugin/gps
+        - sensor_plugin/gps # RTK-GPS. Please consider to remove vo for sensor fusion if you use RTK-GPS in an open outdoor enviroment
 
         # egomotion estimation
         egomotion_list:
@@ -53,8 +54,12 @@ sensor_plugin:
                 estimate_mode: 1 # 1<<0
         gps:
                 estimate_mode: 1 # 1<<0
+        gps1: # Spianl Onboard GPS
                 #delay: -0.45 # Ublox M8N normal: -0.4 ~ -0.6 + -0.05: daylight: -0.45, night: -0.5
-                delay: -0.3 # Ublox M9N normal: -0.2 ~ 0.25?, -0.3 is too large?
+                delay: -0.35 # alternative: -0.25 # Ublox M9N normal: -0.25 ~ 0.35, -0.35 is good @2021.05.24. TODO: auto-calibra with VIO
+                pos_noise_sigma:  1.0 # alternative: 0.1. Ulbox M8N default is 1.0, Ublox M9N 0.1 is OK, but unstble after waypoint. TODO: two cases during hovering (relax) and navigation (strict)
+        gps2: # RTK GPS (NEO-M8P)
+                rtk_offset: false # True: set the takeoff point as zero for RTK model, otherwise, the zero point is the base station like mocap. Default should be false
         vo:
                 estimate_mode: 1 # 1<<0
         vo1: #downward

@@ -25,7 +25,7 @@
         </include>
 
         <!-- mocap -->
-        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" />
+        <!--<include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" />--> <!-- TODO: relief the load of mocap -->
 
         <!-- leddar one -->
         <include file="$(find leddar_one)/launch/leddar_one.launch" >
@@ -40,10 +40,11 @@
 
     <!-- basic configuration for sensors (e.g. noise sigma) -->
     <rosparam file="$(find hydrus)/config/sensors/imu/spinal.yaml" command="load" />
-    <rosparam file="$(find aerial_robot_base)/config/sensors/gps/ublox_m8n.yaml" command="load" />
+    <rosparam file="$(find aerial_robot_base)/config/sensors/gps/ublox_m9n.yaml" command="load" />
     <rosparam file="$(find hydrus)/config/sensors/vo/realsense_t265.yaml" command="load" />
     <rosparam file="$(find aerial_robot_base)/config/sensors/mocap.yaml" command="load" />
     <rosparam file="$(find aerial_robot_base)/config/sensors/altmeter/leddar_one.yaml" command="load" />
+    <rosparam file="$(find aerial_robot_base)/config/sensors/gps/ublox_rtk_m8p.yaml" command="load" />
 
   </group>
 
