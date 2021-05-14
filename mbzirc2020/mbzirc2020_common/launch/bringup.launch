@@ -79,6 +79,7 @@
     <arg name="simulation" value="$(arg simulation)" />
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
+    <arg name="estimate_mode" value="$(arg estimate_mode)"/>
   </include >
 
   ###########  Servo Bridge  ###########

@@ -5,6 +5,7 @@
   <arg name="simulation" default="false" />
   <arg name="horizontal_vio" default="false" />
   <arg name="robot_ns" default="hydrus" />
+  <arg name="estimate_mode" default="0" />
 
   <group ns="$(arg robot_ns)">
 
@@ -25,7 +26,7 @@
         </include>
 
         <!-- mocap -->
-        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" />
+        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" if="$(eval arg('estimate_mode') != 0)"/>
 
         <!-- leddar one -->
         <include file="$(find leddar_one)/launch/leddar_one.launch" >
