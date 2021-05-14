@@ -39,26 +39,15 @@
       <param name="io_method" value="mmap"/>
       <param name="image_raw/compressed/jpeg_quality" value="20" />
     </node>
-
-    ######### realsense d435 ###########
-    <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-          args="3 realsense2_camera rs_rgbd.launch camera:=rs_d435 color_width:=1280 color_height:=720"
-          name="timed_roslaunch" output="screen" unless="$(arg monocular_camera)" />
-
-    <param name="/rs_d435/color/image_raw/compressed/jpeg_quality" value="20" />
-    <param name="/rs_d435/color/image_rect_color/compressed/jpeg_quality" value="20" />
   </group>
 
   <!-- the teleop local frame -->
   <param name="aerial_robot_base_node/navigator/teleop_local_frame" value="monocular_camera_unit" if="$(arg monocular_camera)" />
-  <param name="aerial_robot_base_node/navigator/teleop_local_frame" value="rs_d435_unit" unless="$(arg monocular_camera)" />
-
 
   <!-- override robot model -->
   <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.urdf.xacro" unless="$(arg simulation)" />
   <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro" if="$(arg simulation)" />
 
-  <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
   <group ns="hydrus" >
     <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
   </group >
