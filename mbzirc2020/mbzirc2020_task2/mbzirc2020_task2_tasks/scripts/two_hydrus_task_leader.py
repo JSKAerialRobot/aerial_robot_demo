@@ -114,10 +114,14 @@ class ChangeHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
+        self.robot.goVel('local', [0.1,-0.1], None, None)
+
         if self.outdoor:
             self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 15000)
         elif not self.outdoor:
             self.robot.goPosHeightInterpolation('global', None, 1.0, None, gps_mode=False, time = 5000)
+
+        self.robot.goVel('local', [0.0,0.0], None, None)
 
         self.publish_state()
 
