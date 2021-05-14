@@ -7,7 +7,6 @@ estimation:
         - sensor_plugin/alt
         - sensor_plugin/vo
         - sensor_plugin/gps
-        - sensor_plugin/vo
 
         # egomotion estimation
         egomotion_list:
@@ -63,7 +62,3 @@ sensor_plugin:
                 downwards_vo_min_height: 0.25
                 outdoor_vel_noise_sigma: 0.03 #todo: please tuning this [0.01 ~ 0.03]
                 reset_srv_name: realsense1/reset
-#        vo2: #horizontal
-#                vo_sub_topic_name: /realsense2/odom/throttle
-#                sensor_frame: realsense2_pose_frame
-
