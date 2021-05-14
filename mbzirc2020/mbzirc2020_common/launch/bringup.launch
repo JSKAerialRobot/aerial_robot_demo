@@ -28,7 +28,6 @@
     <arg name="horizontal_vio" value="$(arg horizontal_vio)" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
     <arg name="robot_id" value="$(arg robot_id)" if="$(eval arg('robot_id') != '')" />
-    <arg name="use_vio" value="$(arg use_vio)"/>
   </include>
 
   ###########  Parameters  ###########

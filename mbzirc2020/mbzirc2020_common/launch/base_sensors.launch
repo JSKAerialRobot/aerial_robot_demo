@@ -6,7 +6,6 @@
   <arg name="horizontal_vio" default="false" />
   <arg name="robot_ns" default="hydrus" />
   <arg name="robot_id" default="1"/>
-  <arg name="use_vio" default="true"/>
 
   <group ns="$(arg robot_ns)">
 
@@ -19,7 +18,7 @@
         </include>
 
         <!-- vo by realsense t265 -->
-        <include file="$(find realsense2_camera)/launch/multi_t265_odom.launch" if="$(arg use_vio)">
+        <include file="$(find realsense2_camera)/launch/multi_t265_odom.launch" >
           <arg name="throttle_rate" value="80.0"/> <!-- 80 hz -->
           <arg name="reset_duration" value = "0.5" />
           <arg name="set_module_list" value="true"  if="$(arg horizontal_vio)"/>
