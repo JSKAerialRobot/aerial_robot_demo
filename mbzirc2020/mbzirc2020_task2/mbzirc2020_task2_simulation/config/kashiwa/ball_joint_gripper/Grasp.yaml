@@ -1,5 +1,0 @@
-grasp_joint_angle: [1.05, 1.05]
-ungrasp_joint_angle: [0.6, 0.6]
-preshape_joint_angle: [0.78, 0.78]
-reset_joint_angle: [1.5, 1.5]
-open_joint_angle: [0.6, 0.6]
