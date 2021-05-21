@@ -256,6 +256,7 @@
     <origin xyz="0 0 0.02" rpy="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="0" upper="0" effort="0" velocity="0"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="ball_joint12_left">
@@ -280,6 +281,7 @@
     <origin xyz="0 0 0.02" rpy="1.57 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-0.4363" upper="0.4363" effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy_left">
@@ -297,6 +299,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit lower="-0.4363" upper="0.4363" effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy2_left">
@@ -314,6 +317,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <limit effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="ball_joint2_left">
@@ -336,6 +340,7 @@
     <parent link="ball_joint2_left"/>
     <child link="circle_gripper_left"/>
     <origin xyz="-0.068 0.04 -0.068" rpy="0 0 0"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="circle_gripper_left">
@@ -369,6 +374,7 @@
     <origin xyz="0 0.017 0" rpy="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="0" upper="0" effort="0" velocity="0"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy_gripper_left">
@@ -424,6 +430,7 @@
     <origin xyz="0 0 0.02" rpy="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="0" upper="0" effort="0" velocity="0"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="ball_joint12_right">
@@ -448,6 +455,7 @@
     <origin xyz="0 0 0.02" rpy="1.57 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="-0.4363" upper="0.4363" effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy_right">
@@ -465,6 +473,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit lower="-0.4363" upper="0.4363" effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy2_right">
@@ -482,6 +491,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <limit effort="100" velocity="100"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="ball_joint2_right">
@@ -534,6 +544,7 @@
     <origin xyz="0 0.017 0" rpy="0 0 0"/>
     <axis xyz="1 0 0"/>
     <limit lower="0" upper="0" effort="0" velocity="0"/>
+    <dynamics damping="0.2" friction="0.02"/>
   </joint>
 
   <link name="dummy_gripper_right">
