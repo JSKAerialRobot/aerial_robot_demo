@@ -17,13 +17,11 @@
   <arg name="estimate_mode" default="0" />
 
   <arg name="outdoor" default="True" />
-  <arg name="worldtype" default="kashiwa" if="$(arg outdoor)"/>
-  <arg name="worldtype" default="kashiwa113" unless="$(arg outdoor)"/>
-  <arg name="config_version" default="_202104" if="$(arg outdoor)"/>
-  <arg name="config_version" default="" unless="$(arg outdoor)"/>
+  <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(arg outdoor)"/>
+  <arg name="worldtype" default="kashiwa113_202104_single_long_object" unless="$(arg outdoor)"/>
 
-  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)$(arg config_version)" if="$(arg real_machine)"/>
-  <arg name="config_dir" value="$(find mbzirc2020_task2_simulation)/config/$(arg worldtype)" if="$(arg simulation)"/>
+  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/real" if="$(arg real_machine)"/>
+  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/sim" if="$(arg simulation)"/>
 
   <arg name="ball_joint_gripper" default="True"/>
   <arg name="model" value="ball_joint_gripper" if="$(arg ball_joint_gripper)"/>
@@ -31,7 +29,7 @@
   <arg name="model" value="ring_gripper" if="$(arg ring_gripper)"/>
   <arg name="object_color" default="red" />
 
-  <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/two_hydrus_rviz_config"/>
+  <arg name="rviz_config_path" default="$(arg config_dir)/two_hydrus_rviz_config"/>
 
   # joy_stick for the leader machine
   <include file="$(find aerial_robot_base)/launch/external_module/joy_stick.launch" 
