@@ -25,7 +25,7 @@
         </include>
 
         <!-- mocap -->
-        <!--<include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" />--> <!-- TODO: relief the load of mocap -->
+        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" />
 
         <!-- leddar one -->
         <include file="$(find leddar_one)/launch/leddar_one.launch" >
