@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
-rosrun aerial_robot_base rosbag_control_data.sh /realsense1/odom/throttle /realsense1/odom /rs_d435/color/image_rect_color /rs_d435/color/camera_info /usb_cam/image_raw  --split --duration=30
+rosrun hydrus rosbag_control_data.sh  /rs_d435/color/image_rect_color /rs_d435/color/camera_info /usb_cam/image_raw /usb_cam/camera_info  --split --duration=30

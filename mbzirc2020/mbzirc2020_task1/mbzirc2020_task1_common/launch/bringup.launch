@@ -11,6 +11,7 @@
   <arg name="camera_pitch_angle" default="-0.087" />
   <arg name="camera_height" default="0" />
   <arg name="camera_name" default="elp_1080P_fov60" />
+  <arg name="only_rtkgps" default="false" />
   <arg name="robot_id" default="" />
 
   ##########  basic bringup file ########
@@ -21,14 +22,15 @@
     <arg name="sim_estimate_mode"  value= "$(arg sim_estimate_mode)" />
     <arg name="headless" value="$(arg headless)" />
     <arg name="task" value="1" />
+    <arg name="model_suffix" value="_only_rtkgps" if="$(arg only_rtkgps)"/>
     <arg name="robot_id" value="$(arg robot_id)" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
     <arg name="worldtype" value="$(find mbzirc2020_task1_common)/gazebo_model/world/mbzirc_arena_task_1.world" />
   </include>
 
-  <group if="$(arg real_machine)">
+  <group if="$(eval arg('real_machine') and not arg('simulation'))">
     ######### monocular camera (ELP-SUSB1080P) ######
-    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" if="$(arg monocular_camera)" >
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" if="$(eval arg('monocular_camera') and not arg('only_rtkgps'))" ns="hydrus$(arg robot_id)" >
       <param name="video_device" value="/dev/video0" />
       <param name="image_width" value="1920" />
       <param name="image_height" value="1080" />
@@ -39,17 +41,40 @@
       <param name="io_method" value="mmap"/>
       <param name="image_raw/compressed/jpeg_quality" value="20" />
     </node>
+
+    ######## RTK GPS #############
+    <group if="$(arg only_rtkgps)">
+      <group ns="hydrus$(arg robot_id)">
+        <include file="$(find aerial_robot_base)/launch/external_module/rtk_gps.launch" >
+          <arg name="module_name" value="holybro_m8p" />
+          <arg name="ntrip_ip" value="192.168.1.141" />
+        </include>
+      </group>
+    </group>
   </group>
 
   <!-- the teleop local frame -->
   <param name="aerial_robot_base_node/navigator/teleop_local_frame" value="monocular_camera_unit" if="$(arg monocular_camera)" />
 
+  <group if="$(arg monocular_camera)">
+    <!-- override robot model -->
+    <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.urdf.xacro" unless="$(arg simulation)" />
+    <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro" if="$(arg simulation)" />
+
+    <group ns="hydrus" >
+      <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
+    </group>
+  </group>
+
+
   <!-- override robot model -->
-  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.urdf.xacro" unless="$(arg simulation)" />
-  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus.gazebo.xacro" if="$(arg simulation)" />
+  <arg name="model_suffix" value="_only_rtkgps" if="$(arg only_rtkgps)"/>
+  <arg name="model_suffix" value="" unless="$(arg only_rtkgps)"/>
+  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus$(arg model_suffix).urdf.xacro" unless="$(arg simulation)" />
+  <arg name="robot_model" value="$(find mbzirc2020_task1_common)/robots/hydrus$(arg model_suffix).gazebo.xacro" if="$(arg simulation)" />
 
   <group ns="hydrus" >
     <param name="robot_description" command="$(find xacro)/xacro '$(arg robot_model)' monocular_camera:=$(arg monocular_camera) camera_height:=$(arg camera_height) camera_pitch_angle:=$(arg camera_pitch_angle)" />
-  </group >
+  </group>
 
 </launch>

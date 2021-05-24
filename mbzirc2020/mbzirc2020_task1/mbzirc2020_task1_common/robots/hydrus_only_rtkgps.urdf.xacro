@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
+
+  <!-- base kinematics model -->
+  <xacro:arg name="monocular_camera" default="true" />
+  <xacro:arg name="camera_height" default="0" />
+  <xacro:arg name="camera_pitch_angle" default="0" />
+  <xacro:arg name="horizontal_vio" default="false" />
+  <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
+  <xacro:robot_model tilt_angle = "10" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"/>
+
+  <!-- special battery arrangement -->
+  <xacro:extra_module name = "bat1" parent = "link1" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.411"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "bat2" parent = "link4" visible = "1"
+                      model_url = "package://hydrus/urdf/mesh/battery/Kypom-3000-6s.dae">
+    <origin xyz="${link_length/2} 0.0 -0.048" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.411"/>
+      <inertia
+          ixx="0.0001" iyy="0.0006" izz="0.0006"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+
+  <!-- processor: gygabyte brix i7 -->
+  <xacro:extra_module name = "pc" parent = "link2" visible = "1"
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/processor/gygabyte_brix_fixed_joint_unit.STL" >
+    <origin xyz="${link_length / 2 + 0.27486} 0.02569 0.04" rpy="0 0 0"/>
+    <inertial>
+      <mass value = "0.323" /> <!-- plus cable for leddar one-->
+      <origin xyz="${1.5 * 0.001} ${-3.5 * 0.001} ${8.9 * 0.001}" rpy="0 0 0"/>
+      <inertia
+          ixx="0.000351" ixy="0.0" ixz="0.0"
+          iyy="0.000272" iyz="0.0"
+          izz="0.000570"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: gygabyte brix i7 -->
+
+  <!-- RTK GPS -->
+  <xacro:extra_module name = "rtk_gps" parent = "link2" visible = "0" >
+    <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 0 ${pi * 3/4}"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${0.047 + 0.026}"/> <!-- plus center mounting bar 0.026 Kg -->
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <xacro:extra_module name = "rtkgps_usb_cable" parent = "rtk_gps" visible = "0" >
+    <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+    <inertial>
+      <mass value = "0.017" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0"/>
+    </inertial>
+  </xacro:extra_module>
+  <!-- end: RTK GPS -->
+
+</robot>
