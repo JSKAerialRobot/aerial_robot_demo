@@ -17,7 +17,7 @@
     <arg name="robot_model" value="$(find mbzirc2020_task2_common)/robots/hydrus$(arg model_suffix).gazebo.xacro"/>
     <arg name="robot_ns" value="$(arg robot_ns)" />
     <arg name="model_options" value="horizontal_vio:=0" />
-    <arg name="rviz_config" value="$(find mbzirc2020_task2_common)/launch/debug/rosbag_replay_rviz_config"/>
+    <arg name="rviz_config" value="$(find mbzirc2020_task2_common)/launch/debug/$(arg robot_ns)_rosbag_replay_rviz_config"/>
     <arg name="rviz_init_pose" value="$(find mbzirc2020_common)/config/RvizInit.yaml" />
     <arg name="need_joint_state" value="false"/>
   </include>
