@@ -1,3 +1,11 @@
 #!/bin/bash
 
-rosbag play $@ --clock --pause /hydrus/rectangle_detection_color/target_object_color:=/hydrus/rectangle_detection_color/target_object_color_orig /hydrus/rectangle_detection_depth/target_object_depth:=/hydrus/rectangle_detection_depth/target_object_depth_orig hydrus/kf/alt1/data:=/hydrus/kf/alt1/data_orig hydrus/kf/gps1/data:=hydrus/kf/gps1/data_orig hydrus/kf/imu1/data:=hydrus/kf/imu1/data_orig hydrus/kf/vo1/data:=hydrus/kf/vo1/data_orig /hydrus/kf/plane_detection1/data:=/hydrus/kf/plane_detection1/data_orig
+echo ID=$1
+
+NS=/hydrus$1
+
+echo namespace=$NS
+
+echo bag=$2
+
+rosbag play $2 --clock --pause $NS/rectangle_detection_color/target_object_color:=$NS/rectangle_detection_color/target_object_color_orig $NS/rectangle_detection_depth/target_object_depth:=$NS/rectangle_detection_depth/target_object_depth_orig $NS/kf/alt1/data:=$NS/kf/alt1/data_orig $NS/kf/gps1/data:=$NS/kf/gps1/data_orig $NS/kf/imu1/data:=$NS/kf/imu1/data_orig $NS/kf/vo1/data:=$NS/kf/vo1/data_orig $NS/kf/plane_detection1/data:=$NS/kf/plane_detection1/data_orig
