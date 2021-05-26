@@ -13,8 +13,8 @@
   <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa113_202104_single_long_object" unless="$(arg outdoor)"/>
 
-  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/real" if="$(arg real_machine)"/>
-  <arg name="config_dir" value="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/sim" if="$(arg simulation)"/>
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/real" if="$(arg real_machine)"/>
+  <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/sim" if="$(arg simulation)"/>
 
   <arg name="object_color" default="red" />
 
