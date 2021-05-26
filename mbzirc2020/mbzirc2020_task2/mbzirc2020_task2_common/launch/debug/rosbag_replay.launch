@@ -36,6 +36,7 @@
     <include file="$(find mbzirc2020_task2_common)/launch/debug/image_republish.launch"/>
 
     <include file="$(find mbzirc2020_task2_tasks)/launch/recognition.launch">
+      <arg name="tf_prefix" value="$(arg robot_ns)"/>
       <arg name="config_dir" value="$(arg config_dir)"/>
       <arg name="object_color" value="$(arg object_color)"/>
       <arg name="need_voxel_grid" value="true"/>

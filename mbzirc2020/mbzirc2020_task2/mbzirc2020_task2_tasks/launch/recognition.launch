@@ -76,11 +76,11 @@
         clear_params="true">
     <remap from="~input" to="voxel_grid/output" />
     <remap from="~target" to="euclidean_clustering/output" />
-    <rosparam>
+    <rosparam subst_value="true">
       approximate_sync: true
       align_boxes: true
       align_boxes_with_plane: false
-      target_frame_id: hydrus/base_footprint
+      target_frame_id: $(arg tf_prefix)/base_footprint
       sort_by: cloud_size
     </rosparam>
   </node>
