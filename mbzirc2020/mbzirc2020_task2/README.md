@@ -49,7 +49,7 @@ $ rossetlocal
 $ rossetip
 $ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch
 ```
-  
+
 In the leader machine  
 ```
 $ rossetmaster (external PC's IP)
@@ -73,3 +73,17 @@ $ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch simulati
 ```
 $ roslaunch mbzirc2020_task2_common coop_laptop_master_transport.launch simulation:=true real_machine:=false headless:=false outdoor:=false
 ```
+
+
+
+## Debug
+
+```
+$ roslaunch mbzirc2020_task2_common rosbag_replay.launch robot_ns:=[hydrus1 or hydrus2]
+```
+
+```
+$ rosrun mbzirc2020_task2_common play.sh [robot_id (1 or 2)] [rosbag file]
+```
+
+- Then press space key to play rosbag.
