@@ -5,7 +5,7 @@ estimation:
   - sensor_plugin/imu
   - sensor_plugin/mocap
   - sensor_plugin/alt
-  - sensor_plugin/vo
+  # - sensor_plugin/vo
   - sensor_plugin/gps
   - sensor_plugin/plane_detection
   - sensor_plugin/gps # RTK-GPS. Please consider to remove vo for sensor fusion if you use RTK-GPS in an open outdoor enviroment

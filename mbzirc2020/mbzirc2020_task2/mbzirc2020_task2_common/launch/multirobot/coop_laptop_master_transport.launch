@@ -16,8 +16,11 @@
   <arg name="headless" default="True" />
   <arg name="estimate_mode" default="0" />
 
+  <arg name="skip_pick" default="True" />
+
   <arg name="outdoor" default="True" />
-  <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(arg outdoor)"/>
+  <arg name="worldtype" default="kashiwa_202104" if="$(eval not arg('skip_pick') and arg('outdoor'))" />
+  <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(eval arg('skip_pick') and arg('outdoor'))"/>
   <arg name="worldtype" default="kashiwa113_202104_single_long_object" unless="$(arg outdoor)"/>
 
   <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)/real" if="$(arg real_machine)"/>
@@ -104,6 +107,7 @@
         output="screen">
     <param name="robot_ns_leader" value="$(arg robot_ns_leader)"/>
     <param name="robot_ns_follower" value="$(arg robot_ns_follower)"/>
+    <param name="skip_pick" value="$(arg skip_pick)"/>
   </node>
 
   # if real_machine,  in each machine:

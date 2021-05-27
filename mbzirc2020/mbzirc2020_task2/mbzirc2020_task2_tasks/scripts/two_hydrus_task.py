@@ -37,6 +37,8 @@ class Start(Task2State):
         Task2State.__init__(self, state_name=self.__class__.__name__,
                                   outcomes=['succeeded'])
 
+        self.skip_pick = rospy.get_param('~skip_pick')
+
         self.task_start_sub = rospy.Subscriber('/task_start', Empty, self.TaskStartCallback)
 
         self.task_start = False
