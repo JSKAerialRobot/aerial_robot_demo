@@ -27,8 +27,9 @@ class FTSensorFeedbackInterface:
         self.sensor_takeoff = sensor_takeoff
         self.sensor_landing = sensor_landing
 
-        self.m = 4.5
-        self.m_o = 1.8
+        self.mass = rospy.get_param('~mass',4.5)
+        self.mass_object = rospy.get_param('~mass_object', 1.8)
+
         self.X_acc = np.array([0,0,0])
 
         self.flight_state = 0
@@ -36,11 +37,11 @@ class FTSensorFeedbackInterface:
 
         self.commanded_takeoff = False
         self.commanded_landing = False
-        self.takeoff_thre=0.05
-        self.landing_thre=-0.05
+        self.takeoff_thre=rospy.get_param('~takeoff_thre',0.05)
+        self.landing_thre=rospy.get_param('~landing_thre',-0.05)
 
-        self.short_span = 25
-        self.long_span = 100
+        self.short_span = rospy.get_param('~short_span',25)
+        self.long_span = rospy.get_param('~long_span',100)
         self.smooth_const_short = 2.0/(self.short_span + 1)
         self.smooth_const_long = 2.0/(self.long_span + 1)
         self.ft_ema_short_left = WrenchStamped()
@@ -76,7 +77,7 @@ class FTSensorFeedbackInterface:
         self.X_nav_pid_minimum = -0.05
         self.X_nav_i_max = 0.01
         self.X_nav_i_min = -0.01
-        self.X_nav_PID_controller = PIDController(K_P = self.X_nav_p_gain, K_I = self.X_nav_i_gain, K_D = self.X_nav_d_gain, maximum = self.X_nav_pid_maximum, minimum = self.X_nav_pid_minimum,i_max=self.X_nav_i_max,i_min=self.X_nav_i_min,topic_name=robot_ns + '/debug/pid/X_nav')
+        self.X_nav_PID_controller = PIDController(K_P = self.X_nav_p_gain, K_I = self.X_nav_i_gain, K_D = self.X_nav_d_gain, maximum = self.X_nav_pid_maximum, minimum = self.X_nav_pid_minimum,i_max=self.X_nav_i_max,i_min=self.X_nav_i_min,topic_name='debug/pid/X_nav')
 
         self.yaw_nav_p_gain = 0.6
         self.yaw_nav_i_gain = 0.4
@@ -85,45 +86,54 @@ class FTSensorFeedbackInterface:
         self.yaw_nav_minimum = -0.78
         self.yaw_nav_i_max = 0.78
         self.yaw_nav_i_min = -0.78
-        self.yaw_nav_PID_controller = PIDController(K_P = self.yaw_nav_p_gain, K_I = self.yaw_nav_i_gain, K_D = self.yaw_nav_d_gain, maximum = self.yaw_nav_maximum, minimum = self.yaw_nav_minimum,i_max=self.yaw_nav_i_max,i_min=self.yaw_nav_i_min,topic_name=robot_ns + '/debug/pid/yaw_nav')
+        self.yaw_nav_PID_controller = PIDController(K_P = self.yaw_nav_p_gain, K_I = self.yaw_nav_i_gain, K_D = self.yaw_nav_d_gain, maximum = self.yaw_nav_maximum, minimum = self.yaw_nav_minimum,i_max=self.yaw_nav_i_max,i_min=self.yaw_nav_i_min,topic_name='debug/pid/yaw_nav')
 
-        self.start_pub = rospy.Publisher(robot_ns + '/teleop_command/start', Empty, queue_size=10)
-        self.takeoff_pub = rospy.Publisher(robot_ns + '/teleop_command/takeoff', Empty, queue_size=10)
-        self.landing_pub = rospy.Publisher(robot_ns + '/teleop_command/land', Empty, queue_size=10)
-        self.uav_nav_pub = rospy.Publisher(robot_ns + '/uav/nav', FlightNav, queue_size=10)
-        self.debug_left_ft_cog_pub = rospy.Publisher(robot_ns + '/debug/left_ft_cog',WrenchStamped, queue_size=10)
-        self.debug_right_ft_cog_pub = rospy.Publisher(robot_ns + '/debug/right_ft_cog',WrenchStamped, queue_size=10)
-        self.debug_ft_cog_pub = rospy.Publisher(robot_ns + '/debug/ft_cog',WrenchStamped, queue_size=10)
-        self.debug_x_axis_force_pub = rospy.Publisher(robot_ns + '/debug/x_axis_force',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_short_left_pub = rospy.Publisher(robot_ns + '/debug/ema_short_left',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_short_right_pub = rospy.Publisher(robot_ns + '/debug/ema_short_right',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_long_left_pub = rospy.Publisher(robot_ns + '/debug/ema_long_left',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_long_right_pub = rospy.Publisher(robot_ns + '/debug/ema_long_right',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_short_cog_left_pub = rospy.Publisher(robot_ns + '/debug/ema_short_cog_left',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_short_cog_right_pub = rospy.Publisher(robot_ns + '/debug/ema_short_cog_right',WrenchStamped, queue_size=10)
-        self.debug_X_axis_acc_inner_product_pub = rospy.Publisher(robot_ns + '/debug/X_axis_acc_inner_product', Float64, queue_size=10)
-        self.debug_ft_ema_long_cog_left_pub = rospy.Publisher(robot_ns + '/debug/ema_long_cog_left',WrenchStamped, queue_size=10)
-        self.debug_ft_ema_long_cog_right_pub = rospy.Publisher(robot_ns + '/debug/ema_long_cog_right',WrenchStamped, queue_size=10)
-        self.debug_vector_pub = rospy.Publisher(robot_ns + '/debug/vector',WrenchStamped, queue_size=10)
-        self.debug_vector2_pub = rospy.Publisher(robot_ns + '/debug/vector2',WrenchStamped, queue_size=10)
-        self.debug_X_axis_movement_pub = rospy.Publisher(robot_ns + '/debug/X_axis_movement',WrenchStamped, queue_size=10)
-        self.debug_yaw_pub = rospy.Publisher(robot_ns + '/debug/yaw',Float64, queue_size=10)
+        self.start_pub = rospy.Publisher('teleop_command/start', Empty, queue_size=10)
+        self.takeoff_pub = rospy.Publisher('teleop_command/takeoff', Empty, queue_size=10)
+        self.landing_pub = rospy.Publisher('teleop_command/land', Empty, queue_size=10)
+        self.uav_nav_pub = rospy.Publisher('uav/nav', FlightNav, queue_size=10)
+        self.debug_left_ft_cog_pub = rospy.Publisher('debug/left_ft_cog',WrenchStamped, queue_size=10)
+        self.debug_right_ft_cog_pub = rospy.Publisher('debug/right_ft_cog',WrenchStamped, queue_size=10)
+        self.debug_ft_cog_pub = rospy.Publisher('debug/ft_cog',WrenchStamped, queue_size=10)
+        self.debug_x_axis_force_pub = rospy.Publisher('debug/x_axis_force',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_short_left_pub = rospy.Publisher('debug/ema_short_left',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_short_right_pub = rospy.Publisher('debug/ema_short_right',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_long_left_pub = rospy.Publisher('debug/ema_long_left',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_long_right_pub = rospy.Publisher('debug/ema_long_right',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_short_cog_left_pub = rospy.Publisher('debug/ema_short_cog_left',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_short_cog_right_pub = rospy.Publisher('debug/ema_short_cog_right',WrenchStamped, queue_size=10)
+        self.debug_X_axis_acc_inner_product_pub = rospy.Publisher('debug/X_axis_acc_inner_product', Float64, queue_size=10)
+        self.debug_ft_ema_long_cog_left_pub = rospy.Publisher('debug/ema_long_cog_left',WrenchStamped, queue_size=10)
+        self.debug_ft_ema_long_cog_right_pub = rospy.Publisher('debug/ema_long_cog_right',WrenchStamped, queue_size=10)
+        self.debug_vector_pub = rospy.Publisher('debug/vector',WrenchStamped, queue_size=10)
+        self.debug_vector2_pub = rospy.Publisher('debug/vector2',WrenchStamped, queue_size=10)
+        self.debug_X_axis_movement_pub = rospy.Publisher('debug/X_axis_movement',WrenchStamped, queue_size=10)
+        self.debug_yaw_pub = rospy.Publisher('debug/yaw',Float64, queue_size=10)
 
-        self.flight_state_sub = rospy.Subscriber(robot_ns + '/flight_state', UInt8, self.FlightStateCallback)
+        self.flight_state_sub = rospy.Subscriber('flight_state', UInt8, self.FlightStateCallback)
         self.cfs_left_sub = rospy.Subscriber('cfs/data/left', WrenchStamped, self.SensorCallbackLeft)
         self.cfs_right_sub = rospy.Subscriber('cfs/data/right', WrenchStamped, self.SensorCallbackRight)
-        self.odom_sub = rospy.Subscriber(robot_ns +'/uav/cog/odom', Odometry, self.OdometryCallback)
-        self.ft_sensor_feedback_switch_sub = rospy.Subscriber(robot_ns + '/ft_sensor_feedback_switch', Int8, self.FTSensorFeedbackSwitchCallback)
+        self.odom_sub = rospy.Subscriber('uav/cog/odom', Odometry, self.OdometryCallback)
+        self.ft_sensor_feedback_switch_sub = rospy.Subscriber('ft_sensor_feedback_switch', Int8, self.FTSensorFeedbackSwitchCallback)
 
-        rospy.wait_for_service('/cfs/sensor_calib/left')
-        self.calib_left = rospy.ServiceProxy('/cfs/sensor_calib/left',EmptyService)
-        rospy.wait_for_service('/cfs/sensor_calib/right')
-        self.calib_right = rospy.ServiceProxy('/cfs/sensor_calib/right',EmptyService)
-        rospy.wait_for_service(robot_ns + '/controller/lqi/set_parameters')
-        self.set_yaw_free_service = rospy.ServiceProxy(robot_ns + '/controller/lqi/set_parameters',Reconfigure)
+        rospy.wait_for_service('cfs/sensor_calib/left')
+        self.calib_left = rospy.ServiceProxy('cfs/sensor_calib/left',EmptyService)
+        rospy.wait_for_service('cfs/sensor_calib/right')
+        self.calib_right = rospy.ServiceProxy('cfs/sensor_calib/right',EmptyService)
+        rospy.wait_for_service('controller/lqi/set_parameters')
+        self.set_yaw_free_service = rospy.ServiceProxy('controller/lqi/set_parameters',Reconfigure)
 
         self.listener = tf.TransformListener()
 
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
+        rospy.loginfo('init_ft_sensor_feedback_interface')
         rospy.loginfo('init_ft_sensor_feedback_interface')
 
     def takeoff_landing_check(self):
@@ -244,7 +254,7 @@ class FTSensorFeedbackInterface:
         #d = np.linalg.norm(x_component_of_torque_right/self.X_nav_L, ord=2)
         #print(a,b,c,d)
 
-        e_X = (1.0/2.0)*(3.0 + self.m_o/self.m)*delta_f_o
+        e_X = (1.0/2.0)*(3.0 + self.mass_object/self.mass)*delta_f_o
 
         # use self.x_unit_vector_from_cog_right as a representative vector of X_axis
         e_X_raw_inner_product = (e_X[0] * X_unit_vector_from_cog[0]) + (e_X[1] * X_unit_vector_from_cog[1])
@@ -255,9 +265,9 @@ class FTSensorFeedbackInterface:
         e_X_pid_inner_product = self.X_nav_PID_controller.update(e_X_raw_inner_product)
 
         # in theory 
-        self.X_acc = X_acc_before + (1.0/(2*self.m))*(3 + self.m_o/self.m)*delta_f_o + (1.0/self.m)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X
+        self.X_acc = X_acc_before + (1.0/(2*self.mass))*(3 + self.mass_object/self.mass)*delta_f_o + (1.0/self.mass)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X
         # in use
-        #self.X_acc = (1.0/(2*self.m))*(3 + self.m_o/self.m)*delta_f_o + (1.0/self.m)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X
+        #self.X_acc = (1.0/(2*self.mass))*(3 + self.mass_object/self.mass)*delta_f_o + (1.0/self.mass)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X
 
         total_raw_norm = np.linalg.norm(self.X_acc, ord=2)
         total_clamped_norm = min(total_raw_norm, self.X_nav_norm_maximum)
@@ -322,8 +332,8 @@ class FTSensorFeedbackInterface:
         ### publish debug
         wrench_msg = WrenchStamped()
         wrench_msg.header.frame_id = self.robot_ns + '/cog'
-        wrench_msg.wrench.force.x = ((1.0/(2*self.m))*(3 + self.m_o/self.m)*delta_f_o)[0]
-        wrench_msg.wrench.force.y = ((1.0/(2*self.m))*(3 + self.m_o/self.m)*delta_f_o)[1]
+        wrench_msg.wrench.force.x = ((1.0/(2*self.mass))*(3 + self.mass_object/self.mass)*delta_f_o)[0]
+        wrench_msg.wrench.force.y = ((1.0/(2*self.mass))*(3 + self.mass_object/self.mass)*delta_f_o)[1]
         #wrench_msg.wrench.force.x = x_component_of_force_left[0]
         #wrench_msg.wrench.force.y = x_component_of_force_left[1]
         wrench_msg.wrench.force.z = 0
@@ -335,8 +345,8 @@ class FTSensorFeedbackInterface:
         ### publish debug
         wrench_msg = WrenchStamped()
         wrench_msg.header.frame_id = self.robot_ns + '/cog'
-        wrench_msg.wrench.force.x = ((1.0/self.m)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X)[0]
-        wrench_msg.wrench.force.y = ((1.0/self.m)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X)[1]
+        wrench_msg.wrench.force.x = ((1.0/self.mass)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X)[0]
+        wrench_msg.wrench.force.y = ((1.0/self.mass)*(e_X_pid_inner_product/e_X_raw_inner_product)*e_X)[1]
         #wrench_msg.wrench.force.x = x_component_of_force_right[0]
         #wrench_msg.wrench.force.y = x_component_of_force_right[1]
         wrench_msg.wrench.force.z = 0

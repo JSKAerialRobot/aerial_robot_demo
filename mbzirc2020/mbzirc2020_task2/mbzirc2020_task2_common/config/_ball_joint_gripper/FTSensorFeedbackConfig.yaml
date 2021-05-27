@@ -1,0 +1,7 @@
+mass: 4.5
+mass_object: 1.8
+takeoff_thre: 0.05
+landing_thre: -0.05
+short_span: 25
+long_span: 100
+

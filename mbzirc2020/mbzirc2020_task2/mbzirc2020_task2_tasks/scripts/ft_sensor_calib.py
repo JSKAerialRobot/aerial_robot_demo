@@ -7,16 +7,16 @@ from geometry_msgs.msg import WrenchStamped
 from std_srvs.srv import Empty,EmptyResponse
 
 class FT_SENSOR_CALIB:
-    def __init__(self,robot_ns):
-        self.ft_sensor_left_sub = rospy.Subscriber(robot_ns+'/ft_sensor_topic_left',WrenchStamped,self.SensorCallbackLeft)
-        self.ft_sensor_right_sub = rospy.Subscriber(robot_ns+'/ft_sensor_topic_right',WrenchStamped,self.SensorCallbackRight)
+    def __init__(self):
+        self.ft_sensor_left_sub = rospy.Subscriber('gazebo/cfs/data/left',WrenchStamped,self.SensorCallbackLeft)
+        self.ft_sensor_right_sub = rospy.Subscriber('gazebo/cfs/data/right',WrenchStamped,self.SensorCallbackRight)
 
         #use same topic name of real_machine
-        self.cfs_sensor_left_pub = rospy.Publisher('/cfs/data/left',WrenchStamped,queue_size=10)
-        self.cfs_sensor_right_pub = rospy.Publisher('/cfs/data/right',WrenchStamped,queue_size=10)
+        self.cfs_sensor_left_pub = rospy.Publisher('cfs/data/left',WrenchStamped,queue_size=10)
+        self.cfs_sensor_right_pub = rospy.Publisher('cfs/data/right',WrenchStamped,queue_size=10)
 
-        self.left_sensor_calib_srv = rospy.Service('/cfs/sensor_calib/left',Empty,self.CalibrationLeft)
-        self.right_sensor_calib_srv = rospy.Service('/cfs/sensor_calib/right',Empty,self.CalibrationRight)
+        self.left_sensor_calib_srv = rospy.Service('cfs/sensor_calib/left',Empty,self.CalibrationLeft)
+        self.right_sensor_calib_srv = rospy.Service('cfs/sensor_calib/right',Empty,self.CalibrationRight)
 
         # last data
         self.last_force_x_left = []
@@ -141,8 +141,6 @@ if __name__ == '__main__':
 
     rospy.init_node('ft_sensor_calib')
 
-    robot_ns = rospy.get_param('/ft_sensor_calib/robot_ns','hydrus')
-
-    hydrus_ft_calib = FT_SENSOR_CALIB(robot_ns=robot_ns)
+    hydrus_ft_calib = FT_SENSOR_CALIB()
 
     rospy.spin()

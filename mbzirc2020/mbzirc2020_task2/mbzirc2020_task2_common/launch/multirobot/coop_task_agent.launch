@@ -49,20 +49,34 @@
   </include>
 
   # cfs sensor
-  <include file="$(find mbzirc2020_task2_common)/launch/two_tf_sensors.launch" if="$(eval real_machine=='true' and ft_sensor_feedback=='true')"/>
+  <group ns="$(arg robot_ns)">
+    <include file="$(find mbzirc2020_task2_common)/launch/two_tf_sensors.launch" if="$(eval arg('real_machine') and arg('ft_sensor_feedback'))"/>
+  </group>
 
   <param name="/$(arg robot_ns)/tf_prefix" value="$(arg robot_ns)"/>
 
-  # if follower, navigate hydrus by ft_sensor
-  <node name="ft_sensor_feedback_navigation"
-        pkg="mbzirc2020_task2_common"
-        type="ft_sensor_feedback_navigation.py" 
-        output="screen" 
-        if="$(arg ft_sensor_feedback)"> 
-    <param name="robot_ns" value="$(arg robot_ns)"/> 
-    <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
-    <param name="sensor_landing" value="$(arg sensor_landing)"/>
-  </node>
+  # convert simulation sensor topic into real sensor topic
+  <group ns="$(arg robot_ns)">
+    <node name="ft_sensor_calib" 
+          pkg="mbzirc2020_task2_tasks" 
+          type="ft_sensor_calib.py" 
+          output="screen" 
+          if="$(arg simulation)" />
+  </group>
+
+  # ft_sensor node
+  <group ns="$(arg robot_ns)">
+    <node name="ft_sensor_feedback_navigation"
+          pkg="mbzirc2020_task2_common"
+          type="ft_sensor_feedback_navigation.py" 
+          output="screen" 
+          if="$(arg ft_sensor_feedback)"> 
+      <param name="robot_ns" value="$(arg robot_ns)"/> 
+      <param name="sensor_takeoff" value="$(arg sensor_takeoff)"/>
+      <param name="sensor_landing" value="$(arg sensor_landing)"/>
+      <rosparam command="load" file="$(find mbzirc2020_task2_common)/config/_ball_joint_gripper/FTSensorFeedbackConfig.yaml"/>
+    </node>
+  </group>
 
   # recognition
   <group ns="$(arg robot_ns)">
@@ -88,6 +102,6 @@
       <param name="simulation" value="$(arg simulation)" />
       <param name="outdoor" value="$(arg outdoor)" />
     </node>
-    </group>
+  </group>
 
 </launch>

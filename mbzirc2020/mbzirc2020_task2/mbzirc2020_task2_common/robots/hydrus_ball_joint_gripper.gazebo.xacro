@@ -97,7 +97,7 @@
     <plugin name="$(arg robot_name)/ft_sensor_left" filename="libgazebo_ros_ft_sensor.so">
       <updateRate>100.0</updateRate>
       <robotNamespace>$(arg robot_name)</robotNamespace>
-      <topicName>ft_sensor_topic_left</topicName>
+      <topicName>gazebo/cfs/data/left</topicName>
       <jointName>cfs_sensor_left</jointName>
     </plugin>
   </gazebo>
@@ -106,7 +106,7 @@
     <plugin name="$(arg robot_name)/ft_sensor_right" filename="libgazebo_ros_ft_sensor.so">
       <updateRate>100.0</updateRate>
       <robotNamespace>$(arg robot_name)</robotNamespace>
-      <topicName>ft_sensor_topic_right</topicName>
+      <topicName>gazebo/cfs/data/right</topicName>
       <jointName>cfs_sensor_right</jointName>
     </plugin>
   </gazebo>
