@@ -65,7 +65,8 @@ class Grasp(Task2State):
         #self.robot.grasp()
 
         if not self.simulation:
-            self.robot.add_long_object_to_model(action="add")
+            #self.robot.add_long_object_to_model(action="add")
+            pass
 
         self.publish_state()
 
@@ -114,14 +115,16 @@ class ChangeHeight(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.goVel('local', [0.1,-0.1], None, None)
+    
+        #for _ in range(5):
+        #    self.robot.goVel('local', [0.0707,-0.0707], None, None)
 
         if self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 15000)
+            self.robot.goPosHeightInterpolation('global', None, 3.5, None, gps_mode=False, time = 40000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 1.0, None, gps_mode=False, time = 5000)
+            self.robot.goPosHeightInterpolation('global', None, 1.2, None, gps_mode=False, time = 5000)
 
-        self.robot.goVel('local', [0.0,0.0], None, None)
+        #self.robot.goVel('local', [0.0,0.0], None, None)
 
         self.publish_state()
 
@@ -136,9 +139,9 @@ class EnablePlaneDetection(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.enable_plane_detection(flag = True)
+        #self.robot.enable_plane_detection(flag = True)
 
-        self.robot.enable_alt_sensor(flag = False)
+        #self.robot.enable_alt_sensor(flag = False)
 
         self.publish_state()
 
@@ -280,7 +283,7 @@ class AdjustHeight(Task2State):
         if self.outdoor:
             self.robot.goPosHeightInterpolation('global', None, 2.3, None, gps_mode=False, time = 10000)
         elif not self.outdoor:
-            self.robot.goPosHeightInterpolation('global', None, 0.75, None, gps_mode=False, time = 10000)
+            self.robot.goPosHeightInterpolation('global', None, 0.9, None, gps_mode=False, time = 2000)
 
         self.publish_state()
 
