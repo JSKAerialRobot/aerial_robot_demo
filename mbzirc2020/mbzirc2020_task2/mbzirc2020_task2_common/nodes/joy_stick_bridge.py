@@ -2,7 +2,7 @@
 
 import rospy
 
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, Int8
 from sensor_msgs.msg import JointState
 from sensor_msgs.msg import Joy
 
@@ -25,6 +25,8 @@ class JoyStickBridge:
         self.joint_slave_pub = rospy.Publisher(robot_ns_slave + '/joints_ctrl', JointState, queue_size=1)
 
         self.joint_master_pub = rospy.Publisher(robot_ns_master + '/joints_ctrl', JointState, queue_size=1)
+        self.leader_ctrl_mode_pub = rospy.Publisher(robot_ns_master+ '/teleop_command/ctrl_mode', Int8, queue_size=10)
+        self.follower_ctrl_mode_pub = rospy.Publisher(robot_ns_slave+ '/teleop_command/ctrl_mode', Int8, queue_size=10)
 
 
 
@@ -58,6 +60,29 @@ class JoyStickBridge:
         elif (msg.buttons[0] == 1 and msg.axes[9] == -1.0) and not (self.prev_joy_state.buttons[0] == 1 and self.prev_joy_state.axes[9] == -1.0):
             self.landing_pub.publish(Empty())
 
+
+        #in emergency change to pos-mode & ungrasp 
+        elif msg.buttons[4] == 1 and self.prev_joy_state.buttons[4] == 0:
+
+            angle = 0.7
+            joint_msg = JointState()
+            joint_msg.name = ['joint1','joint3']
+            joint_msg.position = [angle,angle]
+            joint_msg.velocity = [0.0]
+            joint_msg.effort = [0.0]
+
+            for i in range(100):
+                self.joint_master_pub.publish(joint_msg)
+                self.joint_slave_pub.publish(joint_msg)
+                rospy.sleep(0.01)
+
+            msg = Int8()
+            msg.data = 0
+            for i in range(5):
+                self.leader_ctrl_mode_pub.publish(msg)
+                self.follower_ctrl_mode_pub.publish(msg)
+                rospy.sleep(0.1)
+
         #grasping
         elif msg.buttons[5] == 1 and self.prev_joy_state.buttons[5] == 0:
             if self.grasp_flag == 1:
@@ -87,19 +112,10 @@ class JoyStickBridge:
                 joint_msg.effort = [0.0]
 
                 for i in range(100):
+                    self.joint_master_pub.publish(joint_msg)
                     self.joint_slave_pub.publish(joint_msg)
                     rospy.sleep(0.01)
 
-                angle = 1.15 # ring_gripper 1.5
-                joint_msg = JointState()
-                joint_msg.name = ['joint1','joint3']
-                joint_msg.position = [angle,angle]
-                joint_msg.velocity = [0.0]
-                joint_msg.effort = [0.0]
-
-                for i in range(100):
-                    self.joint_master_pub.publish(joint_msg)
-                    rospy.sleep(0.01)
             else:
                 state = False
 
