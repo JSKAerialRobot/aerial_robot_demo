@@ -118,6 +118,17 @@ class Task2HydrusInterface(HydrusInterface):
             doubles3.name = 'yaw_d'
             doubles3.value = 50.0
             doubles = [doubles1,doubles2,doubles3]
+        elif flag == 'onlyD':
+            doubles1 = DoubleParameter()
+            doubles1.name = 'yaw_p'
+            doubles1.value = 0.0
+            doubles2 = DoubleParameter()
+            doubles2.name = 'yaw_i'
+            doubles2.value = 0.0
+            doubles3 = DoubleParameter()
+            doubles3.name = 'yaw_d'
+            doubles3.value = 50.0
+            doubles = [doubles1,doubles2,doubles3]
         
         for d in doubles:
             set_yaw_free_srv.doubles = [d]
