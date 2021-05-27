@@ -24,7 +24,8 @@ class Task2HydrusInterface(HydrusInterface):
         self.init_y = 0
         self.init_z = 0
     
-        self.ctrl_mode_pub = rospy.Publisher('teleop_command/ctrl_mode', Int8, queue_size=10)
+        self.ctrl_mode_pub = rospy.Publisher('teleop_command/ctrl_mode', Int8, queue_size=30)
+        self.ft_sensor_feedback_switch_pub = rospy.Publisher('ft_sensor_feedback_switch', Int8, queue_size=30)
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -133,6 +134,15 @@ class Task2HydrusInterface(HydrusInterface):
         for d in doubles:
             set_yaw_free_srv.doubles = [d]
             self.set_yaw_free_service(set_yaw_free_srv)
+
+    def ft_sensor_feedback_switch(self, flag):
+        msg = Int8()
+        if flag:
+            msg.data = 1
+        else:
+            msg.data = 0
+
+        self.ft_sensor_feedback_switch_pub.publish(msg)
 
     def add_long_object_to_model(self, action):
         transform = Transform()

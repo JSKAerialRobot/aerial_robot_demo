@@ -14,7 +14,7 @@
   <arg name="estimate_mode"  default= "0" />
   <arg name="worldtype" default="kashiwa" />
   <arg name="recognition" default="true" />
-  <arg name="ft_sensor_feedback" default="true" />
+  <arg name="ft_sensor_feedback" default="false" />
   <arg name="rviz_config_path" default="$(find mbzirc2020_task2_simulation)/config/rviz_config"/>
   <arg name="config_dir" default="$(find mbzirc2020_task2_common)/config/challenge/$(arg worldtype)"/>
   <arg name="object_color" default="red" />
@@ -101,6 +101,7 @@
       <param name="robot_ns" value="$(arg robot_ns)"/> 
       <param name="simulation" value="$(arg simulation)" />
       <param name="outdoor" value="$(arg outdoor)" />
+      <param name="ft_sensor_feedback" value="$(arg ft_sensor_feedback)" />
     </node>
   </group>
 

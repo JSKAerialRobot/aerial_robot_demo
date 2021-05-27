@@ -24,6 +24,7 @@ class Task2State(smach.State):
 
         self.simulation = rospy.get_param('~simulation')
         self.outdoor = rospy.get_param('~outdoor')
+        self.ft_sensor_feedback = rospy.get_param('~ft_sensor_feedback')
 
         self.robot = robot
 
@@ -156,7 +157,10 @@ class FollowerNavigated(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.change_ctrl_mode(mode='vel')
+        if self.ft_sensor_feedback:
+            self.robot.ft_sensor_feedback_switch(flag=True)
+        else:
+            self.robot.change_ctrl_mode(mode='vel')
 
         self.publish_state()
 
@@ -171,7 +175,8 @@ class SetYawFree(Task2State):
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
 
-        self.robot.set_yaw_free(flag=True)
+        if not self.ft_sensor_feedback:
+            self.robot.set_yaw_free(flag=True)
 
         self.publish_state()
 
@@ -190,6 +195,9 @@ class FollowerApproachPlacePosition(Task2State):
 
         while not self.manager_state == self.state:
             rospy.sleep(0.1)
+
+        if self.ft_sensor_feedback:
+            self.robot.ft_sensor_feedback_switch(flag=False)
 
         if self.outdoor:
             baselink_pos = self.robot.getBaselinkPos()[0:2]
