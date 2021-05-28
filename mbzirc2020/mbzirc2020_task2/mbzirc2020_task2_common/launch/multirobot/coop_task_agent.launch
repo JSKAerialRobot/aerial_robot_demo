@@ -7,11 +7,14 @@
   <arg name="real_machine" default="True" />
   <arg name="headless" default="True" />
   <arg name="launch_gazebo" default="False" />
-  <arg name="outdoor" default="true" />
   <arg name="passive_gripper" default="False" />
   <arg name="ring_gripper" default="False" />
   <arg name="ball_joint_gripper" default="False" />
-  <arg name="estimate_mode"  default= "0" />
+  <arg name="outdoor" default="true" />
+  <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
+  <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="True" if="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="False" unless="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa" />
   <arg name="recognition" default="true" />
   <arg name="ft_sensor_feedback" default="false" />
@@ -39,6 +42,7 @@
     <arg name="launch_gazebo" value="$(arg launch_gazebo)"/>
     <arg name="headless" value="$(arg headless)"/>
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="rtk_gps"  value= "$(arg rtk_gps)" />
     <arg name="ball_joint_gripper" value="True"/>
     <arg name="worldtype" value="$(arg worldtype)"/>
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>

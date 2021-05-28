@@ -14,11 +14,14 @@
   <arg name="simulation" default="False" />
   <arg name="real_machine" default="True" />
   <arg name="headless" default="True" />
-  <arg name="estimate_mode" default="0" />
 
   <arg name="skip_pick" default="True" />
 
   <arg name="outdoor" default="True" />
+  <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
+  <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="True" if="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="False" unless="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa_202104" if="$(eval not arg('skip_pick') and arg('outdoor'))" />
   <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(eval arg('skip_pick') and arg('outdoor'))"/>
   <arg name="worldtype" default="kashiwa113_202104_single_long_object" unless="$(arg outdoor)"/>
@@ -65,6 +68,7 @@
     <arg name="launch_gazebo" value="true" />
     <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="rtk_gps"  value= "$(arg rtk_gps)" />
     <arg name="recognition" value="$(arg recognition_leader)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_leader)" />
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
@@ -89,6 +93,7 @@
     <arg name="launch_gazebo" value="false" />
     <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="rtk_gps"  value= "$(arg rtk_gps)" />
     <arg name="recognition" value="$(arg recognition_follower)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback_follower)" />
     <arg name="worldtype" value="$(arg worldtype)" />

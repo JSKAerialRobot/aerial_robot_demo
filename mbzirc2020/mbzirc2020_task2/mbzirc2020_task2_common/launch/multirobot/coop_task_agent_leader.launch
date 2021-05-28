@@ -10,6 +10,8 @@
   <arg name="outdoor" default="true" />
   <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
   <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="True" if="$(arg outdoor)"/>
+  <arg name="rtk_gps" default="False" unless="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa_202104_single_long_object" if="$(arg outdoor)"/>
   <arg name="worldtype" default="kashiwa113_202104_single_long_object" unless="$(arg outdoor)"/>
 
@@ -41,6 +43,7 @@
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
     <arg name="outdoor" value="$(arg outdoor)" />
     <arg name="estimate_mode"  value= "$(arg estimate_mode)" />
+    <arg name="rtk_gps"  value= "$(arg rtk_gps)" />
     <arg name="recognition" value="$(arg recognition)" />
     <arg name="ft_sensor_feedback" value="$(arg ft_sensor_feedback)" />
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
