@@ -115,10 +115,15 @@
     <param name="skip_pick" value="$(arg skip_pick)"/>
   </node>
 
+  <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer"/>
+
+  # rtk_gps
+  <include file="$(find ntrip_ros)/launch/ntrip_ros.launch" if="$(eval arg('real_machine') and not arg('simulation') and arg('rtk_gps'))">
+    <arg name="ip" value="192.168.1.141" />
+  </include>
+
   # if real_machine,  in each machine:
   # $ rossetlaptop
-  # $ roslaunch mbzirc2020_task2_common coop_task_agent.launch in each machine.
-
-  <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer"/>
+  # $ roslaunch mbzirc2020_task2_common coop_task_agent_(leader/follower).launch in each machine.
 
 </launch>
