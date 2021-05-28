@@ -9,6 +9,7 @@
   <arg name="passive_gripper" default="False"/>
   <arg name="ring_gripper" default="False"/>
   <arg name="ball_joint_gripper" default="False"/>
+  <arg name="rtk_gps" default="False"/>
   <arg name="robot_id" default="" />
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
@@ -34,7 +35,8 @@
     <arg name="task" value="2" />
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
-    <arg name="model_suffix" value="_ball_joint_gripper" if="$(arg ball_joint_gripper)"/>
+    <arg name="model_suffix" value="_ball_joint_gripper" if="$(eval arg('ball_joint_gripper') and not arg('rtk_gps'))"/>
+    <arg name="model_suffix" value="_ball_joint_gripper_rtk_gps" if="$(eval arg('ball_joint_gripper') and arg('rtk_gps'))"/> # work around to add suffix of rtk_gps
     <arg name="spawn_x" value="$(arg spawn_x)"/>
     <arg name="spawn_y" value="$(arg spawn_y)"/>
     <arg name="spawn_z" value="$(arg spawn_z)"/>
@@ -73,5 +75,17 @@
   <node pkg="mbzirc2020_task2_common" type="base_footprint_tf_publisher.py" name="base_footprint_tf_publisher" ns="$(arg robot_ns)">
     <param name="robot_ns" value="$(arg robot_ns)"/>
   </node>
+
+  ######## RTK GPS without NTRIP Client #############
+  <group if="$(eval arg('real_machine') and not arg('simulation') and arg('rtk_gps'))">
+    <group ns="$(arg robot_ns)">
+        <include file="$(find ublox_gps)/launch/ublox_device.launch" >
+          <arg name="param_file_name" value="holybro_m8p" />
+          <arg name="node_name" value="rtk_gps" />
+        </include>
+	<rosparam file="$(find aerial_robot_base)/config/sensors/gps/ublox_rtk_m8p.yaml" command="load" />
+    </group>
+    <!-- please launch `roslaunch ntrip_ros ntrip_ros.launch ip:=192.168.1.141` -->
+  </group>
 
 </launch>
