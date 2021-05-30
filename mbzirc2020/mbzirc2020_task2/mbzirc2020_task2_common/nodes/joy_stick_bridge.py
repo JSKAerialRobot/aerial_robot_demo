@@ -76,11 +76,11 @@ class JoyStickBridge:
                 self.joint_slave_pub.publish(joint_msg)
                 rospy.sleep(0.01)
 
-            msg = Int8()
-            msg.data = 0
+            ctrl_msg = Int8()
+            ctrl_msg.data = 0
             for i in range(5):
-                self.leader_ctrl_mode_pub.publish(msg)
-                self.follower_ctrl_mode_pub.publish(msg)
+                self.leader_ctrl_mode_pub.publish(ctrl_msg)
+                self.follower_ctrl_mode_pub.publish(ctrl_msg)
                 rospy.sleep(0.1)
 
         #grasping
