@@ -16,8 +16,10 @@
   <arg name="headless" default="True" />
 
   <arg name="skip_pick" default="True" />
+  <param name="skip_pick" value="$(arg skip_pick)" />
 
   <arg name="outdoor" default="True" />
+  <param name="outdoor" value="$(arg outdoor)" />
   <arg name="estimate_mode" default="0" if="$(arg outdoor)"/>
   <arg name="estimate_mode" default="1" unless="$(arg outdoor)"/>
   <arg name="rtk_gps" default="True" if="$(arg outdoor)"/>
@@ -112,7 +114,6 @@
         output="screen">
     <param name="robot_ns_leader" value="$(arg robot_ns_leader)"/>
     <param name="robot_ns_follower" value="$(arg robot_ns_follower)"/>
-    <param name="skip_pick" value="$(arg skip_pick)"/>
   </node>
 
   <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer"/>

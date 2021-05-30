@@ -21,8 +21,10 @@ class Task2State(smach.State):
 
         self.manager_state = ""
 
-        self.simulation = rospy.get_param('~simulation')
-        self.outdoor = rospy.get_param('~outdoor')
+        self.simulation = rospy.get_param('/simulation')
+        self.outdoor = rospy.get_param('/outdoor')
+        self.skip_pick = rospy.get_param('/skip_pick')
+
 
         self.robot = robot
 
@@ -39,7 +41,7 @@ class Task2State(smach.State):
 
 class Start(Task2State):
     def __init__(self, robot):
-        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['skip_pick', 'entire_task'])
 
     def execute(self, userdata):
 
@@ -47,6 +49,61 @@ class Start(Task2State):
             rospy.sleep(0.1)
 
         self.robot.saveInitialPosition()
+
+        self.publish_state()
+
+        if self.skip_pick:
+            return 'skip_pick'
+
+        return 'entire_task'
+
+class LeaderTakeoff(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderApproachPickArea(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderAdjustPickPosition(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
+
+        self.publish_state()
+
+        return 'succeeded'
+
+class LeaderLanding(Task2State):
+    def __init__(self, robot):
+        Task2State.__init__(self, state_name=self.__class__.__name__, robot=robot, outcomes=['succeeded'])
+
+    def execute(self, userdata):
+
+        while not self.manager_state == self.state:
+            rospy.sleep(0.1)
 
         self.publish_state()
 
@@ -405,6 +462,19 @@ def main():
 
     with sm_top:
         smach.StateMachine.add('Start', Start(hydrus),
+                               transitions={'entire_task':'LeaderTakeoff',
+                                            'skip_pick':'Takeoff'})
+
+        smach.StateMachine.add('LeaderTakeoff', LeaderTakeoff(hydrus),
+                               transitions={'succeeded':'LeaderApproachPickArea'})
+
+        smach.StateMachine.add('LeaderApproachPickArea', LeaderApproachPickArea(hydrus),
+                               transitions={'succeeded':'LeaderAdjustPickPosition'})
+
+        smach.StateMachine.add('LeaderAdjustPickPosition', LeaderAdjustPickPosition(hydrus),
+                               transitions={'succeeded':'LeaderLanding'})
+
+        smach.StateMachine.add('LeaderLanding', LeaderLanding(hydrus),
                                transitions={'succeeded':'Grasp'})
 
         smach.StateMachine.add('Grasp', Grasp(hydrus),
