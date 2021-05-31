@@ -44,7 +44,7 @@
     <rosparam file="$(arg config_path)/RobotModel.yaml" command="load" />
 
     ###########  Motor Config  ###########
-    <rosparam file="$(find mbzirc2020_common)/config/MotorInfo.yaml" command="load" />
+    <rosparam file="$(find mbzirc2020_task2_common)/config/MotorInfo.yaml" command="load" />
 
     ###########  Servo Config  ###########
     <rosparam file="$(find mbzirc2020_common)/config/Servo.yaml" command="load" />
