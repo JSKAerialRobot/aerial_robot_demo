@@ -8,8 +8,8 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="passive_gripper" default="False"/>
   <arg name="ring_gripper" default="False"/>
-  <arg name="ball_joint_gripper" default="False"/>
-  <arg name="rtk_gps" default="False"/>
+  <arg name="ball_joint_gripper" default="True"/>
+  <arg name="rtk_gps" default="True"/>
   <arg name="robot_id" default="" />
   <arg name="worldtype" default="default" />
   <arg name="headless" default="True" />
@@ -20,7 +20,7 @@
   <arg name="spawn_yaw" default="0.0"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
   <arg name="launch_gazebo" default="True" />
-  <arg name="battery_type" default="0"/>
+  <arg name="battery_type" default="1"/>
 
   <param name="/simulation" value="$(arg simulation)"/>
 
