@@ -90,7 +90,7 @@
       <limit effort="10.0" lower="0" upper="0" velocity="0.5"/>
       <parent link="link2"/>
       <child link="gps"/>
-      <origin xyz="${link_length/2 + 0.1925} 0.0 0.152" rpy="0 0 0"/>
+      <origin xyz="0.600 -0.0025 0.1195" rpy="0 0 0"/>
       <axis xyz="0 0 1"/>
     </joint>
 

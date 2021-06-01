@@ -1,4 +1,4 @@
 <launch>
   <arg name="robot_ns" default="hydrus" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="gps_tf_broadcaster" args="0.4925 0.0 0.152 0 0 0 1 $(arg robot_ns)/link2 $(arg robot_ns)/gps" ns="$(arg robot_ns)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="gps_tf_broadcaster" args="0.6 -0.0025 0.1195 0 0 0 1 $(arg robot_ns)/link2 $(arg robot_ns)/gps" ns="$(arg robot_ns)" />
 </launch>
