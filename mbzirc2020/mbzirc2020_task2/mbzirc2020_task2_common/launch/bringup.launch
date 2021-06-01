@@ -79,7 +79,7 @@
   </node>
 
   ######## RTK GPS without NTRIP Client #############
-  <group if="$(eval arg('real_machine') and not arg('simulation') and arg('rtk_gps'))">
+  <group if="$(eval arg('real_machine') and not arg('simulation') and arg('rtk_gps') and arg('estimate_mode') == 0)">
     <group ns="$(arg robot_ns)">
         <include file="$(find ublox_gps)/launch/ublox_device.launch" >
           <arg name="param_file_name" value="holybro_m8p" />
