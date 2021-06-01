@@ -7,7 +7,7 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1 prop_15inch:=1" >
+  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1 prop_15inch:=1 rtk_gps:=1" >
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
       <xacro:hydrus_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
@@ -106,6 +106,32 @@
       </inertial>
     </xacro:extra_module>
     <!-- end: gps -->
+
+    ## RTK GPS
+    <xacro:if value="$(arg rtk_gps)">
+      <xacro:extra_module name = "rtk_gps" parent = "link2" visible = "1"
+                          model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/sensor/rtk_gps_module.dae">
+        <origin xyz="0.600 0.558 0.175" rpy="0 0 0"/>
+        <inertial>
+          <origin xyz="-0.00270381 0.0 -0.03990802" rpy="0 0 0"/>
+          <mass value="0.07278032"/> <!-- plus center mounting bar 0.026 Kg -->
+          <inertia
+              ixx="0.00018585" iyy="0.00018992" izz="0.00002352"
+              ixy="0.0" ixz="-0.00000110"  iyz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+      <xacro:extra_module name = "rtkgps_usb_cable" parent = "rtk_gps" visible = "0" >
+        <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+        <inertial>
+          <mass value = "0.017" />
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <inertia
+              ixx="0.00001" ixy="0.00001" ixz="0.00001"
+              iyy="0.0" iyz="0.0"
+              izz="0.0"/>
+        </inertial>
+      </xacro:extra_module>
+    </xacro:if>
 
     <!-- 2.3 downwards rs-t265 (VIO) -->
     <xacro:if value="${downward_vio == 1}">
