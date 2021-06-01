@@ -18,15 +18,16 @@
           <arg name="port" value="/dev/flight_controller" />
         </include>
 
-        <include file="$(find realsense2_camera)/launch/rs_t265.launch">
-          <arg name="camera" value="realsense1"/>
-          <arg name="tf_prefix" value="$(arg robot_ns)/realsense1"/>
-          <arg name="publish_odom_tf" value="false"/>
-        </include>
+        # realsense T265 purged
+        <!-- <include file="$(find realsense2_camera)/launch/rs_t265.launch"> -->
+        <!--   <arg name="camera" value="realsense1"/> -->
+        <!--   <arg name="tf_prefix" value="$(arg robot_ns)/realsense1"/> -->
+        <!--   <arg name="publish_odom_tf" value="false"/> -->
+        <!-- </include> -->
 
-        <node pkg="topic_tools" type="throttle" name="t265_throttle" args="messages realsense1/odom/sample 80.0 realsense1/odom/throttle">
-          <param name="unreliable" value="true"/>
-        </node>
+        <!-- <node pkg="topic_tools" type="throttle" name="t265_throttle" args="messages realsense1/odom/sample 80.0 realsense1/odom/throttle"> -->
+        <!--   <param name="unreliable" value="true"/> -->
+        <!-- </node> -->
 
         <!-- mocap -->
         <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" if="$(eval arg('estimate_mode') != 0)">
