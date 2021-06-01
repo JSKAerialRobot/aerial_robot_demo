@@ -95,7 +95,12 @@
             <mesh filename="package://mbzirc2020_common/urdf/mesh/link/fix_joint_link${self}.dae"/> <!-- please create the model withoug joint module -->
           </xacro:if>
           <xacro:unless value="${tilt_angle == 0}">
-            <mesh filename="package://mbzirc2020_common/urdf/mesh/link/tilt_${tilt_angle}deg_fix_joint_link${self}.dae"/>
+            <xacro:if value="${prop_15inch == 1}">
+              <mesh filename="package://mbzirc2020_common/urdf/mesh/link/tilt_${tilt_angle}deg_15inch_fix_joint_link${self}.dae"/>
+            </xacro:if>
+            <xacro:unless value="${prop_15inch == 1}">
+              <mesh filename="package://mbzirc2020_common/urdf/mesh/link/tilt_${tilt_angle}deg_fix_joint_link${self}.dae"/>
+            </xacro:unless>
           </xacro:unless>
         </geometry>
 
