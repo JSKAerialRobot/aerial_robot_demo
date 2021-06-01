@@ -5,6 +5,7 @@
   <!-- base kinematics model -->
   <xacro:include filename="$(find mbzirc2020_task2_common)/robots/default.urdf.xacro" />
   <xacro:arg name="default_battery" default="0"/>
+  <xacro:arg name="rtk_gps" default="True"/>
   <xacro:property name="modified_leg_collision_model_height" value="0.1715"/>
   <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "0" default_battery = "$(arg default_battery)" with_leg="0" />
 
@@ -572,6 +573,31 @@
     </collision>
   </link>
 
+
+  ## RTK GPS
+  <xacro:if value="$(arg rtk_gps)">
+    <xacro:extra_module name = "rtk_gps" parent = "link2" visible = "0" >
+      <origin xyz="${link_length / 2 + 0.0605} 0.2395 0.0502" rpy="0 0 ${pi * 3/4}"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${0.047 + 0.013}"/> <!-- plus center mounting bar 0.026 Kg -->
+      <inertia
+          ixx="0.0" iyy="0.0" izz="0.0"
+          ixy="0.0" ixz="0.0"  iyz="0.0"/>
+    </inertial>
+    </xacro:extra_module>
+    <xacro:extra_module name = "rtkgps_usb_cable" parent = "rtk_gps" visible = "0" >
+      <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+      <inertial>
+        <mass value = "0.017" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia
+            ixx="0.0" ixy="0.0" ixz="0.0"
+            iyy="0.0" iyz="0.0"
+            izz="0.0"/>
+      </inertial>
+    </xacro:extra_module>
+  </xacro:if>
 
   ## transmission
 

@@ -7,7 +7,7 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1">
+  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1 prop_15inch:=1" >
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
       <xacro:hydrus_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
@@ -16,10 +16,10 @@
       <xacro:hydrus_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
     </xacro:if>
     <xacro:unless value="${tilt_angle == 0}">
-      <xacro:hydrus_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}" />
-      <xacro:hydrus_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" />
-      <xacro:hydrus_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" />
-      <xacro:hydrus_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}"/>
+      <xacro:hydrus_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}" prop_15inch="${prop_15inch}"/>
+      <xacro:hydrus_fixed_link self="2" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" prop_15inch="${prop_15inch}"/>
+      <xacro:hydrus_fixed_link self="3" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_angle = "${tilt_angle}" prop_15inch="${prop_15inch}"/>
+      <xacro:hydrus_link links="4" self="4" rotor_direction="1"  with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="1" tilt_angle="${tilt_angle}" prop_15inch="${prop_15inch}"/>
     </xacro:unless>
 
     <!-- onboard -->

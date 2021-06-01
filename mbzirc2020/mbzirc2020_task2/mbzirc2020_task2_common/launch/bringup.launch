@@ -20,6 +20,7 @@
   <arg name="spawn_yaw" default="0.0"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
   <arg name="launch_gazebo" default="True" />
+  <arg name="battery_type" default="0"/>
 
   <param name="/simulation" value="$(arg simulation)"/>
 
@@ -35,8 +36,7 @@
     <arg name="task" value="2" />
     <arg name="model_suffix" value="_passive_gripper" if="$(arg passive_gripper)"/>
     <arg name="model_suffix" value="_ring_gripper" if="$(arg ring_gripper)"/>
-    <arg name="model_suffix" value="_ball_joint_gripper" if="$(eval arg('ball_joint_gripper') and not arg('rtk_gps'))"/>
-    <arg name="model_suffix" value="_ball_joint_gripper_rtk_gps" if="$(eval arg('ball_joint_gripper') and arg('rtk_gps'))"/> # work around to add suffix of rtk_gps
+    <arg name="model_suffix" value="_ball_joint_gripper"/>
     <arg name="spawn_x" value="$(arg spawn_x)"/>
     <arg name="spawn_y" value="$(arg spawn_y)"/>
     <arg name="spawn_z" value="$(arg spawn_z)"/>
@@ -44,6 +44,8 @@
     <arg name="rviz_config_path" value="$(arg rviz_config_path)"/>
     <arg name="robot_id" value="$(arg robot_id)" />
     <arg name="launch_gazebo" value="$(arg launch_gazebo)" />
+    <arg name="battery_type" value="$(arg battery_type)"/>
+    <arg name="rtk_gps" value="$(arg rtk_gps)"/>
   </include>
 
   ########## overwrite Servo.yaml ###########

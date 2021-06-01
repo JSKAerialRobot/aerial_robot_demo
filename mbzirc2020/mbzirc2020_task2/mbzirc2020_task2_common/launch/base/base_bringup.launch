@@ -19,6 +19,8 @@
   <arg name="config_path" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/config/$(arg model_suffix)"/>
   <arg name="rviz_config_path" default="$(find hydrus)/config/rviz_config"/>
   <arg name="robot_ns" value="hydrus$(arg robot_id)" />
+  <arg name="battery_type" default="0"/>
+  <arg name="rtk_gps" default="true"/>
 
   ###########  Sensors  ###########
   <include file="$(find mbzirc2020_task2_common)/launch/base/base_sensors.launch" >
@@ -77,7 +79,7 @@
     <arg name="headless" value="$(arg headless)" />
     <arg name="robot_model" value="$(find mbzirc2020_common)/../mbzirc2020_task$(arg task)/mbzirc2020_task$(arg task)_common/robots/hydrus$(arg model_suffix).$(arg description_mode).xacro"/>
     <arg name="robot_ns" value="$(arg robot_ns)" />
-    <arg name="model_options" value="horizontal_vio:=$(arg horizontal_vio)" />
+    <arg name="model_options" value="default_battery:=$(arg battery_type) rtk_gps:=$(arg rtk_gps)" />
     <arg name="rviz_config" value="$(arg rviz_config_path)"/>
     <arg name="rviz_init_pose" value="$(find mbzirc2020_common)/config/RvizInit.yaml" />
     <arg name="need_joint_state" value="false" if ="$(eval arg('simulation') or arg('real_machine'))"/>
