@@ -15,10 +15,10 @@ controller:
     i_gain: 1.55
     d_gain: 3.4
     limit_err_p: 1.0
-    limit_sum: 16.5
-    limit_p: 16.5
-    limit_i: 16.5
-    limit_d: 16.5
+    limit_sum: 20.0
+    limit_p: 20.0
+    limit_i: 20.0
+    limit_d: 20.0
     landing_err_z: -0.55
 
   yaw:
