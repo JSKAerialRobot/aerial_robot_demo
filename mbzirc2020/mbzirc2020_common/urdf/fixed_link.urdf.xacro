@@ -2,7 +2,7 @@
 <robot
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus_fixed_link" >
 
-  <xacro:macro name="hydrus_fixed_link" params="self rotor_direction with_battery:=1 with_leg:=1 tilt_angle:=0">
+  <xacro:macro name="hydrus_fixed_link" params="self rotor_direction with_battery:=1 with_leg:=1 tilt_angle:=0 prop_15inch:=0">
 
     <!-- link -->
     <link name="link${self}">
@@ -86,7 +86,12 @@
       <limit effort="100.0" lower="0" upper="${max_force}" velocity="0.5"/> <!-- force range -->
       <parent link="link${self}"/>
       <child link="thrust${self}"/>
-      <origin rpy="0 ${-rotor_direction * tilt_angle * pi / 180.0} 0" xyz="${link_length* 0.5} 0 0.045"/>
+      <xacro:if value="${prop_15inch == 1}">
+        <origin rpy="0 ${-rotor_direction * tilt_angle * pi / 180.0} 0" xyz="${link_length* 0.5 + 0.01944 * rotor_direction} 0 0.05395"/>
+      </xacro:if>
+      <xacro:unless value="${prop_15inch == 1}">
+        <origin rpy="0 ${-rotor_direction * tilt_angle * pi / 180.0} 0" xyz="${link_length* 0.5} 0 0.045"/>
+      </xacro:unless>
       <axis xyz="0 0 ${rotor_direction}"/>
     </joint>
 
