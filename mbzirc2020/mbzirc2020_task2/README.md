@@ -87,3 +87,19 @@ $ rosrun mbzirc2020_task2_common play.sh [robot_id (1 or 2)] [rosbag file]
 ```
 
 - Then press space key to play rosbag.
+
+## Record rosbag
+
+### single robot
+
+```
+$rosrun mbzirc2020_task2_common record.sh
+```
+
+### multiple robot
+
+You should use '-n' option to specify the robot id.
+
+```
+$rosrun mbzirc2020_task2_common record.sh -n 1
+```
