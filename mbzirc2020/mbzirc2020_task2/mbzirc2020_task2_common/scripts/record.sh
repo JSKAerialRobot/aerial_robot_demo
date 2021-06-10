@@ -1,9 +1,9 @@
 #!/bin/sh
 
-while getopts e: OPT
+while getopts n: OPT
 do
   case $OPT in
-    e) id=$OPTARG
+    n) id=$OPTARG
       ;;
   esac
 done
