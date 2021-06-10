@@ -64,6 +64,7 @@ sensor_plugin:
     vo_sub_topic_name: realsense1/odom/throttle
   plane_detection:
     estimate_mode: 1 # 1<<0
+    time_sync: true
     sensor_frame: rs_d435_color_optical_frame
     eps_angle: 0.2
     distance_diff_thresh: 0.8
