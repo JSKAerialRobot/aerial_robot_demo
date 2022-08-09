@@ -3,6 +3,7 @@
 
   <arg name="real_machine" default="false" />
   <arg name="simulation" default="false" />
+  <arg name="peripheral_sensors" default="true" />
   <arg name="horizontal_vio" default="false" />
   <arg name="robot_ns" default="hydrus" />
   <arg name="robot_id" default="1"/>
@@ -13,13 +14,19 @@
     <group if="$(arg real_machine)">
       <group unless="$(arg simulation)">
         <!-- fc & IMU & GPS -->
-        <include file="$(find spinal_ros_bridge)/launch/serial.launch" >
-          <arg name="baud" value="921600" />
-          <arg name="port" value="/dev/flight_controller" />
+        <include file="$(find spinal)/launch/bridge.launch" >
+          <arg name="mode" value="serial" />
+          <arg name="serial_port" value="/dev/flight_controller" />
+          <arg name="serial_baud" value="921600" />
+        </include>
+
+        <!-- mocap -->
+        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" if="$(eval arg('estimate_mode') != 0)">
+          <arg name="robot_id" value="$(arg robot_id)" />
         </include>
 
         # realsense T265 purged
-        <!-- <include file="$(find realsense2_camera)/launch/rs_t265.launch"> -->
+        <!-- <include file="$(find realsense2_camera)/launch/rs_t265.launch" if="$(arg peripheral_sensors)"> -->
         <!--   <arg name="camera" value="realsense1"/> -->
         <!--   <arg name="tf_prefix" value="$(arg robot_ns)/realsense1"/> -->
         <!--   <arg name="publish_odom_tf" value="false"/> -->
@@ -29,13 +36,8 @@
         <!--   <param name="unreliable" value="true"/> -->
         <!-- </node> -->
 
-        <!-- mocap -->
-        <include file="$(find aerial_robot_base)/launch/external_module/mocap.launch" if="$(eval arg('estimate_mode') != 0)">
-          <arg name="robot_id" value="$(arg robot_id)" />
-        </include>
-
         <!-- leddar one -->
-        <include file="$(find leddar_one)/launch/leddar_one.launch" >
+        <include file="$(find leddar_one)/launch/leddar_one.launch" if="$(arg peripheral_sensors)">
           <arg name="port" value="/dev/leddarone" />
         </include>
 

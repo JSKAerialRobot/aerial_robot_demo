@@ -5,7 +5,7 @@
   <!-- base kinematics model -->
   <xacro:arg name="horizontal_vio" default="false" />
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.urdf.xacro" />
-  <xacro:robot_model tilt_angle = "10" downward_vio = "0" horizontal_vio = "$(arg horizontal_vio)" default_battery = "0"  />
+  <xacro:robot_model tilt_angle = "10" default_battery = "0" downward_vio = "0" horizontal_vio = "$(arg horizontal_vio)" />
 
   <!-- special battery arrangement -->
   <xacro:extra_module name = "bat1" parent = "link1" visible = "1"

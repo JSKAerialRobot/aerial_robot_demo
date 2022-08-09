@@ -3,9 +3,12 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro" name="hydrus" >
 
   <xacro:arg name="robot_name" default="hydrus" />
+  <xacro:arg name="sensors" default="True"/>
 
   <!-- base robot model -->
-  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_ball_joint_gripper.urdf.xacro" />
+  <xacro:include filename="$(find mbzirc2020_task2_common)/robots/hydrus_ball_joint_gripper.urdf.xacro" >
+    <sensors>$(arg sensors)</sensors>
+  </xacro:include>
 
   <!-- gazebo plugin for sensors -->
   <xacro:include filename="$(find mbzirc2020_common)/robots/default.gazebo.xacro" />

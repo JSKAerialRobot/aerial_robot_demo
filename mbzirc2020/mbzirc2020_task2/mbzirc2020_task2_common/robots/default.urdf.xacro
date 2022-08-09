@@ -7,7 +7,7 @@
   <xacro:include filename="$(find hydrus)/urdf/link.urdf.xacro" />
   <xacro:include filename="$(find mbzirc2020_common)/urdf/fixed_link.urdf.xacro" />
 
-  <xacro:macro name="robot_model" params="tilt_angle:=0 downward_vio:=1 horizontal_vio:=0 default_battery:=1 with_leg:=1 prop_15inch:=1 rtk_gps:=1" >
+  <xacro:macro name="robot_model" params="tilt_angle:=0 default_battery:=1 with_leg:=1 prop_15inch:=1 sensors:=1 downward_vio:=1 horizontal_vio:=0 rtk_gps:=1" >
 
     <xacro:if value="${tilt_angle == 0}"> <!--no tilt angle-->
       <xacro:hydrus_link links="4" self="1" rotor_direction="-1" with_battery = "${default_battery}" with_leg = "${with_leg}" tilt_mode="0" />
@@ -55,117 +55,108 @@
     <!-- end: processor: neuron -->
 
     <!-- 2.  sensor -->
-    <!-- 2.1 leddar one -->
-    <xacro:extra_module name = "leddarone" parent = "link2" visible = "1"
-                        model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/ledder_one_fixed_joint_unit.dae">
-      <origin xyz="${link_length/2 + 0.31814} 0.05614 -0.022" rpy="${pi} 0 0"/>
-      <inertial>
-        <origin xyz="-0.008 0.0 0.0" rpy="0 0 0"/>
-        <mass value="0.02"/>
-        <inertia
-            ixx="0.0" iyy="0.0" izz="0.0"
-            ixy="0.0" ixz="0.0" iyz="0.0"/>
-      </inertial>
-    </xacro:extra_module>
-    <!-- end: leddar one -->
-
-    <!-- 2.2 gps -->
-    <link name="gps">
-      <inertial>
-        <origin xyz="0.000000 0.000000 -0.013" rpy="0 0 0"/>
-        <mass value="0.042"/>
-        <inertia
-            ixx="0.00006" iyy="0.00006" izz="0.000007"
-            ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
-      </inertial>
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://hydrus/urdf/mesh/sensor/gps_ublox_m8n.dae"/>
-        </geometry>
-      </visual>
-    </link>
-
-    <joint name="link22gps" type="revolute">
-      <limit effort="10.0" lower="0" upper="0" velocity="0.5"/>
-      <parent link="link2"/>
-      <child link="gps"/>
-      <origin xyz="0.600 -0.0025 0.1195" rpy="0 0 0"/>
-      <axis xyz="0 0 1"/>
-    </joint>
-
-    <xacro:extra_module name = "magnet" parent = "gps">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertial>
-        <mass value = "0.00001" />
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia
-            ixx="0.000001" ixy="0.0" ixz="0.0"
-            iyy="0.000001" iyz="0.0"
-            izz="0.000002"/>
-      </inertial>
-    </xacro:extra_module>
-    <!-- end: gps -->
-
-    ## RTK GPS
-    <xacro:if value="$(arg rtk_gps)">
-      <xacro:extra_module name = "rtk_gps" parent = "link2" visible = "1"
-                          model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/sensor/rtk_gps_module.dae">
-        <origin xyz="0.600 0.558 0.175" rpy="0 0 0"/>
+    <xacro:if value="$(arg sensors)">
+      <!-- 2.1 leddar one -->
+      <xacro:extra_module name = "leddarone" parent = "link2" visible = "1"
+                          model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/ledder_one_fixed_joint_unit.dae">
+        <origin xyz="${link_length/2 + 0.31814} 0.05614 -0.022" rpy="${pi} 0 0"/>
         <inertial>
-          <origin xyz="-0.00270381 0.0 -0.03990802" rpy="0 0 0"/>
-          <mass value="0.07278032"/> <!-- plus center mounting bar 0.026 Kg -->
+          <origin xyz="-0.008 0.0 0.0" rpy="0 0 0"/>
+          <mass value="0.02"/>
           <inertia
-              ixx="0.00018585" iyy="0.00018992" izz="0.00002352"
-              ixy="0.0" ixz="-0.00000110"  iyz="0.0"/>
+              ixx="0.0" iyy="0.0" izz="0.0"
+              ixy="0.0" ixz="0.0" iyz="0.0"/>
         </inertial>
       </xacro:extra_module>
-      <xacro:extra_module name = "rtkgps_usb_cable" parent = "rtk_gps" visible = "0" >
-        <origin xyz="-0.13 0 0 " rpy="0 0 0"/>
+      <!-- end: leddar one -->
+
+      <!-- 2.2 gps -->
+      <xacro:extra_module name = "gps" parent = "link2"
+                          visible = "1"
+                          model_url = "package://hydrus/urdf/mesh/sensor/gps_ublox_m8n.dae">
+        <origin xyz="0.600 -0.0025 0.1195" rpy="0 0 0"/>
         <inertial>
-          <mass value = "0.017" />
+          <origin xyz="0.000000 0.000000 -0.013" rpy="0 0 0"/>
+          <mass value="0.042"/>
+          <inertia
+              ixx="0.00006" iyy="0.00006" izz="0.000007"
+              ixy="0.000000" ixz="0.000000" iyz="0.000000"/>
+        </inertial>
+      </xacro:extra_module>
+
+      <xacro:extra_module name = "magnet" parent = "gps">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertial>
+          <mass value = "0.00001" />
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia
-              ixx="0.00001" ixy="0.00001" ixz="0.00001"
-              iyy="0.0" iyz="0.0"
-              izz="0.0"/>
+              ixx="0.000001" ixy="0.0" ixz="0.0"
+              iyy="0.000001" iyz="0.0"
+              izz="0.000002"/>
         </inertial>
       </xacro:extra_module>
-    </xacro:if>
+      <!-- end: gps -->
 
-    <!-- 2.3 downwards rs-t265 (VIO) -->
-    <xacro:if value="${downward_vio == 1}">
-      <xacro:extra_module name = "realsense1_pose_frame" parent = "link2" visible = "1"
-                          model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/downward_realsense_unit.STL">
-	<origin xyz="${link_length/2 + 0.127} 0.0 -0.022" rpy="0 ${pi/2} ${pi/2}"/>
-	<inertial>
-          <mass value = "0.065" /> <!-- sensor + usb-cable -->
-          <origin xyz="-0.009 -0.01 0" rpy="0 0 0"/>
-          <inertia
-              ixx="0.0" ixy="0.0" ixz="0.0"
-              iyy="0.0" iyz="0.0"
-              izz="0.0"/>
-	</inertial>
-      </xacro:extra_module>
-    </xacro:if>
-    <!-- end: rs-5265 -->
-
-    <!-- 2.4 horizontal rs-t265 (option VIO) -->
-    <xacro:if value="${horizontal_vio == 1}">
-        <xacro:extra_module name = "realsense2_pose_frame" parent = "link2" visible = "1"
-        model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/center_leg_rs_t265_unit.STL">
-        <origin xyz="${link_length/2 + 0.3281} -0.00114 -0.04" rpy="0 0 ${-pi/4}"/>
-        <inertial>
-        <mass value = "0.073" />
-        <origin xyz="-0.01 -0.007 0" rpy="0 0 0"/>
-        <inertia
-        ixx="0.0" ixy="0.0" ixz="0.0"
-        iyy="0.0" iyz="0.0"
-        izz="0.0"/>
-        </inertial>
+      ## RTK GPS
+      <xacro:if value="$(arg rtk_gps)">
+        <xacro:extra_module name = "rtk_gps" parent = "link3" visible = "1"
+                            model_url = "package://mbzirc2020_task2_common/urdf/mesh/modules/sensor/rtk_gps_module.dae">
+          <origin xyz="0.558 0 0.175" rpy="0 0 0"/>
+          <inertial>
+            <origin xyz="-0.00270381 0.0 -0.03990802" rpy="0 0 0"/>
+            <mass value="0.07278032"/> <!-- plus center mounting bar 0.026 Kg -->
+            <inertia
+                ixx="0.00018585" iyy="0.00018992" izz="0.00002352"
+                ixy="0.0" ixz="-0.00000110"  iyz="0.0"/>
+          </inertial>
         </xacro:extra_module>
+        <xacro:extra_module name = "rtkgps_usb_cable" parent = "link3" visible = "0" >
+          <origin xyz="0.3 0 0 " rpy="0 0 0"/>
+          <inertial>
+            <mass value = "0.017" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia
+                ixx="0.00001" ixy="0.00001" ixz="0.00001"
+                iyy="0.0" iyz="0.0"
+                izz="0.0"/>
+          </inertial>
+        </xacro:extra_module>
+      </xacro:if>
+
+      <!-- 2.3 downwards rs-t265 (VIO) -->
+      <xacro:if value="${downward_vio == 1}">
+        <xacro:extra_module name = "realsense1_pose_frame" parent = "link2" visible = "1"
+                            model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/downward_realsense_unit.STL">
+	  <origin xyz="${link_length/2 + 0.127} 0.0 -0.022" rpy="0 ${pi/2} ${pi/2}"/>
+	  <inertial>
+            <mass value = "0.065" /> <!-- sensor + usb-cable -->
+            <origin xyz="-0.009 -0.01 0" rpy="0 0 0"/>
+            <inertia
+                ixx="0.0" ixy="0.0" ixz="0.0"
+                iyy="0.0" iyz="0.0"
+                izz="0.0"/>
+	  </inertial>
+        </xacro:extra_module>
+      </xacro:if>
+      <!-- end: rs-5265 -->
+
+      <!-- 2.4 horizontal rs-t265 (option VIO) -->
+      <xacro:if value="${horizontal_vio == 1}">
+        <xacro:extra_module name = "realsense2_pose_frame" parent = "link2" visible = "1"
+                            model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/center_leg_rs_t265_unit.STL">
+          <origin xyz="${link_length/2 + 0.3281} -0.00114 -0.04" rpy="0 0 ${-pi/4}"/>
+          <inertial>
+            <mass value = "0.073" />
+            <origin xyz="-0.01 -0.007 0" rpy="0 0 0"/>
+            <inertia
+                ixx="0.0" ixy="0.0" ixz="0.0"
+                iyy="0.0" iyz="0.0"
+                izz="0.0"/>
+          </inertial>
+        </xacro:extra_module>
+      </xacro:if>
+      <!-- end: rs-5265 -->
     </xacro:if>
-    <!-- end: rs-5265 -->
 
   </xacro:macro>
 
