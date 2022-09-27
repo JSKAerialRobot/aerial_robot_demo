@@ -90,7 +90,7 @@
   <!-- 2. Realsense D435 -->
     <!-- TODO: accurate intertia parameters and position -->
   <xacro:extra_module name = "rs_d435_mount" parent = "link2" visible = "1"
-                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit2.STL">
+                      model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit2.dae">
     <origin xyz="${link_length / 2} 0 0" rpy="0 0 0"/>
     <inertial>
       <mass value = "0.0" />
@@ -118,7 +118,7 @@
     </inertial>
   </link>
 
-  <xacro:extra_module name = "rs_d435_unit" parent = "rs_d435_servo" visible = "1" model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit1.STL">
+  <xacro:extra_module name = "rs_d435_unit" parent = "rs_d435_servo" visible = "1" model_url = "package://mbzirc2020_common/urdf/mesh/modules/sensor/rs_d435_unit1.dae">
     <origin xyz="0.05275 0.01005 0" rpy="0 0 ${pi / 2}"/>
     <inertial>
       <mass value = "0.124" /> <!-- includes usb cable, servo, mounts -->
