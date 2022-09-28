@@ -16,4 +16,4 @@ servo_controller:
     controller1:
       name: rs_d435_servo_joint
       angle_sgn: -1
-      id: 0 # yellow
+      id: 2 # yellow, 0,1 are for joints
