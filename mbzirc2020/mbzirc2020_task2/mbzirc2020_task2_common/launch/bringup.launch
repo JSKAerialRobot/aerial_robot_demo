@@ -8,7 +8,7 @@
   <arg name="horizontal_vio" default="False" />
   <arg name="passive_gripper" default="False"/>
   <arg name="ring_gripper" default="False"/>
-  <arg name="ball_joint_gripper" default="True"/>
+  <arg name="ball_joint_gripper" default="False"/>
   <arg name="sensors" default="True"/>
   <arg name="rtk_gps" default="True"/>
   <arg name="robot_id" default="" />

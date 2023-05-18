@@ -408,78 +408,78 @@ class Grasp(Task2State):
 
         #visual servoing
         r = rospy.Rate(10)
-        while not rospy.is_shutdown():
-            r.sleep()
-            if self.object_bbox is not None:
+        # while not rospy.is_shutdown():
+        #     r.sleep()
+        #     if self.object_bbox is not None:
 
-                #find most nearest object
-                min_distance = 1e8
-                target_object_bbox = None
+        #         #find most nearest object
+        #         min_distance = 1e8
+        #         target_object_bbox = None
 
-                try:
-                    cam_trans = self.robot.getTF(self.object_bbox.header.frame_id, time=self.object_bbox.header.stamp)
-                    cam_trans = ros_numpy.numpify(cam_trans.transform)
-                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-                    rospy.logerr(self.__class__.__name__ + ": cannot find camera tf")
-                    return 'failed'
+        #         try:
+        #             cam_trans = self.robot.getTF(self.object_bbox.header.frame_id, time=self.object_bbox.header.stamp)
+        #             cam_trans = ros_numpy.numpify(cam_trans.transform)
+        #         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        #             rospy.logerr(self.__class__.__name__ + ": cannot find camera tf")
+        #             return 'failed'
 
-                rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
+        #         rospy.logerr("prev_x: %f, prev_y: %f", prev_object_x, prev_object_y)
 
-                for obj in self.object_bbox.boxes:
-                    object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(obj.pose))
-                    object_global_pos = tft.translation_from_matrix(object_global_coords)
-                    distance = (prev_object_x - object_global_pos[0]) ** 2 + (prev_object_y - object_global_pos[1]) ** 2
-                    rospy.logwarn("%f", distance)
-                    if distance < min_distance:
-                        min_distance = distance
-                        target_object_bbox = obj
+        #         for obj in self.object_bbox.boxes:
+        #             object_global_coords = tft.concatenate_matrices(cam_trans, ros_numpy.numpify(obj.pose))
+        #             object_global_pos = tft.translation_from_matrix(object_global_coords)
+        #             distance = (prev_object_x - object_global_pos[0]) ** 2 + (prev_object_y - object_global_pos[1]) ** 2
+        #             rospy.logwarn("%f", distance)
+        #             if distance < min_distance:
+        #                 min_distance = distance
+        #                 target_object_bbox = obj
 
-                #calc center of object
-                target_object_bbox.pose.orientation.x = 0.0
-                target_object_bbox.pose.orientation.y = 0.0
-                target_object_bbox.pose.orientation.z = 0.0
-                target_object_bbox.pose.orientation.w = 1.0
-                bbox_center_coords = ros_numpy.numpify(target_object_bbox.pose)
-                bbox_center_world_coords = tft.concatenate_matrices(cam_trans, bbox_center_coords)
-                bbox_center_world_pos = tft.translation_from_matrix(bbox_center_world_coords)
-                prev_object_x, prev_object_y = bbox_center_world_pos[0], bbox_center_world_pos[1]
+        #         #calc center of object
+        #         target_object_bbox.pose.orientation.x = 0.0
+        #         target_object_bbox.pose.orientation.y = 0.0
+        #         target_object_bbox.pose.orientation.z = 0.0
+        #         target_object_bbox.pose.orientation.w = 1.0
+        #         bbox_center_coords = ros_numpy.numpify(target_object_bbox.pose)
+        #         bbox_center_world_coords = tft.concatenate_matrices(cam_trans, bbox_center_coords)
+        #         bbox_center_world_pos = tft.translation_from_matrix(bbox_center_world_coords)
+        #         prev_object_x, prev_object_y = bbox_center_world_pos[0], bbox_center_world_pos[1]
 
-                object_center_coords = tft.concatenate_matrices(bbox_center_coords, tft.translation_matrix([-target_object_bbox.dimensions.x / 2 + self.object_length / 2, 0, target_object_bbox.dimensions.z / 2]))
-                object_center_worldcoords = tft.concatenate_matrices(cam_trans, object_center_coords)
-                object_center_msg = PoseStamped()
-                object_center_msg.header.stamp = self.object_bbox.header.stamp
-                object_center_msg.header.frame_id = '/world'
-                object_center_msg.pose = ros_numpy.msgify(Pose, object_center_worldcoords)
-                self.object_center_pub.publish(object_center_msg) #for debug
+        #         object_center_coords = tft.concatenate_matrices(bbox_center_coords, tft.translation_matrix([-target_object_bbox.dimensions.x / 2 + self.object_length / 2, 0, target_object_bbox.dimensions.z / 2]))
+        #         object_center_worldcoords = tft.concatenate_matrices(cam_trans, object_center_coords)
+        #         object_center_msg = PoseStamped()
+        #         object_center_msg.header.stamp = self.object_bbox.header.stamp
+        #         object_center_msg.header.frame_id = '/world'
+        #         object_center_msg.pose = ros_numpy.msgify(Pose, object_center_worldcoords)
+        #         self.object_center_pub.publish(object_center_msg) #for debug
 
-                #set camera angle
-                baselink_worldcoords = ros_numpy.numpify(self.robot.getBaselinkOdom().pose.pose)
-                cam_worldcoords = tft.concatenate_matrices(baselink_worldcoords, baselink2cam_trans)
-                object_coords_in_cam_frame = tft.concatenate_matrices(tft.inverse_matrix(cam_worldcoords), object_center_worldcoords)
-                object_pos_in_cam_frame = tft.translation_from_matrix(object_coords_in_cam_frame)
-                cam_angle = np.arctan2(object_pos_in_cam_frame[2], -object_pos_in_cam_frame[1])
+        #         #set camera angle
+        #         baselink_worldcoords = ros_numpy.numpify(self.robot.getBaselinkOdom().pose.pose)
+        #         cam_worldcoords = tft.concatenate_matrices(baselink_worldcoords, baselink2cam_trans)
+        #         object_coords_in_cam_frame = tft.concatenate_matrices(tft.inverse_matrix(cam_worldcoords), object_center_worldcoords)
+        #         object_pos_in_cam_frame = tft.translation_from_matrix(object_coords_in_cam_frame)
+        #         cam_angle = np.arctan2(object_pos_in_cam_frame[2], -object_pos_in_cam_frame[1])
 
-                #moving average filter
-                self.filter_buffer.append(cam_angle)
-                filtered_cam_angle = sum(self.filter_buffer) / len(self.filter_buffer)
-                if len(self.filter_buffer) >= self.filter_buffer_length:
-                    self.filter_buffer.pop(0)
+        #         #moving average filter
+        #         self.filter_buffer.append(cam_angle)
+        #         filtered_cam_angle = sum(self.filter_buffer) / len(self.filter_buffer)
+        #         if len(self.filter_buffer) >= self.filter_buffer_length:
+        #             self.filter_buffer.pop(0)
 
-                self.robot.setCameraJointAngle(filtered_cam_angle, time=0)
-                #rospy.logwarn("%f", cam_angle)
+        #         self.robot.setCameraJointAngle(filtered_cam_angle, time=0)
+        #         #rospy.logwarn("%f", cam_angle)
 
-                #calc uav target
-                if object2baselink_waypoints:
-                    object2baselink_trans = object2baselink_waypoints.pop(0)
-                    uav_target_coords = tft.concatenate_matrices(object_center_worldcoords, object2baselink_trans)
-                    uav_target_pos = tft.translation_from_matrix(uav_target_coords)
-                    uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
-                    rospy.logwarn("%s: uav target x: %f, y: %f, z: %f, yaw: %f", self.__class__.__name__, uav_target_pos[0], uav_target_pos[1], uav_target_pos[2], uav_target_yaw)
-                    self.robot.goPos('global', uav_target_pos[0:2], uav_target_pos[2], None)
-                else:
-                    break
+        #         #calc uav target
+        #         if object2baselink_waypoints:
+        #             object2baselink_trans = object2baselink_waypoints.pop(0)
+        #             uav_target_coords = tft.concatenate_matrices(object_center_worldcoords, object2baselink_trans)
+        #             uav_target_pos = tft.translation_from_matrix(uav_target_coords)
+        #             uav_target_yaw = tft.euler_from_matrix(uav_target_coords)[2]
+        #             rospy.logwarn("%s: uav target x: %f, y: %f, z: %f, yaw: %f", self.__class__.__name__, uav_target_pos[0], uav_target_pos[1], uav_target_pos[2], uav_target_yaw)
+        #             self.robot.goPos('global', uav_target_pos[0:2], uav_target_pos[2], None)
+        #         else:
+        #             break
 
-                self.object_bbox = None #reset
+        #         self.object_bbox = None #reset
 
 
         rospy.logwarn(self.__class__.__name__ + ": landing")
